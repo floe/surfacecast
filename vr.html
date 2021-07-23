@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <script src="stream.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.2.0/dist/aframe-environment-component.min.js"></script>
+    <script type="text/javascript">
+      // from https://aframe.io/aframe/examples/test/video/
+      AFRAME.registerComponent( "play-on-click", {
+        init:    function()  { this.onClick = this.onClick.bind(this); },
+        play:    function()  { window.addEventListener( "click", this.onClick ); },
+        pause:   function()  { window.removeEventListener( "click", this.onClick); },
+        onClick: function(e) { this.el.getAttribute('material').src.play(); }
+      });
+
+      // Component to change to random color on click.
+      AFRAME.registerComponent("cursor-listener", {
+        init: function() {
+          this.el.addEventListener("click", function(evt) {
+            console.log("foo",evt);
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene play>
+      <a-camera><a-cursor cursor-listener/></a-camera>
+      <a-assets>
+        <video id="stream" autoplay muted playsinline>Your browser does not support video</video>
+        <video id="stream2" autoplay muted playsinline>Your browser does not support video</video>
+      </a-assets>
+      <a-entity laser-controls="hand: left" cursor-listener></a-entity>
+      <a-entity laser-controls="hand: right" cursor-listener></a-entity>
+      <a-plane id="front" position="0 1.1 -0.8" rotation="  0 0 0" width="0.9" height="0.5" play-on-click material="src: #stream"></a-plane>
+      <a-plane id="table" position="0 0.8 -0.5" rotation="-90 0 0" width="0.9" height="0.5" cursor-listener material="src: #stream2"></a-plane>
+      <a-entity environment="preset: tron"></a-entity>
+    </a-scene>
+  </body>
+</html>
