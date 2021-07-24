@@ -24,6 +24,12 @@ response_type = {
     "answer": GstWebRTC.WebRTCSDPType.ANSWER
 }
 
+payload = {
+    96: "front",
+    97: "audio",
+    98: "surface"
+}
+
 # TODO: how to connect specific mixers etc. to each webrtcbin?
 
 class WebRTCPeer:
@@ -34,7 +40,6 @@ class WebRTCPeer:
         self.is_client = is_client
         self.data_channel = None
         self.address = address
-        self.num = 0
 
         self.bin = Gst.parse_bin_from_description(bindesc,False)
         self.bin.set_name("bin_"+address)
@@ -113,11 +118,15 @@ class WebRTCPeer:
     # new pad appears on WebRTCBin element
     def on_pad_added(self, wrb, pad):
 
-        if pad.direction != Gst.PadDirection.SRC:
+        caps = pad.get_current_caps()
+        struct = caps.get_structure(0)
+        res, plnum = struct.get_int("payload")
+
+        if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
         print("New incoming stream, linking to decodebin...")
-        decodebin = new_element("decodebin")
+        decodebin = new_element("decodebin",myname="decodebin_"+payload[plnum])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin) # or self.bin.add(...)?
@@ -126,34 +135,26 @@ class WebRTCPeer:
 
     def on_decodebin_pad(self, decodebin, pad):
 
-        print("Handling new decodebin pad (type: ", end="")
-
         if not pad.has_current_caps():
-            print ("no caps), ignoring.")
+            #print ("no caps), ignoring.")
             return
 
-        caps = pad.get_current_caps()
-        name = caps.to_string()
+        name = decodebin.get_name().split("_")[1]
+        print("Handling new decodebin pad of type: "+name)
 
-        # FIXME: numbering is a bad hack
-        self.num = self.num+1
         # add named ghostpads ("src_front" etc.)
-        ghostpad = Gst.GhostPad.new("src_"+name[0:5]+str(self.num),pad)
+        ghostpad = Gst.GhostPad.new("src_"+name,pad)
+        ghostpad.set_active(True)
         decodebin.parent.add_pad(ghostpad)
 
-        # FIXME could probably be refactored
-        if name.startswith("video"):
-            print("video)...")
-            # TODO: how to differentiate between surface and front? size, probably?
-            tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name[0:5]+str(self.num))
-            add_and_link([ tee, new_element("videoconvert"), new_element("fpsdisplaysink",{"sync":False}) ])
-            ghostpad.link(tee.get_static_pad("sink"))
+        tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
 
-        elif name.startswith("audio"):
-            print("audio)...")
-            tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name[0:5])
+        if name == "front" or name == "surface":
+            add_and_link([ tee, new_element("videoconvert"), new_element("fpsdisplaysink",{"sync":False}) ])
+        elif name == "audio":
             add_and_link([ tee, new_element("audioconvert"), new_element("autoaudiosink",{"sync":False}) ])
-            ghostpad.link(tee.get_static_pad("sink"))
+
+        ghostpad.link(tee.get_static_pad("sink"))
 
         # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
         dump_debug("debug_webrtc_stream")
