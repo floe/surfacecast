@@ -41,24 +41,21 @@ class WebRTCPeer:
         add_and_link([self.bin])
 
         self.wrb = self.bin.get_by_name("webrtcbin")
-        # FIXME hardcoded global source names
-        testsrc = get_by_name("testsource")
-        autest = get_by_name("audiotest")
 
-        # TODO: give client-specific names
         # add ghostpads (proxy-pads) and input-selectors for the converters
         for name in ["surface","front","audio"]:
+
             element = self.bin.get_by_name(name)
             realpad = element.get_static_pad("sink")
             ghostpad = Gst.GhostPad.new("sink_"+name,realpad)
             self.bin.add_pad(ghostpad)
+
             selector = new_element("input-selector",myname="input_"+self.address+"_"+name)
             add_and_link([selector])
             selector.get_static_pad("src").link(ghostpad)
+            # TODO: source name should be configurable
+            link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
 
-        link_request_pads(testsrc,"src_%u",get_by_name("input_"+self.address+"_surface"),"sink_%u")
-        link_request_pads(testsrc,"src_%u",get_by_name("input_"+self.address+"_front"  ),"sink_%u")
-        link_request_pads(autest, "src_%u",get_by_name("input_"+self.address+"_audio"  ),"sink_%u")
         #inputselect.set_property("active-pad", inputselect.get_static_pad("sink_1"))
 
         self.connection.connect("message",self.on_ws_message)
@@ -71,9 +68,6 @@ class WebRTCPeer:
 
         # create the data channel
         self.wrb.emit("create-data-channel", "events", None)
-
-        # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
-        dump_debug("debug_webrtc_added")
 
     # message on WebRTC data channel
     def on_dc_message(self, wrb, message):
@@ -159,6 +153,9 @@ class WebRTCPeer:
             tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name[0:5])
             add_and_link([ tee, new_element("audioconvert"), new_element("autoaudiosink",{"sync":False}) ])
             ghostpad.link(tee.get_static_pad("sink"))
+
+        # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
+        dump_debug("debug_webrtc_stream")
 
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):

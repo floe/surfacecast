@@ -11,7 +11,6 @@ from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
-pipeline = None
 clients = {}
 
 # incoming HTTP(S) request
@@ -47,17 +46,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 # "main"
 init_pipeline()
 
-add_and_link([
-    new_element("videotestsrc",{"is-live":True,"pattern":"ball"}),
-    new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),
-    new_element("tee",{"allow-not-linked":True},"testsource")
-])
-
-add_and_link([
-    new_element("audiotestsrc",{"is-live":True,"wave":"ticks"}),
-    new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=8000,channels=1")}),
-    new_element("tee",{"allow-not-linked":True},"audiotest")
-])
+add_test_sources()
 
 server = Soup.Server()
 server.add_handler("/",http_handler,None)
