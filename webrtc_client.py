@@ -11,8 +11,6 @@ from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
-pipeline = None
-
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
     # TODO actually handle closing (might be tricky, needs to rewire pipeline)
@@ -24,8 +22,22 @@ def ws_conn_handler(session, result):
     wrb = WebRTCPeer(connection,"client",is_client=True)
     connection.connect("closed",ws_close_handler,wrb)
 
+def on_element_added(thebin, element):
+
+    name = element.get_name()
+    if not name.startswith("output_"):
+        return
+
+    name = name.split("_")[-1]
+
+    if name == "front" or name == "surface":
+        add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink",{"sync":False}) ])
+    elif name == "audio":
+        add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink",{"sync":False}) ])
+
+
 # "main"
-init_pipeline()
+init_pipeline(on_element_added)
 
 add_test_sources()
 

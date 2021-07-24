@@ -148,12 +148,7 @@ class WebRTCPeer:
         decodebin.parent.add_pad(ghostpad)
 
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
-
-        if name == "front" or name == "surface":
-            add_and_link([ tee, new_element("videoconvert"), new_element("fpsdisplaysink",{"sync":False}) ])
-        elif name == "audio":
-            add_and_link([ tee, new_element("audioconvert"), new_element("autoaudiosink",{"sync":False}) ])
-
+        add_and_link([tee])
         ghostpad.link(tee.get_static_pad("sink"))
 
         # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)

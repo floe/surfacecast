@@ -83,9 +83,8 @@ def dump_debug(name="debug"):
 def get_by_name(name):
     return pipeline.get_by_name(name)
 
-
 # initialize pipeline and mainloop
-def init_pipeline():
+def init_pipeline(callback):
 
     global pipeline,mainloop
 
@@ -95,6 +94,7 @@ def init_pipeline():
     # kick things off
     pipeline.set_state(Gst.State.PLAYING)
     mainloop = GLib.MainLoop()
+    pipeline.connect("element-added",callback)
 
     # listen for bus messages
     bus = pipeline.get_bus()

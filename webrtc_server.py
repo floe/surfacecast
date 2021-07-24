@@ -43,8 +43,11 @@ def ws_conn_handler(server, connection, path, client, user_data):
     connection.connect("closed",ws_close_handler,wrb)
     clients[source] = wrb
 
+def on_element_added(thebin, element):
+    pass
+
 # "main"
-init_pipeline()
+init_pipeline(on_element_added)
 
 add_test_sources()
 
