@@ -59,6 +59,7 @@ class WebRTCPeer:
             selector = new_element("input-selector",myname="input_"+self.address+"_"+name)
             add_and_link([selector])
             selector.get_static_pad("src").link(ghostpad)
+
             # TODO: source name should be configurable
             link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
 
@@ -150,9 +151,6 @@ class WebRTCPeer:
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
         add_and_link([tee])
         ghostpad.link(tee.get_static_pad("sink"))
-
-        # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
-        dump_debug("debug_webrtc_stream")
 
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):

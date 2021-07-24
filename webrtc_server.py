@@ -13,6 +13,15 @@ from webrtc_peer import WebRTCPeer
 
 clients = {}
 
+class Client:
+
+    def __init__(self):
+
+        self.wrb = None
+        self.inputs  = {}
+        self.outputs = {}
+
+
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
     content_type = "text/html"
@@ -39,12 +48,30 @@ def ws_conn_handler(server, connection, path, client, user_data):
     source = addr.get_address().to_string()+"_"+str(addr.get_port())
     print("New WebSocket connection from "+source)
 
+    clients[source] = Client()
     wrb = WebRTCPeer(connection,source)
     connection.connect("closed",ws_close_handler,wrb)
-    clients[source] = wrb
+    clients[source].wrb = wrb
 
 def on_element_added(thebin, element):
-    pass
+
+    elname = element.get_name().split("_")
+    if len(elname) != 4:
+        return
+
+    direction = elname[0]
+    source = elname[1]+"_"+elname[2]
+    stype = elname[3]
+    #print(direction,source,stype)
+
+    if direction == "output":
+        clients[source].outputs[stype] = element
+    if direction == "input":
+        clients[source].inputs[stype] = element
+
+    # are all outputs in place?
+    if len(clients[source].outputs) == 3:
+        print("Client elements complete.")
 
 # "main"
 init_pipeline(on_element_added)

@@ -41,9 +41,11 @@ init_pipeline(on_element_added)
 
 add_test_sources()
 
+target = "127.0.0.1" if len(sys.argv) < 2 else sys.argv[1]
+
 session = Soup.Session()
 session.set_property("ssl-strict", False)
-msg = Soup.Message.new("GET", "wss://"+sys.argv[1]+":8080/ws")
+msg = Soup.Message.new("GET", "wss://"+target+":8080/ws")
 session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
 #msg = Soup.Message.new("GET", "https://127.0.0.1:8080/stream.html")
 #session.add_feature(Soup.Logger.new(Soup.LoggerLogLevel.BODY, -1))
