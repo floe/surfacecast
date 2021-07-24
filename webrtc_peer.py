@@ -48,6 +48,7 @@ class WebRTCPeer:
             element = self.bin.get_by_name(name)
             realpad = element.get_static_pad("sink")
             ghostpad = Gst.GhostPad.new("sink_"+name,realpad)
+            ghostpad.set_active(True)
             self.bin.add_pad(ghostpad)
 
             selector = new_element("input-selector",myname="input_"+self.address+"_"+name)

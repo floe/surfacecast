@@ -27,21 +27,11 @@ def ws_conn_handler(session, result):
 # "main"
 init_pipeline()
 
-add_and_link([
-    new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}),
-    new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),
-    new_element("tee",{"allow-not-linked":True},"testsource")
-])
-
-add_and_link([
-    new_element("audiotestsrc",{"is-live":True,"wave":"ticks"}),
-    new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=8000,channels=1")}),
-    new_element("tee",{"allow-not-linked":True},"audiotest")
-])
+add_test_sources()
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
-msg = Soup.Message.new("GET", "wss://127.0.0.1:8080/ws")
+msg = Soup.Message.new("GET", "wss://"+sys.argv[1]+":8080/ws")
 session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
 #msg = Soup.Message.new("GET", "https://127.0.0.1:8080/stream.html")
 #session.add_feature(Soup.Logger.new(Soup.LoggerLogLevel.BODY, -1))
