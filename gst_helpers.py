@@ -76,6 +76,12 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True):
         pad1.link(pad2)
     return pad2
 
+# link to input-selector and activate new link
+def link_to_inputselector(el1, tpl1, el2):
+    pad = link_request_pads(el1,tpl1,el2,"sink_%u",do_queue=False)
+    el2.set_property("active-pad", pad)
+    return pad
+
 def dump_debug(name="debug"):
     # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
     Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails(15),name)

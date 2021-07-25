@@ -63,8 +63,6 @@ class WebRTCPeer:
             # TODO: source name should be configurable
             link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
 
-        #inputselect.set_property("active-pad", inputselect.get_static_pad("sink_1"))
-
         self.connection.connect("message",self.on_ws_message)
 
         # connect signals (note: negotiation-needed will initially be empty on client side)
