@@ -50,6 +50,7 @@ class Client:
     # link client to frontmixer
     def link_to_front(self):
 
+        # FIXME: frontstream is separately encoded for each client ATM, should be one single encoder
         if not "front" in self.inputs or not "front" in self.outputs:
             return
 
@@ -105,7 +106,7 @@ def create_frontmixer_queue():
     global frontmixer
     global frontstream
 
-    if frontmixer != None:
+    if frontmixer != None or frontstream != None:
         return
 
     print("  creating frontmixer subqueue")
