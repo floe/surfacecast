@@ -16,6 +16,9 @@ clients = {}
 frontmixer  = None
 frontstream = None
 
+# links between individual client tee/mixer pairs
+mixer_links = []
+
 # position offsets for 4 front streams
 # FIXME: how to handle > 4 clients?
 offsets = [
@@ -57,6 +60,7 @@ class Client:
         print("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
+        # TODO: seems to work witouth queue?
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
 
         # request and link pads from tee and frontmixer
@@ -68,6 +72,52 @@ class Client:
         padnum = int(sinkpad.get_name().split("_")[1])
         sinkpad.set_property("xpos",offsets[padnum][0])
         sinkpad.set_property("ypos",offsets[padnum][1])
+
+    # helper function to link source tees to destination mixers
+    def link_streams_oneway(self,dest,prefix,qparams):
+
+        linkname = prefix+"_"+self.name+"_"+dest.name
+        if not linkname in mixer_links:
+
+            print("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
+            # TODO: needs a queue?
+            link_to_inputselector(self.outputs[prefix],"src_%u",dest.inputs[prefix])
+            #add_and_link([
+            #    self.outputs[prefix],
+            #    new_element("queue",qparams),
+            #    dest.mixers[prefix]
+            #])
+            mixer_links.append(linkname)
+
+            # for the "main" surface (identified through special SSRC),
+            # the destination mixer pad needs to have zorder = 0
+            # FIXME: feels like an ugly hack to do this here...
+            if prefix == "surface" and self.name == "FIXME":
+                print("    fixing zorder for main client")
+                sinkpads = dest.mixers[prefix].sinkpads
+                sinkpads[-1].set_property("zorder",0)
+
+    # link all other clients to this mixer, this client to other mixers
+    def link_streams(self,clients,prefix,qparams):
+
+        for c in clients:
+
+            if c == self.name: # skip own ssrc
+                continue
+
+            other = clients[c]
+
+            # for every _other_ mixer, link my tee to that mixer
+            self.link_streams_oneway(other,prefix,qparams)
+
+            # for every _other_ tee, link that tee to my mixer
+            other.link_streams_oneway(self,prefix,qparams)
+
+    # link all other clients to local mixer, this client to other mixers
+    def link_all_streams(self,clients):
+        self.link_streams(clients,"surface",{"max-size-buffers":1})
+        self.link_streams(clients,"audio",{"max-size-time":100000000})
+
 
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
@@ -133,14 +183,16 @@ def link_new_client(client):
     # create surface/audio mixers for _all_ clients that don't have one yet
     # needs to loop through all clients for the case where 2 or more clients
     # appear simultaneously, otherwise there are no mixers to link to
-    #for c in clients:
-    #    clients[c].create_mixers()
+    # FIXME: will probably b0rk if one client is not yet completely initialized
+    if len(clients) >= 2:
+        for c in clients:
+            clients[c].create_mixers()
 
     # add missing frontmixer links
     client.link_to_front()
 
     # add missing surface/audio mixer links
-    #client.link_all_streams(clients)
+    client.link_all_streams(clients)
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):

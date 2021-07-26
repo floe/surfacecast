@@ -146,9 +146,14 @@ class WebRTCPeer:
         ghostpad.set_active(True)
         decodebin.parent.add_pad(ghostpad)
 
+        alpha = None
+        if name == "surface":
+            alpha = new_element("alpha", { "method": "green" } )
+
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
-        add_and_link([tee])
-        ghostpad.link(tee.get_static_pad("sink"))
+        add_and_link([alpha,tee])
+        last = tee if alpha == None else alpha
+        ghostpad.link(last.get_static_pad("sink"))
 
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):
