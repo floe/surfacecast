@@ -15,9 +15,9 @@ AENCODER="queue ! opusenc ! rtpopuspay ! queue max-size-time=100000000 ! applica
 # TODO implement the stun servers (again) for actual internet connections
 # stun-server=stun://" STUN_SERVER " "
 bindesc="webrtcbin name=webrtcbin "+\
-  "videoconvert name=surface ! "+VENCODER+"payload=98 ! webrtcbin. "+\
   "videoconvert name=front   ! "+VENCODER+"payload=96 ! webrtcbin. "+\
-  "audioconvert name=audio   ! "+AENCODER+"payload=97 ! webrtcbin. "
+  "audioconvert name=audio   ! "+AENCODER+"payload=97 ! webrtcbin. "+\
+  "videoconvert name=surface ! "+VENCODER+"payload=98 ! webrtcbin. "
 
 response_type = {
     "offer":  GstWebRTC.WebRTCSDPType.OFFER,
