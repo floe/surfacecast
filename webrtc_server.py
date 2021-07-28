@@ -27,6 +27,8 @@ def http_handler(server,msg,path,query,client,user_data):
     msg.response_body.append(data.encode("utf-8"))
     msg.set_status(Soup.Status.OK)
 
+# TODO: add request to restart server
+
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
     # TODO actually handle closing (might be tricky, needs to rewire pipeline)
@@ -42,6 +44,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
     add_new_client(source)
     wrb = WebRTCPeer(connection,source)
     connection.connect("closed",ws_close_handler,wrb)
+    # TODO: do we ever need the wrb reference in the Client object?
     #clients[source].wrb = wrb
 
 

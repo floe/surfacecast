@@ -30,7 +30,7 @@ payload = {
     98: "surface"
 }
 
-# TODO: how to connect specific mixers etc. to each webrtcbin?
+# TODO: use proper logging
 
 class WebRTCPeer:
 
@@ -83,6 +83,7 @@ class WebRTCPeer:
         print("New data channel created...")
         self.data_channel = data_channel
         self.data_channel.connect("on-message-string", self.on_dc_message)
+        # FIXME: doesn't seem to send anything?
         self.data_channel.emit("send-string","Hi!")
 
     # ICE connection candidate received, forward to peer

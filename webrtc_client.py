@@ -39,6 +39,7 @@ def on_element_added(thebin, element):
 # "main"
 init_pipeline(on_element_added)
 
+# TODO: use non-fake sources (ideally configurable)
 add_test_sources()
 
 target = "127.0.0.1" if len(sys.argv) < 2 else sys.argv[1]
