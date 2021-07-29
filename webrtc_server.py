@@ -28,6 +28,7 @@ def http_handler(server,msg,path,query,client,user_data):
     msg.set_status(Soup.Status.OK)
 
 # TODO: add request to restart server
+# TODO: add request to flag client as main (lowest z-layer)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):

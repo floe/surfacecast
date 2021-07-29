@@ -13,8 +13,8 @@ from webrtc_peer import WebRTCPeer
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
-    # TODO actually handle closing (might be tricky, needs to rewire pipeline)
     print("WebSocket closed by remote.")
+    sys.exit(1)
 
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
