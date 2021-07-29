@@ -56,15 +56,13 @@ def bus_call(bus, message, loop):
 # convenience function to link request pads
 def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True):
 
-    try:
+    pad1 = el1.get_static_pad(tpl1)
+    if pad1 == None:
         pad1 = el1.request_pad(el1.get_pad_template(tpl1), None, None)
-    except:
-        pad1 = el1.get_static_pad(tpl1)
 
-    try:
+    pad2 = el2.get_static_pad(tpl2)
+    if pad2 == None:
         pad2 = el2.request_pad(el2.get_pad_template(tpl2), None, None)
-    except:
-        pad2 = el2.get_static_pad(tpl2)
 
     if do_queue:
         queue = new_element("queue")#,{"max-size-time":200000000})
