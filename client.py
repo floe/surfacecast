@@ -38,17 +38,16 @@ class Client:
         self.outputs = {}
         self.mixers = {}
 
-    def create_mixers(self):
+    # create mixer & converter
+    def create_mixer(self,mtype,mixer,convert,caps):
 
-        if "audio" in self.mixers or "surface" in self.mixers:
+        if mtype in self.mixers:
             return
 
-        # setup surface & audio mixer
-        print("    creating mixers for client "+self.name)
-        self.mixers["surface"] = new_element("compositor",{"background":"black"},myname="mixer_"+self.name)
-        self.mixers["audio"]   = new_element("audiomixer",myname="audio_"+self.name)
-        add_and_link([self.mixers["surface"]])
-        add_and_link([self.mixers["audio"]])
+        print("    creating "+mtype+" mixer for client "+self.name)
+        self.mixers[mtype] = mixer
+        add_and_link([mixer,convert,caps])
+        link_to_inputselector(caps,"src",self.inputs[mtype])
 
     # link client to frontmixer
     def link_to_front(self):
@@ -64,6 +63,7 @@ class Client:
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
 
         # request and link pads from tee and frontmixer
+        # TODO: needs a queue or not?
         sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
         #sinkpad.set_property("max-last-buffer-repeat",10000000000) # apparently not needed
 
@@ -81,7 +81,7 @@ class Client:
 
             print("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
             # TODO: needs a queue?
-            link_to_inputselector(self.outputs[prefix],"src_%u",dest.inputs[prefix])
+            link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
             #add_and_link([
             #    self.outputs[prefix],
             #    new_element("queue",qparams),
@@ -152,16 +152,21 @@ def link_new_client(client):
     # create surface/audio mixers for _all_ clients that don't have one yet
     # needs to loop through all clients for the case where 2 or more clients
     # appear simultaneously, otherwise there are no mixers to link to
-    # FIXME: will probably b0rk if one client is not yet completely initialized
+    # FIXME: this is a hack, might be solved by using the testsources initially?
     if len(clients) >= 2:
         for c in clients:
-            clients[c].create_mixers()
+            clients[c].create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),
+            new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}))
+            clients[c].create_mixer(  "audio", new_element("audiomixer"), new_element("audioconvert"),
+            new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=8000,channels=1")}))
 
     # add missing frontmixer links
     client.link_to_front()
 
     # add missing surface/audio mixer links
     client.link_all_streams(clients)
+
+    dump_debug("final")
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):
@@ -185,7 +190,7 @@ def on_element_added(thebin, element):
 
     # are all outputs in place?
     if len(client.outputs) == 3:
-        print("Client elements complete.")
+        print("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 
 # add new client to pool
