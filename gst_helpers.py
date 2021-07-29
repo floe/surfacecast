@@ -106,7 +106,14 @@ def init_pipeline(callback):
     bus.connect("message", bus_call, mainloop)
 
 # test sources as stream placeholders
-def add_test_sources():
+def add_test_sources(main=False):
+
+    bgcol = 0xFF00FF00
+    wave  = "ticks"
+
+    if main:
+        bgcol = 0xFFFF00FF
+        wave  = "sine"
 
     add_and_link([
         new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}),
@@ -115,13 +122,13 @@ def add_test_sources():
     ])
 
     add_and_link([
-        new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":4278255360}),
+        new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}),
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 
     add_and_link([
-        new_element("audiotestsrc",{"is-live":True,"wave":"ticks"}),
+        new_element("audiotestsrc",{"is-live":True,"wave":wave}),
         new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=8000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])

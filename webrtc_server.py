@@ -52,7 +52,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 # "main"
 init_pipeline(on_element_added)
 
-add_test_sources()
+add_test_sources(main=True)
 
 server = Soup.Server()
 server.add_handler("/",http_handler,None)
