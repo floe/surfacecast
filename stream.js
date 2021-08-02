@@ -8,10 +8,59 @@ var datastream;
 var canvas;
 var context;
 
+
+
+// adapted from: https://www.npmjs.com/package/intrinsic-scale
+function getObjectFitSize(
+  contains /* true = contain, false = cover */,
+  containerWidth,
+  containerHeight,
+  width,
+  height
+) {
+  var doRatio = width / height;
+  var cRatio = containerWidth / containerHeight;
+  var targetWidth = 0;
+  var targetHeight = 0;
+  var test = contains ? doRatio > cRatio : doRatio < cRatio;
+
+  if (test) {
+    targetWidth = containerWidth;
+    targetHeight = targetWidth / doRatio;
+  } else {
+    targetHeight = containerHeight;
+    targetWidth = targetHeight * doRatio;
+  }
+
+  return {
+    width: targetWidth,
+    height: targetHeight,
+    x: (containerWidth - targetWidth) / 2,
+    y: (containerHeight - targetHeight) / 2
+  };
+}
+
+function fixCanvas(myCanvas) {
+
+  const dimensions = getObjectFitSize(
+    true,
+    myCanvas.clientWidth,
+    myCanvas.clientHeight,
+    myCanvas.width,
+    myCanvas.height
+  );
+
+  myCanvas.width = dimensions.width;
+  myCanvas.height = dimensions.height;
+}
+
+
 function onCanvasClick(evt) {
-  const centerX = evt.layerX; //canvas.width / 2;
-  const centerY = evt.layerY; //canvas.height / 2;
+  const rect = canvas.getBoundingClientRect()
+  const centerX = evt.clientX - rect.left; //canvas.width / 2;
+  const centerY = evt.clientY - rect.top;  //canvas.height / 2;
   const radius = 5;
+  console.log("click"+centerX+" "+centerY);
 
   context.beginPath();
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -56,7 +105,7 @@ function onIceCandidate(event) {
 }
 
 function getLocalStreams() {
-  var constraints = {video: true, audio: true};
+  var constraints = {video: { width: 640, height: 360, facingMode: "user" }, audio: true};
   return navigator.mediaDevices.getUserMedia(constraints);
 }
 
@@ -128,6 +177,7 @@ window.onload = function() {
   var vidstream = document.getElementById("stream");
   html5VideoElement2 = document.getElementById("stream2");
   canvas = document.getElementById("canvas");
+  fixCanvas(canvas);
   canvas.onclick = onCanvasClick;
   context = canvas.getContext("2d");
   var config = { 'iceServers': [] };
