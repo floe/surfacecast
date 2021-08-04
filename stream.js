@@ -7,6 +7,7 @@ var reportError;
 var datastream;
 var canvas;
 var context;
+var canvasstream;
 
 
 
@@ -64,7 +65,7 @@ function onCanvasClick(evt) {
 
   context.beginPath();
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  context.fillStyle = "red";
+  context.fillStyle = "yellow";
   context.fill();
 }
 
@@ -164,7 +165,17 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       // datastream.onmessage = ...
 
       webrtcPeerConnection.addStream(stream);
-      webrtcPeerConnection.addStream(canvas.captureStream(15));
+
+    context.beginPath();
+    context.arc(0, 0, 5, 0, 2 * Math.PI, false);
+    context.fillStyle = "yellow";
+    context.fill();
+
+      canvasstream = canvas.captureStream(15);
+      canvastrack = canvasstream.getVideoTracks()[0];
+      //canvastrack.requestFrame();
+      canvastrack.contentHint = "detail";
+      webrtcPeerConnection.addStream(canvasstream);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
@@ -177,9 +188,12 @@ window.onload = function() {
   var vidstream = document.getElementById("stream");
   html5VideoElement2 = document.getElementById("stream2");
   canvas = document.getElementById("canvas");
-  fixCanvas(canvas);
-  canvas.onclick = onCanvasClick;
+  //fixCanvas(canvas);
   context = canvas.getContext("2d");
+  canvas.width=1280;
+  canvas.height=720;
+  canvas.onclick = onCanvasClick;
+  canvas.onmousemove = onCanvasClick;
   var config = { 'iceServers': [] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   vidstream.onplay = onvideoplay;
