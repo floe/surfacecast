@@ -194,7 +194,7 @@ window.onload = function() {
   canvas.height=720;
   canvas.onclick = onCanvasClick;
   canvas.onmousemove = onCanvasClick;
-  var config = { 'iceServers': [] };
+  var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   vidstream.onplay = onvideoplay;
 };

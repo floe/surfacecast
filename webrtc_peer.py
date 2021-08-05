@@ -12,9 +12,8 @@ from gst_helpers import *
 VENCODER="queue max-size-buffers=1 ! x264enc bitrate=600 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! rtph264pay config-interval=-1 ! application/x-rtp,media=video,encoding-name=H264,"
 AENCODER="queue ! opusenc ! rtpopuspay ! queue max-size-time=100000000 ! application/x-rtp,media=audio,encoding-name=OPUS,"
 
-# TODO implement the stun servers (again) for actual internet connections
-# stun-server=stun://" STUN_SERVER " "
-bindesc="webrtcbin name=webrtcbin "+\
+# TODO make stun server configurable? maybe print firewall info?
+bindesc="webrtcbin name=webrtcbin stun-server=stun://stun.l.google.com:19302 "+\
   "videoconvert name=front   ! "+VENCODER+"payload=96 ! webrtcbin. "+\
   "audioconvert name=audio   ! "+AENCODER+"payload=97 ! webrtcbin. "+\
   "videoconvert name=surface ! "+VENCODER+"payload=98 ! webrtcbin. "
