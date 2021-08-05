@@ -9,12 +9,12 @@ var canvas;
 var context;
 var canvasstream;
 var mousedown;
-
+var mycolor;
 
 
 // adapted from: https://www.npmjs.com/package/intrinsic-scale
-function getObjectFitSize(
-  contains /* true = contain, false = cover */,
+/*function getObjectFitSize(
+  contains, // true = contain, false = cover
   containerWidth,
   containerHeight,
   width,
@@ -54,7 +54,7 @@ function fixCanvas(myCanvas) {
 
   myCanvas.width = dimensions.width;
   myCanvas.height = dimensions.height;
-}
+}*/
 
 
 function onCanvasDown(evt) { mousedown = true;  }
@@ -69,7 +69,7 @@ function onCanvasMove(evt) {
 
   context.beginPath();
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  context.fillStyle = "yellow";
+  context.fillStyle = mycolor;
   context.fill();
 }
 
@@ -202,4 +202,6 @@ window.onload = function() {
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   vidstream.onplay = onvideoplay;
+  colors = ["red", "cyan", "yellow", "blue", "magenta" ];
+  mycolor = colors[Math.floor(Math.random() * colors.length)];
 };

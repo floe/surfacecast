@@ -24,6 +24,7 @@ def http_handler(server,msg,path,query,client,user_data):
         msg.set_status(Soup.Status.NOT_FOUND)
         return
     msg.response_headers.append("Content-Type",content_type)
+    msg.response_headers.append("Cache-Control","no-store")
     msg.response_body.append(data.encode("utf-8"))
     msg.set_status(Soup.Status.OK)
 
