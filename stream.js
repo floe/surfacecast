@@ -8,6 +8,7 @@ var datastream;
 var canvas;
 var context;
 var canvasstream;
+var mousedown;
 
 
 
@@ -56,12 +57,15 @@ function fixCanvas(myCanvas) {
 }
 
 
-function onCanvasClick(evt) {
+function onCanvasDown(evt) { mousedown = true;  }
+function onCanvasUp  (evt) { mousedown = false; }
+function onCanvasMove(evt) {
+  if (!mousedown) return;
   const rect = canvas.getBoundingClientRect()
   const centerX = evt.clientX - rect.left; //canvas.width / 2;
   const centerY = evt.clientY - rect.top;  //canvas.height / 2;
   const radius = 5;
-  console.log("click"+centerX+" "+centerY);
+  //console.log("click"+centerX+" "+centerY);
 
   context.beginPath();
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -192,8 +196,9 @@ window.onload = function() {
   context = canvas.getContext("2d");
   canvas.width=1280;
   canvas.height=720;
-  canvas.onclick = onCanvasClick;
-  canvas.onmousemove = onCanvasClick;
+  canvas.onmousedown = onCanvasDown;
+  canvas.onmouseup   = onCanvasUp;
+  canvas.onmousemove = onCanvasMove;
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   vidstream.onplay = onvideoplay;
