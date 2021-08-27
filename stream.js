@@ -10,6 +10,7 @@ var context;
 var canvasstream;
 var mousedown;
 var mycolor;
+var x,y;
 
 
 // adapted from: https://www.npmjs.com/package/intrinsic-scale
@@ -57,20 +58,27 @@ function fixCanvas(myCanvas) {
 }*/
 
 
-function onCanvasDown(evt) { mousedown = true;  }
-function onCanvasUp  (evt) { mousedown = false; }
+function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = true;  }
+function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = false; }
 function onCanvasMove(evt) {
   if (!mousedown) return;
-  const rect = canvas.getBoundingClientRect()
-  const centerX = evt.clientX - rect.left; //canvas.width / 2;
-  const centerY = evt.clientY - rect.top;  //canvas.height / 2;
+  //const rect = canvas.getBoundingClientRect()
+  const centerX = evt.offsetX; //clientX - rect.left; //canvas.width / 2;
+  const centerY = evt.offsetY; //clientY - rect.top;  //canvas.height / 2;
   const radius = 5;
   //console.log("click"+centerX+" "+centerY);
 
   context.beginPath();
-  context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  context.fillStyle = mycolor;
-  context.fill();
+  //context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  context.lineWidth = 5;
+  context.strokeStyle = mycolor;
+  context.moveTo(x,y);
+  context.lineTo(centerX,centerY);
+  context.stroke();
+  context.closePath();
+
+  x = centerX;
+  y = centerY;
 }
 
 
