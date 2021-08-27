@@ -67,14 +67,16 @@ function onCanvasMove(evt) {
   const radius = (mousedown == 1) ? 5 : 20;
 
   context.beginPath();
-  //context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
   context.lineWidth = radius;
   context.strokeStyle = (mousedown == 1) ? mycolor : "rgba(0,255,0,1)";
+  context.fillStyle = context.strokeStyle
   context.globalCompositeOperation = (mousedown == 1) ? "source-over" : "destination-out";
   //context.strokeStyle = mycolor;
   context.moveTo(x,y);
   context.lineTo(centerX,centerY);
   context.stroke();
+  context.arc(centerX, centerY, radius/2, 0, 2 * Math.PI, false);
+  context.fill();
   context.closePath();
 
   x = centerX;
