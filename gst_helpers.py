@@ -129,7 +129,7 @@ def add_test_sources(main=False):
 
     add_and_link([
         new_element("audiotestsrc",{"is-live":True,"wave":wave}),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=8000,channels=1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])
 
