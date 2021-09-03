@@ -178,7 +178,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       datastream.onopen = function(event) { datastream.send("Hi!"); console.log("Hi!"); }
       // datastream.onmessage = ...
 
-      webrtcPeerConnection.addStream(stream);
+      for (const track of stream.getTracks()) { webrtcPeerConnection.addTrack(track, stream); }
 
     context.beginPath();
     context.arc(0, 0, 5, 0, 2 * Math.PI, false);
@@ -189,7 +189,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       canvastrack = canvasstream.getVideoTracks()[0];
       //canvastrack.requestFrame();
       canvastrack.contentHint = "detail";
-      webrtcPeerConnection.addStream(canvasstream);
+      for (const track of canvasstream.getTracks()) { webrtcPeerConnection.addTrack(track, stream); }
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
