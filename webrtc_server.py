@@ -15,6 +15,7 @@ from webrtc_peer import WebRTCPeer
 
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
+    print("HTTP(S) request for "+path)
     content_type = "text/html"
     try:
         data = open(path[1:],"r").read()
