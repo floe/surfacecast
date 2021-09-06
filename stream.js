@@ -107,7 +107,20 @@ function onIncomingICE(ice) {
 
 
 function onAddRemoteStream(event) {
+  //console.log(event.streams[0].getVideoTracks());
+  //console.log(event.streams[0].getAudioTracks());
+  // FIXME: is this enough to fix Safari?
+  var stream1 = event.streams[0];
+  var vtracks = stream1.getVideoTracks();
+  if (vtracks.length < 2) { return; }
   html5VideoElement.srcObject = event.streams[0];
+  html5VideoElement.srcObject.removeTrack( vtracks[1] );
+  var stream2 = new MediaStream( [ vtracks[1] ] );
+  html5VideoElement2.srcObject = stream2;
+  html5VideoElement2.play();
+  // FIXME: on Chrome, canvas stream only starts after first onclick event?
+  context.fillStyle = "rgba(0,255,0,0)";
+  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 
@@ -139,19 +152,6 @@ function onServerMessage(event) {
     case "ice": onIncomingICE(msg.data); break;
     default: break;
   }
-}
-
-function onvideoplay(event) {
-  var stream1 = html5VideoElement.srcObject;
-  var vtracks = stream1.getVideoTracks();
-  if (vtracks.length < 2) { return; }
-  html5VideoElement.srcObject.removeTrack( vtracks[1] );
-  var stream2 = new MediaStream( [ vtracks[1] ] );
-  html5VideoElement2.srcObject = stream2;
-  html5VideoElement2.play();
-  // FIXME: on Chrome, canvas stream only starts after first onclick event?
-  context.fillStyle = "rgba(0,255,0,0)";
-  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
@@ -211,7 +211,6 @@ window.onload = function() {
   canvas.onmousemove = onCanvasMove;
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
-  vidstream.onplay = onvideoplay;
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
 };
