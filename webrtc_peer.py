@@ -29,6 +29,30 @@ payload = {
     98: "surface"
 }
 
+# extract MediaIDs (mid) from SDP and match with payload ID
+def get_mids_from_sdp(sdptext):
+
+    result = { }
+    lines = sdptext.splitlines()
+    plnum = 0
+
+    for line in lines:
+
+        if line.startswith("m="):
+            try:
+                plnum = int(line.split(" ")[-1])
+            except:
+                plnum = 0
+
+        if not plnum in payload:
+            continue
+
+        if line.startswith("a=mid:"):
+            mid = line.split(":")[1]
+            result[payload[plnum]] = mid
+
+    return result
+
 # TODO: use proper logging
 
 class WebRTCPeer:
@@ -111,7 +135,12 @@ class WebRTCPeer:
         self.wrb.emit("set-local-description", result, None)
 
         text = result.sdp.as_text()
-        message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text}})
+
+        # FIXME this is an extremly ugly hack, treating SDP as "string soup"
+        # see https://stackoverflow.com/q/65408744/838719 for some background
+        mapping = get_mids_from_sdp(text)
+
+        message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
         self.connection.send_text(message)
 
     # new pad appears on WebRTCBin element
@@ -165,6 +194,8 @@ class WebRTCPeer:
             return
 
         if msg["type"] == "sdp":
+            # TODO: use mapping for payload ID <-> stream name
+            #print(msg["mapping"])
             reply = msg["data"]
             stype = reply["type"]
             sdp = reply["sdp"]
