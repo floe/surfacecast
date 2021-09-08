@@ -12,6 +12,10 @@ var mousedown;
 var mycolor;
 var x,y;
 
+var audiotrans;
+var surfacetrans;
+var fronttrans;
+
 
 // adapted from: https://www.npmjs.com/package/intrinsic-scale
 /*function getObjectFitSize(
@@ -85,9 +89,14 @@ function onCanvasMove(evt) {
 
 
 function onLocalDescription(desc) {
-  console.log("Local description: " + JSON.stringify(desc));
+  var mapping = { };
+  for (const trans of webrtcPeerConnection.getTransceivers()) {
+    if (trans.sender.track.id == surfacetrans) mapping["surface"] = trans.mid;
+    if (trans.sender.track.id == fronttrans  ) mapping["front"  ] = trans.mid;
+    if (trans.sender.track.id == audiotrans  ) mapping["audio"  ] = trans.mid;
+  }
   webrtcPeerConnection.setLocalDescription(desc).then(function() {
-    websocketConnection.send(JSON.stringify({ "type": "sdp", "data": webrtcPeerConnection.localDescription }));
+    websocketConnection.send(JSON.stringify({ "type": "sdp", "data": webrtcPeerConnection.localDescription, "mapping": mapping }));
   }).catch(reportError);
 }
 
@@ -107,8 +116,7 @@ function onIncomingICE(ice) {
 
 
 function onAddRemoteStream(event) {
-  //console.log(event.streams[0].getVideoTracks());
-  //console.log(event.streams[0].getAudioTracks());
+  console.log(event);
   // FIXME: is this enough to fix Safari?
   var stream1 = event.streams[0];
   var vtracks = stream1.getVideoTracks();
@@ -178,7 +186,13 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       datastream.onopen = function(event) { datastream.send("Hi!"); console.log("Hi!"); }
       // datastream.onmessage = ...
 
-      for (const track of stream.getTracks()) { webrtcPeerConnection.addTrack(track, stream); }
+      audiotrack = stream.getAudioTracks()[0];
+      audiotrans = audiotrack.id;
+      webrtcPeerConnection.addTrack(audiotrack);
+
+      fronttrack = stream.getVideoTracks()[0];
+      fronttrans = fronttrack.id;
+      webrtcPeerConnection.addTrack(fronttrack);
 
     context.beginPath();
     context.arc(0, 0, 5, 0, 2 * Math.PI, false);
@@ -189,7 +203,9 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       canvastrack = canvasstream.getVideoTracks()[0];
       //canvastrack.requestFrame();
       canvastrack.contentHint = "detail";
-      for (const track of canvasstream.getTracks()) { webrtcPeerConnection.addTrack(track, stream); }
+      //for (const track of canvasstream.getTracks()) {
+      surfacetrans = canvastrack.id;
+      webrtcPeerConnection.addTrack(canvastrack, stream);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
