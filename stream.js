@@ -15,51 +15,9 @@ var x,y;
 var audiotrans;
 var surfacetrans;
 var fronttrans;
-
-
-// adapted from: https://www.npmjs.com/package/intrinsic-scale
-/*function getObjectFitSize(
-  contains, // true = contain, false = cover
-  containerWidth,
-  containerHeight,
-  width,
-  height
-) {
-  var doRatio = width / height;
-  var cRatio = containerWidth / containerHeight;
-  var targetWidth = 0;
-  var targetHeight = 0;
-  var test = contains ? doRatio > cRatio : doRatio < cRatio;
-
-  if (test) {
-    targetWidth = containerWidth;
-    targetHeight = targetWidth / doRatio;
-  } else {
-    targetHeight = containerHeight;
-    targetWidth = targetHeight * doRatio;
-  }
-
-  return {
-    width: targetWidth,
-    height: targetHeight,
-    x: (containerWidth - targetWidth) / 2,
-    y: (containerHeight - targetHeight) / 2
-  };
-}
-
-function fixCanvas(myCanvas) {
-
-  const dimensions = getObjectFitSize(
-    true,
-    myCanvas.clientWidth,
-    myCanvas.clientHeight,
-    myCanvas.width,
-    myCanvas.height
-  );
-
-  myCanvas.width = dimensions.width;
-  myCanvas.height = dimensions.height;
-}*/
+var remotemap;
+var frontstream;
+var surfacestream;
 
 
 function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = evt.buttons; }
@@ -117,15 +75,19 @@ function onIncomingICE(ice) {
 
 function onAddRemoteStream(event) {
   console.log(event);
-  // FIXME: is this enough to fix Safari?
-  var stream1 = event.streams[0];
-  var vtracks = stream1.getVideoTracks();
-  if (vtracks.length < 2) { return; }
-  html5VideoElement.srcObject = event.streams[0];
-  html5VideoElement.srcObject.removeTrack( vtracks[1] );
-  var stream2 = new MediaStream( [ vtracks[1] ] );
-  html5VideoElement2.srcObject = stream2;
-  html5VideoElement2.play();
+
+  if ((event.transceiver.mid == remotemap["front"]) || (event.transceiver.mid == remotemap["audio"])) {
+    frontstream.addTrack(event.track);
+    html5VideoElement.srcObject = frontstream;
+    html5VideoElement.play();
+  }
+
+  if (event.transceiver.mid == remotemap["surface"]) {
+    surfacestream.addTrack(event.track);
+    html5VideoElement2.srcObject = surfacestream;
+    html5VideoElement2.play();
+  }
+
   // FIXME: on Chrome, canvas stream only starts after first onclick event?
   context.fillStyle = "rgba(0,255,0,0)";
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -155,6 +117,10 @@ function onServerMessage(event) {
     return;
   }
 
+  if ("mapping" in msg) {
+    remotemap = msg.mapping;
+    console.log(remotemap);
+  }
   switch (msg.type) {
     case "sdp": onIncomingSDP(msg.data); break;
     case "ice": onIncomingICE(msg.data); break;
@@ -174,6 +140,8 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
   html5VideoElement = videoElement;
   webrtcConfiguration = configuration;
   reportError = (reportErrorCB != undefined) ? reportErrorCB : function(text) {};
+  frontstream = new MediaStream();
+  surfacestream = new MediaStream();
 
   if (!webrtcPeerConnection) {
     getLocalStreams().then( (stream) => {
