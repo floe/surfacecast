@@ -76,10 +76,14 @@ function onIncomingICE(ice) {
 function onAddRemoteStream(event) {
   console.log(event);
 
-  if ((event.transceiver.mid == remotemap["front"]) || (event.transceiver.mid == remotemap["audio"])) {
+  if (event.transceiver.mid == remotemap["front"]) {
     frontstream.addTrack(event.track);
     html5VideoElement.srcObject = frontstream;
     html5VideoElement.play();
+  }
+
+  if (event.transceiver.mid == remotemap["audio"]) {
+    frontstream.addTrack(event.track);
   }
 
   if (event.transceiver.mid == remotemap["surface"]) {
