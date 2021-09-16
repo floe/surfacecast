@@ -197,6 +197,7 @@ window.onload = function() {
   canvas.onmousedown = onCanvasDown;
   canvas.onmouseup   = onCanvasUp;
   canvas.onmousemove = onCanvasMove;
+  canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
