@@ -115,20 +115,28 @@ def add_test_sources(main=False):
         bgcol = 0xFFFF00FF
         wave  = "sine"
 
-    add_and_link([
-        new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}),
+    if main:
+        frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
+        surfsrc  = [ new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}) ]
+        audiosrc = [ new_element("audiotestsrc",{"is-live":True,"wave":wave}) ]
+    else:
+        frontsrc = [ new_element("v4l2src",{"do-timestamp":True,"device":"/dev/video0" }), new_element("videorate"), new_element("videoconvert") ]
+        #frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
+        surfsrc  = [ new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}) ]
+        #surfsrc  = [ new_element("v4l2src",{"do-timestamp":True,"device":"/dev/video10"}), new_element("videorate"), new_element("videoconvert") ]
+        audiosrc = [ new_element("alsasrc",{"do-timestamp":True}), new_element("audiorate"), new_element("audioconvert") ]
+
+    add_and_link(frontsrc + [
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
-    add_and_link([
-        new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}),
+    add_and_link(surfsrc + [
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 
-    add_and_link([
-        new_element("audiotestsrc",{"is-live":True,"wave":wave}),
+    add_and_link(audiosrc + [
         new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])
