@@ -116,6 +116,14 @@ class WebRTCPeer:
 
     # format negotiation requested
     def on_negotiation_needed(self, wrb):
+
+        # explicitly set transceivers to SENDRECV (only for 1.18)
+        for i in range(3): # FIXME: should be dynamic
+            trans = self.wrb.emit("get-transceiver",i)
+            if (trans.find_property("direction")):
+                trans.set_property("direction", GstWebRTC.WebRTCRTPTransceiverDirection.SENDRECV)
+
+        # request offer or answer, depending on role
         kind = "answer" if self.is_client else "offer"
         print("Negotiation requested, creating "+kind+"...")
         promise = Gst.Promise.new_with_change_func(self.on_negotiation_created,kind)
