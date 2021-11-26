@@ -12,10 +12,17 @@ from gst_helpers import *
 from client import *
 from webrtc_peer import WebRTCPeer
 
+flags = { }
+
+# get address and port from client
+def get_client_address(client):
+    addr = client.get_remote_address()
+    return addr.get_address().to_string()+"_"+str(addr.get_port())
 
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
     print("HTTP(S) request for "+path)
+    flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
         data = open(path[1:],"r").read()
@@ -40,11 +47,11 @@ def ws_close_handler(connection, wrb):
 # incoming Websocket connection
 def ws_conn_handler(server, connection, path, client, user_data):
 
-    addr = client.get_remote_address()
-    source = addr.get_address().to_string()+"_"+str(addr.get_port())
+    source = get_client_address(client)
     print("New WebSocket connection from "+source)
 
-    add_new_client(source)
+    # FIXME: HTTP(S) requests and Websocket connection come from different ports...
+    add_new_client(source,{}) # flags[source])
     wrb = WebRTCPeer(connection,source)
     connection.connect("closed",ws_close_handler,wrb)
     # TODO: do we ever need the wrb reference in the Client object?

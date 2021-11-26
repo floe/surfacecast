@@ -30,13 +30,15 @@ offsets = [
 
 class Client:
 
-    def __init__(self,name):
+    def __init__(self,name,flags):
 
         self.wrb = None
         self.name = name
+        self.flags = flags
         self.inputs  = {}
         self.outputs = {}
         self.mixers = {}
+        print(flags)
 
     # create mixer & converter
     def create_mixer(self,mtype,mixer,convert,caps):
@@ -194,6 +196,6 @@ def on_element_added(thebin, element):
         link_new_client(client)
 
 # add new client to pool
-def add_new_client(source):
-    clients[source] = Client(source)
+def add_new_client(source,flags):
+    clients[source] = Client(source,flags)
  
