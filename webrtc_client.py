@@ -37,6 +37,8 @@ def on_element_added(thebin, element):
 
 
 # "main"
+print("SurfaceCast frontend client v0.1\n")
+
 init_pipeline(on_element_added)
 
 # TODO: use non-fake sources (ideally configurable)
