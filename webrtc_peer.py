@@ -106,8 +106,12 @@ class WebRTCPeer:
         print("New data channel created...")
         self.data_channel = data_channel
         self.data_channel.connect("on-message-string", self.on_dc_message)
+        self.data_channel.connect("on-message-data",   self.on_dc_message)
         # FIXME: doesn't seem to send anything?
+        self.data_channel.emit("send-data",GLib.Bytes.new("Hi!".encode("utf-8")))
         self.data_channel.emit("send-string","Hi!")
+        message = json.dumps({"type":"msg","data":"Howdy!"})
+        self.connection.send_text(message)
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
@@ -227,3 +231,5 @@ class WebRTCPeer:
             sdpmlineindex = ice["sdpMLineIndex"]
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
 
+        if msg["type"] == "msg":
+            print("Websocket message:",msg["data"])
