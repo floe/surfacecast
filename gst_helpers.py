@@ -106,24 +106,16 @@ def init_pipeline(callback):
     bus.connect("message", bus_call, mainloop)
 
 # test sources as stream placeholders
-def add_test_sources(main=False):
+def add_test_sources(frontdev,surfdev,fake=False,bgcol=0xFF00FF00,wave="ticks"):
 
-    bgcol = 0xFF00FF00
-    wave  = "ticks"
-
-    if main:
-        bgcol = 0xFFFF00FF
-        wave  = "sine"
-
-    if main:
+    if fake:
         frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
         surfsrc  = [ new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}) ]
         audiosrc = [ new_element("audiotestsrc",{"is-live":True,"wave":wave}) ]
     else:
-        frontsrc = [ new_element("v4l2src",{"do-timestamp":True,"device":"/dev/video0" }), new_element("videorate"), new_element("videoconvert") ]
-        #frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
-        surfsrc  = [ new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}) ]
-        #surfsrc  = [ new_element("v4l2src",{"do-timestamp":True,"device":"/dev/video10"}), new_element("videorate"), new_element("videoconvert") ]
+        # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
+        frontsrc = [ new_element("v4l2src",{"do-timestamp":True,"device":frontdev}), new_element("videorate"), new_element("videoconvert") ]
+        surfsrc  = [ new_element("v4l2src",{"do-timestamp":True,"device":surfdev }), new_element("videorate"), new_element("videoconvert") ]
         audiosrc = [ new_element("alsasrc",{"do-timestamp":True}), new_element("audiorate"), new_element("audioconvert") ]
 
     add_and_link(frontsrc + [
@@ -140,6 +132,7 @@ def add_test_sources(main=False):
         new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])
+
 
 def run_mainloop():
     mainloop.run()

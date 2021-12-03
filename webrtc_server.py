@@ -63,7 +63,7 @@ print("SurfaceCast backend mixer v0.1\n")
 
 init_pipeline(on_element_added)
 
-add_test_sources(main=True)
+add_test_sources(fake=True,bgcol=0xFFFF00FF,wave="sine")
 
 server = Soup.Server()
 server.add_handler("/",http_handler,None)

@@ -42,7 +42,7 @@ print("SurfaceCast frontend client v0.1\n")
 init_pipeline(on_element_added)
 
 # TODO: use non-fake sources (ideally configurable)
-add_test_sources()
+add_test_sources(frontdev="/dev/video0",surfdev="/dev/video10")
 
 target = "127.0.0.1" if len(sys.argv) < 2 else sys.argv[1]
 
