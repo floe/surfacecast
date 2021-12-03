@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json
+import sys,gi,json,argparse
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -39,17 +39,25 @@ def on_element_added(thebin, element):
 # "main"
 print("SurfaceStreams frontend client v0.1\n")
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument(     "--fake",   help="use fake sources, ignore other opts",action="store_true"  )
+parser.add_argument("-t","--target", help="server to connect to (%(default)s)",default="127.0.0.1"   )
+parser.add_argument("-f","--front",  help="front image source   (%(default)s)",default="/dev/video0" )
+parser.add_argument("-s","--surface",help="surface image source (%(default)s)",default="/dev/video10")
+
+args = parser.parse_args()
+print("Option",args)
+
 init_pipeline(on_element_added)
 
-# TODO: use non-fake sources (ideally configurable)
-add_test_sources(frontdev="/dev/video0",surfdev="/dev/video10")
-
-target = "127.0.0.1" if len(sys.argv) < 2 else sys.argv[1]
+add_test_sources(args.front,args.surface,args.fake)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
-msg = Soup.Message.new("GET", "wss://"+target+":8080/ws")
+msg = Soup.Message.new("GET", "wss://"+args.target+":8080/ws")
 session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
+
 #msg = Soup.Message.new("GET", "https://127.0.0.1:8080/stream.html")
 #session.add_feature(Soup.Logger.new(Soup.LoggerLogLevel.BODY, -1))
 #session.queue_message(msg,ws_conn_handler,None)
