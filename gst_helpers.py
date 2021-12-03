@@ -106,7 +106,7 @@ def init_pipeline(callback):
     bus.connect("message", bus_call, mainloop)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev,surfdev,fake=False,bgcol=0xFF00FF00,wave="ticks"):
+def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):
 
     if fake:
         frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
