@@ -136,3 +136,18 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
 
 def run_mainloop():
     mainloop.run()
+
+# FIXME: hacking around the buggy v4l2loopback implementation
+# Note: v4l2loopback works as long as RGB format is fed in (which floe/surfacecast does anyway).
+framenum = 1
+
+def probe_callback(pad,info,pdata):
+    #pad = get_by_name("v4l2src0").get_static_pad("src")
+    #pad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
+    global framenum
+    buf = info.get_buffer()
+    buf.offset = framenum
+    buf.offset_end = framenum+1
+    framenum = framenum+1
+    #print(buf.dts,buf.duration,buf.offset,buf.offset_end,buf.pts,buf.get_size(),pad.get_current_caps().to_string())
+    return Gst.PadProbeReturn.OK
