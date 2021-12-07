@@ -49,9 +49,9 @@ function onCanvasMove(evt) {
 function onLocalDescription(desc) {
   var mapping = { };
   for (const trans of webrtcPeerConnection.getTransceivers()) {
-    if (trans.sender.track.id == surfacetrans) mapping["surface"] = trans.mid;
-    if (trans.sender.track.id == fronttrans  ) mapping["front"  ] = trans.mid;
-    if (trans.sender.track.id == audiotrans  ) mapping["audio"  ] = trans.mid;
+    if (trans.sender.track.id == surfacetrans) mapping[trans.mid] = "surface";
+    if (trans.sender.track.id == fronttrans  ) mapping[trans.mid] = "front";
+    if (trans.sender.track.id == audiotrans  ) mapping[trans.mid] = "audio";
   }
   webrtcPeerConnection.setLocalDescription(desc).then(function() {
     websocketConnection.send(JSON.stringify({ "type": "sdp", "data": webrtcPeerConnection.localDescription, "mapping": mapping }));
@@ -68,7 +68,7 @@ function onIncomingSDP(sdp) {
 
 function onIncomingICE(ice) {
   var candidate = new RTCIceCandidate(ice);
-  console.log("Incoming ICE: " + JSON.stringify(ice));
+  //console.log("Incoming ICE: " + JSON.stringify(ice));
   webrtcPeerConnection.addIceCandidate(candidate).catch(reportError);
 }
 
@@ -76,17 +76,17 @@ function onIncomingICE(ice) {
 function onAddRemoteStream(event) {
   console.log(event);
 
-  if (event.transceiver.mid == remotemap["front"]) {
+  if (remotemap[event.transceiver.mid] == "front") {
     frontstream.addTrack(event.track);
     html5VideoElement.srcObject = frontstream;
     html5VideoElement.play();
   }
 
-  if (event.transceiver.mid == remotemap["audio"]) {
+  if (remotemap[event.transceiver.mid] == "audio") {
     frontstream.addTrack(event.track);
   }
 
-  if (event.transceiver.mid == remotemap["surface"]) {
+  if (remotemap[event.transceiver.mid] == "surface") {
     surfacestream.addTrack(event.track);
     html5VideoElement2.srcObject = surfacestream;
     html5VideoElement2.play();
@@ -102,7 +102,7 @@ function onIceCandidate(event) {
   if (event.candidate == null)
     return;
 
-  console.log("Sending ICE candidate out: " + JSON.stringify(event.candidate));
+  //console.log("Sending ICE candidate out: " + JSON.stringify(event.candidate));
   websocketConnection.send(JSON.stringify({ "type": "ice", "data": event.candidate }));
 }
 

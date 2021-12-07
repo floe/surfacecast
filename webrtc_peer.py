@@ -23,6 +23,8 @@ response_type = {
     "answer": GstWebRTC.WebRTCSDPType.ANSWER
 }
 
+# FIXME: apparently it's not a good idea to directly use payload numbers,
+# but still no idea how to identify the streams individually otherwise...
 payload = {
     96: "front",
     97: "audio",
@@ -49,7 +51,7 @@ def get_mids_from_sdp(sdptext):
 
         if line.startswith("a=mid:"):
             mid = line.split(":")[1]
-            result[payload[plnum]] = mid
+            result[mid] = payload[plnum]
 
     return result
 
@@ -63,6 +65,7 @@ class WebRTCPeer:
         self.is_client = is_client
         self.data_channel = None
         self.address = address
+        self.mapping = None
 
         self.bin = Gst.parse_bin_from_description(bindesc,False)
         self.bin.set_name("bin_"+address)
@@ -122,6 +125,7 @@ class WebRTCPeer:
     def on_negotiation_needed(self, wrb):
 
         # explicitly set transceivers to SENDRECV (only for 1.18)
+        # FIXME: still doesn't work on 1.18 :-/
         for i in range(3): # FIXME: should be dynamic
             trans = self.wrb.emit("get-transceiver",i)
             if (trans.find_property("direction")):
@@ -150,7 +154,9 @@ class WebRTCPeer:
 
         # FIXME this is an extremly ugly hack, treating SDP as "string soup"
         # see https://stackoverflow.com/q/65408744/838719 for some background
+        # a (slightly) better solution would be to use the result.sdp object
         mapping = get_mids_from_sdp(text)
+        print("Outgoing stream mapping:",mapping)
 
         message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
         self.connection.send_text(message)
@@ -160,13 +166,13 @@ class WebRTCPeer:
 
         caps = pad.get_current_caps()
         struct = caps.get_structure(0)
-        res, plnum = struct.get_int("payload")
+        res, ssrc = struct.get_uint("ssrc")
 
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
         print("New incoming stream, linking to decodebin...")
-        decodebin = new_element("decodebin",myname="decodebin_"+payload[plnum])
+        decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin) # or self.bin.add(...)?
@@ -206,8 +212,7 @@ class WebRTCPeer:
             return
 
         if msg["type"] == "sdp":
-            # TODO: use mapping for payload ID <-> stream name
-            #print(msg["mapping"])
+
             reply = msg["data"]
             stype = reply["type"]
             sdp = reply["sdp"]
@@ -219,11 +224,26 @@ class WebRTCPeer:
             result = GstWebRTC.WebRTCSessionDescription.new(response_type[stype], sdpmsg)
             self.wrb.emit("set-remote-description", result, None)
 
+            # mapping contains only MediaIDs, but we need SSRC locally
+            if "mapping" in msg:
+                self.mapping = msg["mapping"]
+
+                # lookup corresponding SSRC for each MediaID
+                for i in range(sdpmsg.medias_len()):
+                    media = sdpmsg.get_media(i)
+                    mid  = media.get_attribute_val("mid").split(" ")[0]
+                    ssrc = media.get_attribute_val("ssrc")
+                    if ssrc and mid in self.mapping:
+                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
+
+                print("Incoming stream mapping:",self.mapping)
+
             # on the client side, we need to manually trigger the negotiation answer
             if self.is_client:
                 self.on_negotiation_needed(self.wrb)
 
         if msg["type"] == "ice":
+
             ice = msg["data"]
             candidate = ice["candidate"]
             if len(candidate) == 0:
