@@ -30,15 +30,19 @@ offsets = [
 
 class Client:
 
-    def __init__(self,name,flags):
+    def __init__(self,name):
 
         self.wrb = None
         self.name = name
-        self.flags = flags
+        self.flags = {}
         self.inputs  = {}
         self.outputs = {}
         self.mixers = {}
-        print(flags)
+        clients[name] = self
+
+    def process(self, msg):
+        self.flags[msg] = True
+        print("Setting flags for",self.name,":",self.flags)
 
     # create mixer & converter
     def create_mixer(self,mtype,mixer,convert,caps):
@@ -84,17 +88,11 @@ class Client:
             print("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
             # TODO: needs a queue?
             link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
-            #add_and_link([
-            #    self.outputs[prefix],
-            #    new_element("queue",qparams),
-            #    dest.mixers[prefix]
-            #])
             mixer_links.append(linkname)
 
-            # for the "main" surface (identified through special SSRC),
-            # the destination mixer pad needs to have zorder = 0
+            # for the "main" surface, destination mixer pad needs zorder = 0
             # FIXME: feels like an ugly hack to do this here...
-            if prefix == "surface" and self.name == "FIXME":
+            if prefix == "surface" and "main" in self.flags:
                 print("    fixing zorder for main client")
                 sinkpads = dest.mixers[prefix].sinkpads
                 sinkpads[-1].set_property("zorder",0)
@@ -135,14 +133,7 @@ def create_frontmixer_queue():
     frontmixer  = new_element("compositor",myname="frontmixer")
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
-    add_and_link([
-        frontmixer,
-        #new_element("videoconvert"),
-        # TODO: capsfilter here, probably
-        #new_element("queue",{"max-size-buffers":1}),
-        #new_element("x264enc",x264params),
-        frontstream
-    ])
+    add_and_link([ frontmixer, frontstream ])
 
 # link new client to mixers
 def link_new_client(client):
@@ -195,7 +186,3 @@ def on_element_added(thebin, element):
         print("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 
-# add new client to pool
-def add_new_client(source,flags):
-    clients[source] = Client(source,flags)
- 

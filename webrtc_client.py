@@ -11,6 +11,8 @@ from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
+args = None
+
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
     print("WebSocket closed by remote.")
@@ -19,7 +21,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",is_client=True)
+    wrb = WebRTCPeer(connection,"client",is_client=True,is_main=args.main)
     connection.connect("closed",ws_close_handler,wrb)
 
 def on_element_added(thebin, element):
@@ -42,6 +44,7 @@ print("SurfaceStreams frontend client v0.1\n")
 parser = argparse.ArgumentParser()
 
 parser.add_argument(     "--fake",   help="use fake sources, ignore other opts",action="store_true"  )
+parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true"  )
 parser.add_argument("-t","--target", help="server to connect to (%(default)s)",default="127.0.0.1"   )
 parser.add_argument("-f","--front",  help="front image source   (%(default)s)",default="/dev/video0" )
 parser.add_argument("-s","--surface",help="surface image source (%(default)s)",default="/dev/video10")

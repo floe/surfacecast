@@ -12,8 +12,6 @@ from gst_helpers import *
 from client import *
 from webrtc_peer import WebRTCPeer
 
-flags = { }
-
 # get address and port from client
 def get_client_address(client):
     addr = client.get_remote_address()
@@ -22,7 +20,7 @@ def get_client_address(client):
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
     print("HTTP(S) request for "+path)
-    flags[get_client_address(client)] = query
+    #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
         data = open(path[1:],"r").read()
@@ -37,7 +35,6 @@ def http_handler(server,msg,path,query,client,user_data):
     msg.set_status(Soup.Status.OK)
 
 # TODO: add request to restart server
-# TODO: add request to flag client as main (lowest z-layer)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
@@ -50,13 +47,9 @@ def ws_conn_handler(server, connection, path, client, user_data):
     source = get_client_address(client)
     print("New WebSocket connection from "+source)
 
-    # FIXME: HTTP(S) requests and Websocket connection come from different ports...
-    add_new_client(source,{}) # flags[source])
-    wrb = WebRTCPeer(connection,source)
+    new_client = Client(source)
+    wrb = WebRTCPeer(connection,source,new_client)
     connection.connect("closed",ws_close_handler,wrb)
-    # TODO: do we ever need the wrb reference in the Client object?
-    #clients[source].wrb = wrb
-
 
 # "main"
 print("SurfaceStreams backend mixer v0.1\n")

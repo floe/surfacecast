@@ -59,13 +59,14 @@ def get_mids_from_sdp(sdptext):
 
 class WebRTCPeer:
 
-    def __init__(self, connection, address, is_client=False):
+    def __init__(self, connection, address, msghandler = None, is_client=False, is_main=False):
 
         self.connection = connection
         self.is_client = is_client
         self.data_channel = None
         self.address = address
         self.mapping = None
+        self.msghandler = msghandler
 
         self.bin = Gst.parse_bin_from_description(bindesc,False)
         self.bin.set_name("bin_"+address)
@@ -100,6 +101,11 @@ class WebRTCPeer:
         # create the data channel
         self.wrb.emit("create-data-channel", "events", None)
 
+        # send message to server if main client
+        if is_main:
+            message = json.dumps({"type":"msg","data":"main"})
+            self.connection.send_text(message)
+
     # message on WebRTC data channel
     def on_dc_message(self, wrb, message):
         print("New data channel message: "+message)
@@ -113,8 +119,6 @@ class WebRTCPeer:
         # FIXME: doesn't seem to send anything?
         self.data_channel.emit("send-data",GLib.Bytes.new("Hi!".encode("utf-8")))
         self.data_channel.emit("send-string","Hi!")
-        message = json.dumps({"type":"msg","data":"Howdy!"})
-        self.connection.send_text(message)
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
@@ -251,5 +255,5 @@ class WebRTCPeer:
             sdpmlineindex = ice["sdpMLineIndex"]
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
 
-        if msg["type"] == "msg":
-            print("Websocket message:",msg["data"])
+        if msg["type"] == "msg" and self.msghandler:
+            self.msghandler.process(msg["data"])
