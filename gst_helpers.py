@@ -116,7 +116,7 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
         frontsrc = [ new_element("v4l2src",{"do-timestamp":True,"device":frontdev}), new_element("videorate"), new_element("videoconvert") ]
         surfsrc  = [ new_element("v4l2src",{"do-timestamp":True,"device":surfdev }), new_element("videorate"), new_element("videoconvert") ]
-        audiosrc = [ new_element("alsasrc",{"do-timestamp":True}), new_element("audiorate"), new_element("audioconvert") ]
+        audiosrc = [ new_element("alsasrc",{"do-timestamp":True}) ] #, new_element("audiorate"), new_element("audioconvert") ]
 
     add_and_link(frontsrc + [
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),

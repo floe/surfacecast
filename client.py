@@ -71,7 +71,6 @@ class Client:
         # request and link pads from tee and frontmixer
         # TODO: needs a queue or not?
         sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
-        #sinkpad.set_property("max-last-buffer-repeat",10000000000) # apparently not needed
 
         # set xpos/ypos properties on pad according to sequence number
         # FIXME: only works with <= 4 clients at the moment
@@ -87,15 +86,13 @@ class Client:
 
             print("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
             # TODO: needs a queue?
-            link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
+            sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
             mixer_links.append(linkname)
 
             # for the "main" surface, destination mixer pad needs zorder = 0
-            # FIXME: feels like an ugly hack to do this here...
             if prefix == "surface" and "main" in self.flags:
                 print("    fixing zorder for main client")
-                sinkpads = dest.mixers[prefix].sinkpads
-                sinkpads[-1].set_property("zorder",0)
+                sinkpad.set_property("zorder",0)
 
     # link all other clients to this mixer, this client to other mixers
     def link_streams(self,clients,prefix,qparams):
