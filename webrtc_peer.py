@@ -170,13 +170,13 @@ class WebRTCPeer:
 
         caps = pad.get_current_caps()
         struct = caps.get_structure(0)
-        res, plid = struct.get_int("payload")
+        res, ssrc = struct.get_uint("ssrc")
 
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
         print("New incoming stream, linking to decodebin...")
-        decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(plid)])
+        decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin) # or self.bin.add(...)?
@@ -236,9 +236,9 @@ class WebRTCPeer:
                 for i in range(sdpmsg.medias_len()):
                     media = sdpmsg.get_media(i)
                     mid  = media.get_attribute_val("mid").split(" ")[0]
-                    plid = media.get_attribute_val("rtpmap")
-                    if plid and mid in self.mapping:
-                        self.mapping[plid.split(" ")[0]] = self.mapping[mid]
+                    ssrc = media.get_attribute_val("ssrc")
+                    if ssrc and mid in self.mapping:
+                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
 
                 print("Incoming stream mapping:",self.mapping)
 
