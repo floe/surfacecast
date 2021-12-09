@@ -6,7 +6,7 @@ var webrtcConfiguration;
 var reportError;
 var datastream;
 var canvas;
-var context;
+var context,c2;
 var canvasstream;
 var mousedown;
 var mycolor;
@@ -19,27 +19,33 @@ var remotemap;
 var frontstream;
 var surfacestream;
 
+function paint(ctx, centerX, centerY, clearcolor, clearmode) {
+  const radius = (mousedown == 1) ? 5 : 20;
+  ctx.beginPath();
+  ctx.lineWidth = radius;
+  ctx.strokeStyle = (mousedown == 1) ? mycolor : clearcolor;
+  ctx.fillStyle = ctx.strokeStyle
+  ctx.globalCompositeOperation = (mousedown == 1) ? "source-over" : clearmode;
+  ctx.moveTo(x,y);
+  ctx.lineTo(centerX,centerY);
+  ctx.stroke();
+  ctx.arc(centerX, centerY, radius/2, 0, 2 * Math.PI, false);
+  ctx.fill();
+  ctx.closePath();
+}
+
 
 function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0; }
+function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;           }
+
 function onCanvasMove(evt) {
+
   if (mousedown == 0) return;
   const centerX = evt.offsetX;
   const centerY = evt.offsetY;
-  const radius = (mousedown == 1) ? 5 : 20;
 
-  context.beginPath();
-  context.lineWidth = radius;
-  context.strokeStyle = (mousedown == 1) ? mycolor : "rgba(0,255,0,1)";
-  context.fillStyle = context.strokeStyle
-  context.globalCompositeOperation = (mousedown == 1) ? "source-over" : "destination-out";
-  //context.strokeStyle = mycolor;
-  context.moveTo(x,y);
-  context.lineTo(centerX,centerY);
-  context.stroke();
-  context.arc(centerX, centerY, radius/2, 0, 2 * Math.PI, false);
-  context.fill();
-  context.closePath();
+  paint(context, centerX, centerY, "rgba(0,  0,0,255)", "destination-out");
+  paint(c2,      centerX, centerY, "rgba(0,255,0,255)", "source-over"    );
 
   x = centerX;
   y = centerY;
@@ -93,8 +99,6 @@ function onAddRemoteStream(event) {
   }
 
   // FIXME: on Chrome, canvas stream only starts after first onclick event?
-  context.fillStyle = "rgba(0,255,0,0)";
-  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 
@@ -107,7 +111,7 @@ function onIceCandidate(event) {
 }
 
 function getLocalStreams() {
-  var constraints = {video: { width: 640, height: 360, facingMode: "user" }, audio: true};
+  var constraints = {video: { width: { ideal: 640 }, height: { ideal: 360 }, aspectRatio: { ideal: 1.7777777778 }, facingMode: "user" }, audio: true};
   return navigator.mediaDevices.getUserMedia(constraints);
 }
 
@@ -166,16 +170,9 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       fronttrans = fronttrack.id;
       webrtcPeerConnection.addTrack(fronttrack);
 
-    context.beginPath();
-    context.arc(0, 0, 5, 0, 2 * Math.PI, false);
-    context.fillStyle = "yellow";
-    context.fill();
-
-      canvasstream = canvas.captureStream(15);
+      canvasstream = canvas2.captureStream(15);
       canvastrack = canvasstream.getVideoTracks()[0];
-      //canvastrack.requestFrame();
       canvastrack.contentHint = "detail";
-      //for (const track of canvasstream.getTracks()) {
       surfacetrans = canvastrack.id;
       webrtcPeerConnection.addTrack(canvastrack, stream);
 
@@ -194,6 +191,9 @@ window.onload = function() {
   context = canvas.getContext("2d");
   canvas.width=1280;
   canvas.height=720;
+  context.fillStyle = "rgba(0,255,0,0)";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
   canvas.onmousedown = onCanvasDown;
   canvas.onmouseup   = onCanvasUp;
   canvas.onmousemove = onCanvasMove;
@@ -202,4 +202,12 @@ window.onload = function() {
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
+
+  canvas2 = document.getElementById("canvas2");
+  c2 = canvas2.getContext("2d");
+  canvas2.width=1280;
+  canvas2.height=720;
+
+  c2.fillStyle = "rgba(0,255,0,255)";
+  c2.fillRect(0, 0, canvas2.width, canvas2.height);
 };
