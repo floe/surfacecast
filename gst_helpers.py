@@ -137,6 +137,9 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
 def run_mainloop():
     mainloop.run()
 
+def quit_mainloop():
+    mainloop.quit()
+
 # FIXME: hacking around the buggy v4l2loopback implementation
 # Note: v4l2loopback works as long as RGB format is fed in (which floe/surfacecast does anyway).
 framenum = 1
