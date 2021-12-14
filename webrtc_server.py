@@ -28,6 +28,9 @@ def http_handler(server,msg,path,query,client,user_data):
             content_type = "text/javascript"
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
+        if path == "/quit":
+            print("Well... bye.")
+            quit_mainloop()
         return
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
