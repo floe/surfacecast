@@ -33,9 +33,9 @@ def on_element_added(thebin, element):
     name = name.split("_")[-1]
 
     if name == "front" or name == "surface":
-        add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink",{"sync":False}) ])
+        add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink", {"text-overlay":args.debug}) ])
     elif name == "audio":
-        add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink",{"sync":False}) ])
+        add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
 
 # "main"
@@ -45,6 +45,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(     "--fake",   help="use fake sources, ignore other opts",action="store_true"  )
 parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true"  )
+parser.add_argument("-d","--debug",  help="print more verbose debug output"    ,action="store_true"  )
 parser.add_argument("-t","--target", help="server to connect to (%(default)s)",default="127.0.0.1"   )
 parser.add_argument("-f","--front",  help="front image source   (%(default)s)",default="/dev/video0" )
 parser.add_argument("-s","--surface",help="surface image source (%(default)s)",default="/dev/video10")
