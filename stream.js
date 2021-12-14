@@ -175,6 +175,8 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       canvastrack.contentHint = "detail";
       surfacetrans = canvastrack.id;
       webrtcPeerConnection.addTrack(canvastrack, stream);
+      // make sure that the canvas stream starts by triggering a delayed paint operation
+      setTimeout(() => { c2.fillRect(0, 0, canvas2.width, canvas2.height); }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
