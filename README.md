@@ -25,7 +25,7 @@ The mixing server then composes a new surface stream for each client, consisting
   * Install dependencies: `sudo apt install gstreamer1.0-libav gir1.2-soup-2.4 gir1.2-gstreamer-1.0 gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-nice-0.1 libnice10 gstreamer1.0-nice gstreamer1.0-plugins-bad`
 
 * HTML5 client
-  * Firefox 78 ESR
+  * Firefox 78 ESR (Note: remember to enable OpenH264 plugin in about:plugins)
   * Firefox 94/95
   * Chrome 92
   * Chromium (buggy)
