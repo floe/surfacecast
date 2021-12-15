@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json
+import sys,gi,json,re
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('GstWebRTC', '1.0')
@@ -128,13 +128,6 @@ class WebRTCPeer:
     # format negotiation requested
     def on_negotiation_needed(self, wrb):
 
-        # explicitly set transceivers to SENDRECV (only for 1.18)
-        # FIXME: still doesn't work on 1.18 :-/
-        for i in range(3): # FIXME: should be dynamic
-            trans = self.wrb.emit("get-transceiver",i)
-            if (trans.find_property("direction")):
-                trans.set_property("direction", GstWebRTC.WebRTCRTPTransceiverDirection.SENDRECV)
-
         # request offer or answer, depending on role
         kind = "answer" if self.is_client else "offer"
         print("Negotiation requested, creating "+kind+"...")
@@ -155,6 +148,11 @@ class WebRTCPeer:
         self.wrb.emit("set-local-description", result, None)
 
         text = result.sdp.as_text()
+
+        # 1.16 generates sprop-parameter-sets containing the substring "DAILS", 1.18 contains "DAwNS".
+        # This can confuse caps negotiation on the client side, and subsequently transceiver matching.
+        # To avoid this issue altogether, get rid of the entire SPS parameter in the generated SDP.
+        text = re.sub(";sprop-parameter-sets=.*","",text)
 
         # FIXME this is an extremly ugly hack, treating SDP as "string soup"
         # see https://stackoverflow.com/q/65408744/838719 for some background
