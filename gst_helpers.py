@@ -24,11 +24,9 @@ def add_and_link(elements):
     for item in elements:
         if item == None:
             continue
-        # FIXME what about duplicate names in child bins?
         if pipeline.get_by_name(item.name) == None:
             pipeline.add(item)
         item.sync_state_with_parent()
-        # TODO: add a way to link pads instead of elements?
         if prev != None:
             prev.link(item)
         prev = item
@@ -140,7 +138,7 @@ def run_mainloop():
 def quit_mainloop():
     mainloop.quit()
 
-# FIXME: hacking around the buggy v4l2loopback implementation
+# example for how to hack around the buggy v4l2loopback implementation, not needed ATM
 # Note: v4l2loopback works as long as RGB format is fed in (which floe/surfacecast does anyway).
 framenum = 1
 

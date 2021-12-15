@@ -73,7 +73,6 @@ class Client:
         sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
 
         # set xpos/ypos properties on pad according to sequence number
-        # FIXME: only works with <= 4 clients at the moment
         padnum = int(sinkpad.get_name().split("_")[1])
         sinkpad.set_property("xpos",offsets[padnum][0])
         sinkpad.set_property("ypos",offsets[padnum][1])
@@ -142,7 +141,6 @@ def link_new_client(client):
     # create surface/audio mixers for _all_ clients that don't have one yet
     # needs to loop through all clients for the case where 2 or more clients
     # appear simultaneously, otherwise there are no mixers to link to
-    # FIXME: this is a hack, might be solved by using the testsources initially?
     if len(clients) >= 2:
         for c in clients:
             clients[c].create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),

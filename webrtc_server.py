@@ -37,8 +37,6 @@ def http_handler(server,msg,path,query,client,user_data):
     msg.response_body.append(data.encode("utf-8"))
     msg.set_status(Soup.Status.OK)
 
-# TODO: add request to restart server
-
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
     # TODO actually handle closing (might be tricky, needs to rewire pipeline)

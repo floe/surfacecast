@@ -177,7 +177,7 @@ class WebRTCPeer:
         decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
-        self.wrb.parent.add(decodebin) # or self.bin.add(...)?
+        self.wrb.parent.add(decodebin) # TODO or self.bin.add(...)?
         decodebin.sync_state_with_parent()
         pad.link(decodebin.get_static_pad("sink"))
 
