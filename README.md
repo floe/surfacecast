@@ -30,3 +30,9 @@ The mixing server then composes a new surface stream for each client, consisting
   * Chrome 92
   * Chromium (buggy)
   * Safari (buggy?)
+
+## Known issues
+  
+  * The server will repeatedly issue the warning `[...]: loop detected in the graph of bin 'pipeline0'!!`, which can be safely ignored.
+  * Using webcams as live sources in the Python client (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YV12. (see also [issue #4](https://github.com/floe/surfacestreams/issues/4))
+  * The Python client has a noticeable delay before the surface stream finally starts running, unlike e.g. the browser client (see also [issue #2](https://github.com/floe/surfacestreams/issues/2))
