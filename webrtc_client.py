@@ -51,7 +51,7 @@ parser.add_argument("-f","--front",  help="front image source   (device or pipel
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
 
 args = parser.parse_args()
-print("Option",args)
+print("Option",args,"\n")
 
 init_pipeline(on_element_added)
 

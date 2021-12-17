@@ -42,7 +42,7 @@ class Client:
 
     def process(self, msg):
         self.flags[msg] = True
-        print("Setting flags for",self.name,":",self.flags)
+        logging.info("Setting flags for "+self.name+": "+str(self.flags))
 
     # create mixer & converter
     def create_mixer(self,mtype,mixer,convert,caps):
@@ -50,7 +50,7 @@ class Client:
         if mtype in self.mixers:
             return
 
-        print("    creating "+mtype+" mixer for client "+self.name)
+        logging.info("    creating "+mtype+" mixer for client "+self.name)
         self.mixers[mtype] = mixer
         add_and_link([mixer,convert,caps])
         link_to_inputselector(caps,"src",self.inputs[mtype])
@@ -62,7 +62,7 @@ class Client:
         if not "front" in self.inputs or not "front" in self.outputs:
             return
 
-        print("    linking client "+self.name+" to frontmixer")
+        logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
         # TODO: seems to work witouth queue?
@@ -83,14 +83,14 @@ class Client:
         linkname = prefix+"_"+self.name+"_"+dest.name
         if not linkname in mixer_links:
 
-            print("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
+            logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
             # TODO: needs a queue?
             sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
             mixer_links.append(linkname)
 
             # for the "main" surface, destination mixer pad needs zorder = 0
             if prefix == "surface" and "main" in self.flags:
-                print("    fixing zorder for main client")
+                logging.info("    fixing zorder for main client")
                 sinkpad.set_property("zorder",0)
 
     # link all other clients to this mixer, this client to other mixers
@@ -124,7 +124,7 @@ def create_frontmixer_queue():
     if frontmixer != None or frontstream != None:
         return
 
-    print("  creating frontmixer subqueue")
+    logging.info("  creating frontmixer subqueue")
 
     frontmixer  = new_element("compositor",myname="frontmixer")
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
@@ -136,7 +136,7 @@ def link_new_client(client):
 
     create_frontmixer_queue()
 
-    print("  setting up mixers for new client "+client.name)
+    logging.info("  setting up mixers for new client "+client.name)
 
     # create surface/audio mixers for _all_ clients that don't have one yet
     # needs to loop through all clients for the case where 2 or more clients
@@ -167,7 +167,7 @@ def on_element_added(thebin, element):
     direction = elname[0]
     source = elname[1]+"_"+elname[2]
     stype = elname[3]
-    #print(direction,source,stype)
+    #logging.debug("New element:",direction,source,stype)
 
     client = clients[source]
 
@@ -178,6 +178,6 @@ def on_element_added(thebin, element):
 
     # are all outputs in place?
     if len(client.outputs) == 3:
-        print("Client "+source+": all input/output elements complete.")
+        logging.info("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 

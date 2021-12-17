@@ -91,7 +91,7 @@ def init_pipeline(callback):
 
     global pipeline,mainloop
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(format="%(levelname)s:: %(message)s",level=logging.INFO)
 
     Gst.init(None)
     pipeline = Gst.Pipeline()
