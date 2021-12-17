@@ -97,8 +97,6 @@ function onAddRemoteStream(event) {
     html5VideoElement2.srcObject = surfacestream;
     html5VideoElement2.play();
   }
-
-  // FIXME: on Chrome, canvas stream only starts after first onclick event?
 }
 
 
