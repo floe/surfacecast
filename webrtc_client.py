@@ -15,7 +15,7 @@ args = None
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
-    print("WebSocket closed by remote.")
+    logging.info("WebSocket closed by remote.")
     sys.exit(1)
 
 # outgoing Websocket connection

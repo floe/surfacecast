@@ -19,7 +19,7 @@ def get_client_address(client):
 
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
-    print("HTTP(S) request for "+path)
+    logging.info("HTTP(S) request for: "+path)
     #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
@@ -29,7 +29,7 @@ def http_handler(server,msg,path,query,client,user_data):
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
         if path == "/quit":
-            print("Well... bye.")
+            logging.info("Well... bye.")
             quit_mainloop()
         return
     msg.response_headers.append("Content-Type",content_type)
@@ -40,13 +40,13 @@ def http_handler(server,msg,path,query,client,user_data):
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
     # TODO actually handle closing (might be tricky, needs to rewire pipeline)
-    print("WebSocket closed by remote.")
+    logging.info("WebSocket closed by remote.")
 
 # incoming Websocket connection
 def ws_conn_handler(server, connection, path, client, user_data):
 
     source = get_client_address(client)
-    print("New WebSocket connection from "+source)
+    logging.info("New WebSocket connection from: "+source)
 
     new_client = Client(source)
     wrb = WebRTCPeer(connection,source,new_client)

@@ -33,22 +33,23 @@ def add_and_link(elements):
 
 # capture and handle bus messages
 def bus_call(bus, message, loop):
+    # TODO: handle more message types? see https://lazka.github.io/pgi-docs/index.html#Gst-1.0/flags.html#Gst.MessageType
     t = message.type
-    #print(message.src,t)
+    #logging.debug(message.src,t)
     if t == Gst.MessageType.EOS:
-        print("End-of-stream, quitting.\n")
+        logging.info("Pipeline reached end-of-stream, quitting.")
         loop.quit()
     elif t == Gst.MessageType.ERROR:
         err, debug = message.parse_error()
-        print("Error: %s: %s\n" % (err, debug))
+        logging.error("Pipeline error: %s: %s", err, debug)
         loop.quit()
     elif t == Gst.MessageType.WARNING:
         err, debug = message.parse_warning()
-        print("Warning: %s: %s\n" % (err, debug))
+        logging.warning("Pipeline warning: %s: %s", err, debug)
     elif t == Gst.MessageType.NEW_CLOCK:
-        print("New clock source selected.\n")
+        logging.info("New pipeline clock source selected.")
     elif t == Gst.MessageType.CLOCK_LOST:
-        print("Clock lost!\n")
+        logging.warning("Pipeline clock lost!")
     return True
 
 # convenience function to link request pads
@@ -139,18 +140,3 @@ def run_mainloop():
 
 def quit_mainloop():
     mainloop.quit()
-
-# example for how to hack around the buggy v4l2loopback implementation, not needed ATM
-# Note: v4l2loopback works as long as RGB format is fed in (which floe/surfacecast does anyway).
-framenum = 1
-
-def probe_callback(pad,info,pdata):
-    #pad = get_by_name("v4l2src0").get_static_pad("src")
-    #pad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
-    global framenum
-    buf = info.get_buffer()
-    buf.offset = framenum
-    buf.offset_end = framenum+1
-    framenum = framenum+1
-    #print(buf.dts,buf.duration,buf.offset,buf.offset_end,buf.pts,buf.get_size(),pad.get_current_caps().to_string())
-    return Gst.PadProbeReturn.OK
