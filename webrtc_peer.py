@@ -251,7 +251,7 @@ class WebRTCPeer:
                 return
             sdpmlineindex = ice["sdpMLineIndex"]
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
-            logging.debug("Incoming ICE candidate: " + candidate)
+            logging.debug("Incoming ICE candidate: " + json.dumps(msg))
 
         if msg["type"] == "msg" and self.msghandler:
             self.msghandler.process(msg["data"])

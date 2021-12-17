@@ -53,7 +53,7 @@ parser.add_argument("-s","--surface",help="surface image source (device or pipel
 args = parser.parse_args()
 print("Option",args,"\n")
 
-init_pipeline(on_element_added)
+init_pipeline(on_element_added,args.debug)
 
 add_test_sources(args.front,args.surface,args.fake)
 

@@ -87,11 +87,12 @@ def get_by_name(name):
     return pipeline.get_by_name(name)
 
 # initialize pipeline and mainloop
-def init_pipeline(callback):
+def init_pipeline(callback,do_debug=False):
 
     global pipeline,mainloop
 
-    logging.basicConfig(format="%(levelname)s:: %(message)s",level=logging.INFO)
+    loglevel = logging.DEBUG if do_debug else logging.INFO
+    logging.basicConfig(format="%(levelname)s:: %(message)s",level=loglevel)
 
     Gst.init(None)
     pipeline = Gst.Pipeline()
