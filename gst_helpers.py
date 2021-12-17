@@ -96,7 +96,6 @@ def init_pipeline(callback):
     pipeline = Gst.Pipeline()
 
     # kick things off
-    pipeline.set_state(Gst.State.PLAYING)
     mainloop = GLib.MainLoop()
     pipeline.connect("element-added",callback)
 
@@ -135,6 +134,7 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
 
 
 def run_mainloop():
+    pipeline.set_state(Gst.State.PLAYING)
     mainloop.run()
 
 def quit_mainloop():
