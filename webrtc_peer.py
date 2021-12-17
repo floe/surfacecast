@@ -196,7 +196,7 @@ class WebRTCPeer:
         decodebin.parent.add_pad(ghostpad)
 
         alpha = None
-        if name == "surface":
+        if name == "surface" and not "main" in self.msghandler.flags:
             alpha = new_element("alpha", { "method": "green" } )
 
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
