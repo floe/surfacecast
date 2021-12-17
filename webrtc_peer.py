@@ -140,7 +140,7 @@ class WebRTCPeer:
         if reply == None:
             # Note: this is okay on client side, the initial on-negotiation-needed signal will fire before
             # the remote offer has been received, so it has to be re-triggered once the offer has arrived
-            logging.info("Warning: received empty "+kind+" from webrtcbin!")
+            logging.info("Received empty "+kind+" from webrtcbin, retrying...")
             return
 
         result = reply.get_value(kind)
