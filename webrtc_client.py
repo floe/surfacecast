@@ -43,12 +43,12 @@ print("SurfaceStreams frontend client v0.1\n")
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument(     "--fake",   help="use fake sources, ignore other opts",action="store_true"  )
-parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true"  )
-parser.add_argument("-d","--debug",  help="print more verbose debug output"    ,action="store_true"  )
-parser.add_argument("-t","--target", help="server to connect to (%(default)s)",default="127.0.0.1"   )
-parser.add_argument("-f","--front",  help="front image source   (%(default)s)",default="/dev/video0" )
-parser.add_argument("-s","--surface",help="surface image source (%(default)s)",default="/dev/video10")
+parser.add_argument(     "--fake",   help="use fake sources (desc. from -f/-s)",action="store_true")
+parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true")
+parser.add_argument("-d","--debug",  help="print more verbose debug output"    ,action="store_true")
+parser.add_argument("-t","--target", help="server to connect to (%(default)s)", default="127.0.0.1")
+parser.add_argument("-f","--front",  help="front image source   (device or pipeline)",default=""   )
+parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
 
 args = parser.parse_args()
 print("Option",args)
