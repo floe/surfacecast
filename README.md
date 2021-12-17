@@ -33,7 +33,6 @@ The mixing server then composes a new surface stream for each client, consisting
 
   * Server
     * The server will repeatedly issue the warning `[...]: loop detected in the graph of bin 'pipeline0'!!`, which can be safely ignored.
-    * With GStreamer 1.16, startup will occasionally fail with `Error: gst-stream-error-quark: Internal data stream error. (1): gstbasesrc.c(3072): gst_base_src_loop (): /GstPipeline:pipeline0/GstVideoTestSrc:videotestsrc0: streaming stopped, reason not-linked (-1)`. This is a race condition I haven't yet tracked down, see also [issue #17](https://github.com/floe/surfacestreams/issues/17), and can be fixed by just re-starting (or using 1.18).
   * Python Client
     * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YV12. (see also [issue #4](https://github.com/floe/surfacestreams/issues/4))
     * The Python client has a noticeable delay before the surface stream finally starts running, unlike e.g. the browser client (see also [issue #2](https://github.com/floe/surfacestreams/issues/2))
