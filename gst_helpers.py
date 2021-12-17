@@ -106,26 +106,26 @@ def init_pipeline(callback):
 def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):
 
     if fake:
-        frontsrc = [ new_element("videotestsrc",{"is-live":True,"pattern":"smpte"}) ]
-        surfsrc  = [ new_element("videotestsrc",{"is-live":True,"pattern":"ball","background-color":bgcol}) ]
-        audiosrc = [ new_element("audiotestsrc",{"is-live":True,"wave":wave}) ]
+        frontsrc = "videotestsrc is-live=true pattern=smpte" if frontdev == "" else frontdev
+        surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol) if surfdev == "" else surfdev
+        audiosrc = "audiotestsrc is-live=true wave="+wave
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
-        frontsrc = [ new_element("v4l2src",{"do-timestamp":True,"device":frontdev}), new_element("videorate"), new_element("videoconvert") ]
-        surfsrc  = [ new_element("v4l2src",{"do-timestamp":True,"device":surfdev }), new_element("videorate"), new_element("videoconvert") ]
-        audiosrc = [ new_element("alsasrc",{"do-timestamp":True}) ] #, new_element("audiorate"), new_element("audioconvert") ]
+        frontsrc = "v4l2src do-timestamp=true device="+frontdev+" ! videorate ! videoconvert" 
+        surfsrc  = "v4l2src do-timestamp=true device="+surfdev+"  ! videorate ! videoconvert" 
+        audiosrc = "alsasrc do-timestamp=true" # "audiorate ! audioconvert"
 
-    add_and_link(frontsrc + [
+    add_and_link([ Gst.parse_bin_from_description( frontsrc, True ),
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
-    add_and_link(surfsrc + [
+    add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 
-    add_and_link(audiosrc + [
+    add_and_link([ Gst.parse_bin_from_description( audiosrc, True ),
         new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])
