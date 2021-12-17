@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gi
+import gi,logging
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 from gi.repository import Gst, GLib
@@ -89,6 +89,8 @@ def get_by_name(name):
 def init_pipeline(callback):
 
     global pipeline,mainloop
+
+    logging.basicConfig(level=logging.INFO)
 
     Gst.init(None)
     pipeline = Gst.Pipeline()

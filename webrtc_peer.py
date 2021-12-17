@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,re
+import sys,gi,json,re,logging
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('GstWebRTC', '1.0')
@@ -55,8 +55,6 @@ def get_mids_from_sdp(sdptext):
 
     return result
 
-# TODO: use proper logging
-
 class WebRTCPeer:
 
     def __init__(self, connection, address, msghandler = None, is_client=False, is_main=False):
@@ -108,11 +106,11 @@ class WebRTCPeer:
 
     # message on WebRTC data channel
     def on_dc_message(self, wrb, message):
-        print("New data channel message: "+message)
+        logging.debug("New data channel message: "+message)
 
     # new data channel created
     def on_data_channel(self, wrb, data_channel):
-        print("New data channel created...")
+        logging.info("New data channel created.")
         self.data_channel = data_channel
         self.data_channel.connect("on-message-string", self.on_dc_message)
         self.data_channel.connect("on-message-data",   self.on_dc_message)
@@ -123,6 +121,7 @@ class WebRTCPeer:
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
         icemsg = json.dumps({"type":"ice","data":{"sdpMLineIndex":index,"candidate":candidate}})
+        logging.debug("New local ICE candidate: "+icemsg)
         self.connection.send_text(icemsg)
 
     # format negotiation requested
@@ -130,7 +129,7 @@ class WebRTCPeer:
 
         # request offer or answer, depending on role
         kind = "answer" if self.is_client else "offer"
-        print("Negotiation requested, creating "+kind+"...")
+        logging.info("Negotiation requested, creating "+kind+"...")
         promise = Gst.Promise.new_with_change_func(self.on_negotiation_created,kind)
         self.wrb.emit("create-"+kind, None, promise)
 
@@ -141,7 +140,7 @@ class WebRTCPeer:
         if reply == None:
             # Note: this is okay on client side, the initial on-negotiation-needed signal will fire before
             # the remote offer has been received, so it has to be re-triggered once the offer has arrived
-            print("Warning: received empty "+kind+" from webrtcbin!")
+            logging.info("Warning: received empty "+kind+" from webrtcbin!")
             return
 
         result = reply.get_value(kind)
@@ -158,9 +157,9 @@ class WebRTCPeer:
         # see https://stackoverflow.com/q/65408744/838719 for some background
         # a (slightly) better solution would be to use the result.sdp object
         mapping = get_mids_from_sdp(text)
-        print("Outgoing stream mapping:",mapping)
 
         message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
+        logging.debug("Outgoing SDP: " + message)
         self.connection.send_text(message)
 
     # new pad appears on WebRTCBin element
@@ -173,7 +172,7 @@ class WebRTCPeer:
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
-        print("New incoming stream, linking to decodebin...")
+        logging.info("New incoming stream, linking to decodebin...")
         decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
@@ -184,11 +183,10 @@ class WebRTCPeer:
     def on_decodebin_pad(self, decodebin, pad):
 
         if not pad.has_current_caps():
-            #print ("no caps), ignoring.")
             return
 
         name = decodebin.get_name().split("_")[1]
-        print("Handling new decodebin pad of type: "+name)
+        logging.info("Handling new decodebin pad of type: "+name)
 
         # add named ghostpads ("src_front" etc.)
         ghostpad = Gst.GhostPad.new("src_"+name,pad)
@@ -207,7 +205,6 @@ class WebRTCPeer:
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):
 
-        #print(data.get_data())
         try:
             msg = json.loads(data.get_data())
         except:
@@ -220,6 +217,8 @@ class WebRTCPeer:
             sdp = reply["sdp"]
             if len(sdp) == 0:
                 return
+
+            logging.debug("Incoming SDP: " + json.dumps(msg))
 
             res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
             # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
@@ -238,7 +237,7 @@ class WebRTCPeer:
                     if ssrc and mid in self.mapping:
                         self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
 
-                print("Incoming stream mapping:",self.mapping)
+                logging.debug("Incoming stream mapping:"+json.dumps(self.mapping))
 
             # on the client side, we need to manually trigger the negotiation answer
             if self.is_client:
@@ -252,6 +251,8 @@ class WebRTCPeer:
                 return
             sdpmlineindex = ice["sdpMLineIndex"]
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
+            logging.debug("Incoming ICE candidate: " + candidate)
 
         if msg["type"] == "msg" and self.msghandler:
             self.msghandler.process(msg["data"])
+            logging.debug("Incoming websocket message: "+msg["data"])
