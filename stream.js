@@ -85,7 +85,7 @@ function onAddRemoteStream(event) {
   if (remotemap[event.transceiver.mid] == "front") {
     frontstream.addTrack(event.track);
     html5VideoElement.srcObject = frontstream;
-    html5VideoElement.play();
+    html5VideoElement.play().catch(reportError);
   }
 
   if (remotemap[event.transceiver.mid] == "audio") {
@@ -95,7 +95,7 @@ function onAddRemoteStream(event) {
   if (remotemap[event.transceiver.mid] == "surface") {
     surfacestream.addTrack(event.track);
     html5VideoElement2.srcObject = surfacestream;
-    html5VideoElement2.play();
+    html5VideoElement2.play().catch(reportError);
   }
 }
 
@@ -195,8 +195,11 @@ window.onload = function() {
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   canvas.onmousedown = onCanvasDown;
+  canvas.ontouchstart = onCanvasDown;
   canvas.onmouseup   = onCanvasUp;
+  canvas.ontouchend = onCanvasUp;
   canvas.onmousemove = onCanvasMove;
+
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
