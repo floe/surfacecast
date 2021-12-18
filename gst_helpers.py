@@ -4,12 +4,14 @@ import gi,logging
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 from gi.repository import Gst, GLib
+from functools import partial, partialmethod
 
 # TODO this should be a class Pipeline
 
 # global objects
 pipeline = None
 mainloop = None
+
 
 # conveniently create a new GStreamer element and set parameters
 def new_element(element_name,parameters={},myname=None):
@@ -87,12 +89,19 @@ def get_by_name(name):
     return pipeline.get_by_name(name)
 
 # initialize pipeline and mainloop
-def init_pipeline(callback,do_debug=False):
+def init_pipeline(callback,mylevel=0):
 
     global pipeline,mainloop
 
-    loglevel = logging.DEBUG if do_debug else logging.INFO
-    logging.basicConfig(format="%(levelname)s:: %(message)s",level=loglevel)
+    # add an extra logging level (courtesy of https://stackoverflow.com/a/55276759/838719)
+    logging.TRACE = 5
+    logging.addLevelName(logging.TRACE, "TRACE")
+    logging.Logger.trace = partialmethod(logging.Logger.log, logging.TRACE)
+    logging.trace = partial(logging.log, logging.TRACE)
+
+    # configure the logger
+    loglevels = { 0: logging.INFO, 1: logging.DEBUG, 2: logging.TRACE }
+    logging.basicConfig(format="%(levelname)s:: %(message)s",level=loglevels[mylevel])
 
     Gst.init(None)
     pipeline = Gst.Pipeline()

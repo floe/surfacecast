@@ -121,7 +121,7 @@ class WebRTCPeer:
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
         icemsg = json.dumps({"type":"ice","data":{"sdpMLineIndex":index,"candidate":candidate}})
-        logging.debug("New local ICE candidate: "+icemsg)
+        logging.trace("New local ICE candidate: "+icemsg)
         self.connection.send_text(icemsg)
 
     # format negotiation requested
@@ -251,7 +251,7 @@ class WebRTCPeer:
                 return
             sdpmlineindex = ice["sdpMLineIndex"]
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
-            logging.debug("Incoming ICE candidate: " + json.dumps(msg))
+            logging.trace("Incoming ICE candidate: " + json.dumps(msg))
 
         if msg["type"] == "msg" and self.msghandler:
             self.msghandler.process(msg["data"])
