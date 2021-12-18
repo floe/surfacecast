@@ -37,6 +37,7 @@ def on_element_added(thebin, element):
     elif name == "audio":
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
+    dump_debug("client")
 
 # "main"
 print("SurfaceStreams frontend client v0.1\n")
@@ -45,7 +46,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(     "--fake",   help="use fake sources (desc. from -f/-s)",action="store_true")
 parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true")
-parser.add_argument("-d","--debug",  help="print more verbose debug output"    ,action="store_true")
+parser.add_argument("-d","--debug",  help="more debug output (-dd=max)",action="count",default=0   )
 parser.add_argument("-t","--target", help="server to connect to (%(default)s)", default="127.0.0.1")
 parser.add_argument("-f","--front",  help="front image source   (device or pipeline)",default=""   )
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
@@ -54,6 +55,9 @@ args = parser.parse_args()
 print("Option",args,"\n")
 
 init_pipeline(on_element_added,args.debug)
+
+if not args.fake and (args.front == "" or args.surface == ""):
+    logging.warning("Need to either specify --fake for test sources, or -f/-s for source devices/pipelines.")
 
 add_test_sources(args.front,args.surface,args.fake)
 

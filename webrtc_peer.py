@@ -237,7 +237,7 @@ class WebRTCPeer:
                     if ssrc and mid in self.mapping:
                         self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
 
-                logging.debug("Incoming stream mapping:"+json.dumps(self.mapping))
+                logging.debug("Incoming stream mapping: "+json.dumps(self.mapping))
 
             # on the client side, we need to manually trigger the negotiation answer
             if self.is_client:

@@ -55,7 +55,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 # "main"
 print("SurfaceStreams backend mixer v0.1\n")
 
-init_pipeline(on_element_added)
+init_pipeline(on_element_added,mylevel=1)
 
 add_test_sources(fake=True,bgcol=0xFFFF00FF,wave="sine")
 
