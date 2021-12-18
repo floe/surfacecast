@@ -33,8 +33,10 @@ def on_element_added(thebin, element):
     name = name.split("_")[-1]
 
     if name == "front" or name == "surface":
+        logging.info("Starting video output for "+name)
         add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink", {"text-overlay":args.debug}) ])
     elif name == "audio":
+        logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
     dump_debug("client")

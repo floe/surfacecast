@@ -9,6 +9,7 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 
 from gst_helpers import *
 
+# TODO: 600k bitrate is probably a bit low, maybe 1.5M or so?
 VENCODER="queue max-size-buffers=1 ! x264enc bitrate=600 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! rtph264pay config-interval=-1 ! application/x-rtp,media=video,encoding-name=H264,"
 AENCODER="queue ! opusenc ! rtpopuspay ! queue max-size-time=100000000 ! application/x-rtp,media=audio,encoding-name=OPUS,"
 
@@ -194,6 +195,7 @@ class WebRTCPeer:
         decodebin.parent.add_pad(ghostpad)
 
         alpha = None
+        # TODO: not sure, should we disable alpha filtering for main client or not?
         if name == "surface" and self.msghandler and not "main" in self.msghandler.flags:
             alpha = new_element("alpha", { "method": "green" } )
 

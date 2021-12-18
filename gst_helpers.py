@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gi,logging
+import gi,logging,os
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 from gi.repository import Gst, GLib
@@ -82,6 +82,9 @@ def link_to_inputselector(el1, tpl1, el2):
     return pad
 
 def dump_debug(name="debug"):
+    if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
+        return
+    logging.info("Writing graph snapshot to "+name+".dot")
     # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
     Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails(15),name)
 
@@ -119,8 +122,8 @@ def init_pipeline(callback,mylevel=0):
 def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):
 
     if fake:
-        frontsrc = "videotestsrc is-live=true pattern=smpte" if frontdev == "" else frontdev
-        surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol) if surfdev == "" else surfdev
+        frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay" if frontdev == "" else frontdev
+        surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol)+" ! timeoverlay" if surfdev == "" else surfdev
         audiosrc = "audiotestsrc is-live=true wave="+wave
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
