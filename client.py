@@ -65,11 +65,9 @@ class Client:
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
-        # TODO: seems to work witouth queue?
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
 
         # request and link pads from tee and frontmixer
-        # TODO: needs a queue or not?
         sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
 
         # set xpos/ypos properties on pad according to sequence number
@@ -84,8 +82,8 @@ class Client:
         if not linkname in mixer_links:
 
             logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-            # TODO: needs a queue?
-            sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
+            # TODO: figure out the queue parameters
+            sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
             mixer_links.append(linkname)
 
             # for the "main" surface, destination mixer pad needs zorder = 0

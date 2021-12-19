@@ -55,7 +55,7 @@ def bus_call(bus, message, loop):
     return True
 
 # convenience function to link request pads
-def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True):
+def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
 
     pad1 = el1.get_static_pad(tpl1)
     if pad1 == None:
@@ -66,7 +66,7 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True):
         pad2 = el2.request_pad(el2.get_pad_template(tpl2), None, None)
 
     if do_queue:
-        queue = new_element("queue")#,{"max-size-time":200000000})
+        queue = new_element("queue",qp)
         pipeline.add(queue)
         queue.sync_state_with_parent()
         pad1.link(queue.get_static_pad("sink"))
