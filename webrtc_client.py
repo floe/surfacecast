@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,argparse
+import sys,gi,json,argparse,os
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -12,6 +12,7 @@ from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
 args = None
+sink = ""
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
@@ -24,7 +25,17 @@ def ws_conn_handler(session, result):
     wrb = WebRTCPeer(connection,"client",is_client=True,is_main=args.main)
     connection.connect("closed",ws_close_handler,wrb)
 
+# element message was posted on bus
+def message_cb(bus, message):
+    struct = message.get_structure()
+    res, val = struct.get_uint64("window-handle")
+    if res:
+        # FIXME: this is obviously a hack...
+        os.system("xprop -id "+str(val)+" -format _NET_WM_NAME 8u -set _NET_WM_NAME "+sink)
+
 def on_element_added(thebin, element):
+
+    global sink
 
     name = element.get_name()
     if not name.startswith("output_"):
@@ -35,6 +46,7 @@ def on_element_added(thebin, element):
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
         add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink", {"text-overlay":args.debug}) ])
+        sink = name
     elif name == "audio":
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
@@ -57,6 +69,7 @@ args = parser.parse_args()
 print("Option",args,"\n")
 
 init_pipeline(on_element_added,args.debug)
+connect_bus("message::element",message_cb)
 
 if not args.fake and (args.front == "" or args.surface == ""):
     logging.warning("Need to either specify --fake for test sources, or -f/-s for source devices/pipelines.")

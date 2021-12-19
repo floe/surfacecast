@@ -11,6 +11,7 @@ from functools import partial, partialmethod
 # global objects
 pipeline = None
 mainloop = None
+bus = None
 
 
 # conveniently create a new GStreamer element and set parameters
@@ -37,7 +38,7 @@ def add_and_link(elements):
 def bus_call(bus, message, loop):
     # TODO: handle more message types? see https://lazka.github.io/pgi-docs/index.html#Gst-1.0/flags.html#Gst.MessageType
     t = message.type
-    #logging.debug(message.src,t)
+    logging.trace(str(message.src)+str(t))
     if t == Gst.MessageType.EOS:
         logging.info("Pipeline reached end-of-stream, quitting.")
         loop.quit()
@@ -94,7 +95,7 @@ def get_by_name(name):
 # initialize pipeline and mainloop
 def init_pipeline(callback,mylevel=0):
 
-    global pipeline,mainloop
+    global pipeline,mainloop,bus
 
     # add an extra logging level (courtesy of https://stackoverflow.com/a/55276759/838719)
     logging.TRACE = 5
@@ -117,6 +118,9 @@ def init_pipeline(callback,mylevel=0):
     bus = pipeline.get_bus()
     bus.add_signal_watch()
     bus.connect("message", bus_call, mainloop)
+
+def connect_bus(msgtype, callback, *args):
+    bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
 def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):

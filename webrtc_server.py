@@ -54,6 +54,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 
 # "main"
 print("SurfaceStreams backend mixer v0.1\n")
+print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 init_pipeline(on_element_added,mylevel=1)
 
