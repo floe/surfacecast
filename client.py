@@ -158,6 +158,7 @@ def link_new_client(client):
 def on_element_added(thebin, element):
 
     # check format: {input,output}_IPADDR_PORT_{surface,front,audio}
+    # FIXME: fails if source name is not IPADDR_PORT
     elname = element.get_name().split("_")
     if len(elname) != 4:
         return

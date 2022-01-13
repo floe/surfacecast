@@ -129,6 +129,7 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay" if frontdev == "" else frontdev
         surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol)+" ! timeoverlay" if surfdev == "" else surfdev
         audiosrc = "audiotestsrc is-live=true wave="+wave
+        # audiosrc = "multifilesrc do-timestamp=true loop=true location=count.wav ! wavparse ignore-length=1"
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
         frontsrc = "v4l2src do-timestamp=true device="+frontdev+" ! videorate ! videoconvert" 
@@ -150,7 +151,7 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
     ])
 
     add_and_link([ Gst.parse_bin_from_description( audiosrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}),
         new_element("tee",{"allow-not-linked":True},"audiotestsource")
     ])
 
