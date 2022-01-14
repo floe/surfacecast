@@ -55,6 +55,10 @@ def get_mids_from_sdp(sdptext):
             mid = line.split(":")[1]
             result[mid] = payload[plnum]
 
+        if line.startswith("a=ssrc:"):
+            ssrc = line.split(":")[1].split(" ")[0]
+            result[ssrc] = payload[plnum]
+
     return result
 
 class WebRTCPeer:
@@ -148,15 +152,6 @@ class WebRTCPeer:
         result = reply.get_value(kind)
         text = result.sdp.as_text()
 
-        # check whether all media blocks actually have an SSRC, otherwise retry
-        if text.count("ssrc") < 6:
-            logging.debug("Not all SSRC present, retrying negotiation...")
-            time.sleep(1)
-            self.on_negotiation_needed(self.wrb)
-            return
-
-        self.wrb.emit("set-local-description", result, None)
-
         # 1.16 generates sprop-parameter-sets containing the substring "DAILS", 1.18 contains "DAwNS".
         # This can confuse caps negotiation on the client side, and subsequently transceiver matching.
         # To avoid this issue altogether, get rid of the entire SPS parameter in the generated SDP.
@@ -167,6 +162,17 @@ class WebRTCPeer:
         # a (slightly) better solution would be to use the result.sdp object
         mapping = get_mids_from_sdp(text)
 
+        # check whether all 3 media blocks already have MID & SSRC, otherwise retry
+        if not len(mapping) == 6:
+            logging.debug("Not all MIDs/SSRCs present, retrying negotiation...")
+            time.sleep(1)
+            self.on_negotiation_needed(self.wrb)
+            return
+
+        # SDP is now good, so confirm as local session description...
+        self.wrb.emit("set-local-description", result, None)
+
+        # ... and send to peer.
         message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
         logging.debug("Outgoing SDP: " + message)
         self.connection.send_text(message)
@@ -228,6 +234,7 @@ class WebRTCPeer:
             if len(sdp) == 0:
                 return
 
+            logging.info("Received SDP " + stype + ", parsing...")
             logging.debug("Incoming SDP: " + json.dumps(msg))
 
             res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
