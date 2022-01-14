@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,re
+import sys,gi,json,re,time
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('GstWebRTC', '1.0')
@@ -142,13 +142,20 @@ class WebRTCPeer:
         if reply == None:
             # Note: this is okay on client side, the initial on-negotiation-needed signal will fire before
             # the remote offer has been received, so it has to be re-triggered once the offer has arrived
-            logging.info("Received empty "+kind+" from webrtcbin, retrying...")
+            logging.debug("Received empty "+kind+" from webrtcbin, retrying...")
             return
 
         result = reply.get_value(kind)
-        self.wrb.emit("set-local-description", result, None)
-
         text = result.sdp.as_text()
+
+        # check whether all media blocks actually have an SSRC, otherwise retry
+        if text.count("ssrc") < 6:
+            logging.debug("Not all SSRC present, retrying negotiation...")
+            time.sleep(1)
+            self.on_negotiation_needed(self.wrb)
+            return
+
+        self.wrb.emit("set-local-description", result, None)
 
         # 1.16 generates sprop-parameter-sets containing the substring "DAILS", 1.18 contains "DAwNS".
         # This can confuse caps negotiation on the client side, and subsequently transceiver matching.
