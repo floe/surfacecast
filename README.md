@@ -33,8 +33,9 @@ The mixing server then composes a new surface stream for each client, consisting
 
   * Server
     * The server will repeatedly issue the warning `[...]: loop detected in the graph of bin 'pipeline0'!!`, which can be safely ignored.
+    * Some race conditions when setting up the mixers still seem to be present, but hard to pin down.
   * Python Client
-    * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YV12. (see also [issue #4](https://github.com/floe/surfacestreams/issues/4))
+    * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YUYV/YUV2 (see also [issue #4](https://github.com/floe/surfacestreams/issues/4)). The front/face cam needs to support 640x360 natively, the surface cam needs to support 1280x720 natively. Good results with Logitech C270 (front) and C920 (surface).
     * The Python client has a noticeable delay before the surface stream finally starts running, unlike e.g. the browser client (see also [issue #2](https://github.com/floe/surfacestreams/issues/2))
   * HTML5 client
     * not working on Chromium (probably a codec issue, see [#8](https://github.com/floe/surfacestreams/issues/8))
