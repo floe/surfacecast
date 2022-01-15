@@ -123,7 +123,7 @@ def connect_bus(msgtype, callback, *args):
     bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):
+def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks",perspective=None):
 
     if fake:
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay" if frontdev == "" else frontdev
@@ -136,6 +136,9 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
         surfsrc  = "v4l2src do-timestamp=true device="+surfdev+"  ! videorate ! videoconvert" 
         audiosrc = "alsasrc do-timestamp=true" # "audiorate ! audioconvert"
 
+    # FIXME still a bit hackish, maybe solveable without double videoconvert?
+    vc = None if perspective == None else new_element("videoconvert")
+
     logging.debug("  Front Source: "+frontsrc)
     logging.debug("Surface Source: "+surfsrc)
     logging.debug("  Audio Source: "+audiosrc)
@@ -145,7 +148,7 @@ def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ti
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
-    add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
+    add_and_link([ Gst.parse_bin_from_description( surfsrc, True ), perspective, vc, # <-- NOTE
         new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
