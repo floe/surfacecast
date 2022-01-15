@@ -144,7 +144,7 @@ def link_new_client(client):
             clients[c].create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),
             new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}))
             clients[c].create_mixer(  "audio", new_element("audiomixer"), new_element("audioconvert"),
-            new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=U8,rate=48000,channels=1")}))
+            new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
     # add missing frontmixer links
     client.link_to_front()
