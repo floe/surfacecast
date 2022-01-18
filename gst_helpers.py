@@ -129,7 +129,6 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,perspective=N
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay" if frontdev == "" else frontdev
         surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol)+" ! timeoverlay" if surfdev == "" else surfdev
         audiosrc = "audiotestsrc is-live=true wave="+wave if audiodev == "" else audiodev
-        # audiosrc = "multifilesrc do-timestamp=true loop=true location=count.wav ! wavparse ignore-length=1 ! identity sync=true"
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
         frontsrc = "v4l2src do-timestamp=true device="+frontdev+" ! videorate ! videoconvert" 

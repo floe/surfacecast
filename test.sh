@@ -4,17 +4,18 @@
 trap 'trap - SIGTERM && kill 0' SIGINT SIGTERM EXIT
 
 URL="https://localhost:8080/stream.html"
+LOG="$(date +%Y%m%d-%H%M%S).log"
 
 if [ "$1" = "" ] ; then
-	echo Usage: $0 default\|firefox\|chrome\|live-front\|live-surf\|live-both
+	echo Usage: $0 default\|firefox\|chrome\|live-front\|live-surf\|live-both\|perspective
 	exit 1
 fi
 
-xterm -e ./webrtc_server.py &
+xterm -e "./webrtc_server.py |& tee $1-server-$LOG" &
 [ $(jobs -p | wc -l) = 1 ] || { echo "Server failed to start." ; exit 1 ; }
 sleep 2.5
 
-xterm -e ./webrtc_client.py --fake &
+xterm -e ./webrtc_client.py --fake -a "multifilesrc do-timestamp=true loop=true location=count.wav ! wavparse ignore-length=1 ! identity sync=true" &
 [ $(jobs -p | wc -l) = 2 ] || { echo "Client failed to start." ; exit 1 ; }
 sleep 2.5
 	
