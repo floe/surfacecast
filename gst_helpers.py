@@ -123,12 +123,12 @@ def connect_bus(msgtype, callback, *args):
     bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev="",surfdev="",fake=False,bgcol=0xFF00FF00,wave="ticks",perspective=None):
+def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,perspective=None,bgcol=0xFF00FF00,wave="ticks"):
 
     if fake:
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay" if frontdev == "" else frontdev
         surfsrc  = "videotestsrc is-live=true pattern=ball background-color="+str(bgcol)+" ! timeoverlay" if surfdev == "" else surfdev
-        audiosrc = "audiotestsrc is-live=true wave="+wave
+        audiosrc = "audiotestsrc is-live=true wave="+wave if audiodev == "" else audiodev
         # audiosrc = "multifilesrc do-timestamp=true loop=true location=count.wav ! wavparse ignore-length=1 ! identity sync=true"
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails

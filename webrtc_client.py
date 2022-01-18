@@ -62,6 +62,7 @@ parser.add_argument(     "--fake",   help="use fake sources (desc. from -f/-s)",
 parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true")
 parser.add_argument("-d","--debug",  help="more debug output (-dd=max)",action="count",default=0   )
 parser.add_argument("-t","--target", help="server to connect to (%(default)s)", default="127.0.0.1")
+parser.add_argument("-a","--audio",  help="audio source (device name or pipeline)",   default=""   )
 parser.add_argument("-f","--front",  help="front image source   (device or pipeline)",default=""   )
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
 parser.add_argument("-p","--perspective",help="perspective (9 floats: \"1,0,0,...\")",default=""   )
@@ -81,7 +82,7 @@ if args.perspective != "":
 else:
     pt = None
 
-add_test_sources(args.front,args.surface,args.fake,perspective=pt)
+add_test_sources(args.front,args.surface,args.audio,args.fake,pt)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
