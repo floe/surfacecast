@@ -53,7 +53,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
     connection.connect("closed",ws_close_handler,wrb)
 
 # "main"
-print("SurfaceStreams backend mixer v0.1\n")
+print("\nSurfaceStreams backend mixing server v0.1.0 - https://github.com/floe/surfacestreams\n")
 print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 init_pipeline(on_element_added,mylevel=1)

@@ -54,7 +54,7 @@ def on_element_added(thebin, element):
     dump_debug("client")
 
 # "main"
-print("SurfaceStreams frontend client v0.1\n")
+print("\nSurfaceStreams frontend client v0.1.0 - https://github.com/floe/surfacestreams\n")
 
 parser = argparse.ArgumentParser()
 
