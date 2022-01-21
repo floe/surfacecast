@@ -131,8 +131,8 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,perspective=N
         audiosrc = "audiotestsrc is-live=true wave="+wave if audiodev == "" else audiodev
     else:
         # FIXME: if a virtual device (e.g. v4l2loopback is used here, then it needs to use RGB pixel format, otherwise caps negotiation fails
-        frontsrc = "v4l2src do-timestamp=true device="+frontdev+" ! videorate ! videoconvert" 
-        surfsrc  = "v4l2src do-timestamp=true device="+surfdev+"  ! videorate ! videoconvert" 
+        frontsrc = "v4l2src do-timestamp=true device="+frontdev+" ! videorate ! videoconvert ! videocrop top=-1 bottom=-1 left=-1 right=-1"
+        surfsrc  = "v4l2src do-timestamp=true device="+surfdev+"  ! videorate ! videoconvert ! videocrop top=-1 bottom=-1 left=-1 right=-1"
         audiosrc = "alsasrc do-timestamp=true" # "audiorate ! audioconvert"
 
     # FIXME still a bit hackish, maybe solveable without double videoconvert?
