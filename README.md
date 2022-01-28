@@ -2,7 +2,7 @@
 
 A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
-[add picture here]
+![table surface with projected message](IMG_20220121_143509.JPG)
 
 SurfaceStreams consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
@@ -19,7 +19,7 @@ Here's an example walkthrough of how to connect an interactive surface with a br
    * you should then see your own webcam stream and a pink surface with a bouncing ball after a few seconds, and hear a pilot tone
    * try doodling on the pink surface (left mouse button draws, right button erases)
  * start the interactive surface:
-   * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20`
+   * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20` (see Usage - Example 2)
    * run the Python client: `./webrtc_client.py -t server.host -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
    * put the `surface` window as fullscreen on the surface display, and the `front` window on the front display
  * connect additional browser and/or surface clients (up to 4 in total)
