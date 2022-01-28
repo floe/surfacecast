@@ -14,13 +14,13 @@ Here's an example walkthrough of how to connect an interactive surface with a br
 
  * on a server host with sufficient CPU resources, run the mixing backend: `./webrtc_server.py`
  * start the browser client:
-   * with Chrome or Firefox, go to https://server.host:8080/stream.html
+   * with Chrome or Firefox, go to https://${SERVER_HOST}:8080/stream.html
    * allow access to camera/microphone
    * you should then see your own webcam stream and a pink surface with a bouncing ball after a few seconds, and hear a pilot tone
    * try doodling on the pink surface (left mouse button draws, right button erases)
  * start the interactive surface:
    * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20` (see Usage - Example 2)
-   * run the Python client: `./webrtc_client.py -t server.host -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
+   * run the Python client: `./webrtc_client.py -t ${SERVER_HOST} -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
    * put the `surface` window as fullscreen on the surface display, and the `front` window on the front display
  * connect additional browser and/or surface clients (up to 4 in total)
 
