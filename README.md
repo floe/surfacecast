@@ -8,6 +8,22 @@ SurfaceStreams consists of a mixing server, and one or more clients. Each client
 
 The mixing server then composes a new surface stream for each client, consisting of the layered surface streams of the _other_ clients, and streams that back to each client (along with a single combined front stream of all individual front streams arranged side-by-side).
 
+## HowTo
+
+Here's an example walkthrough of how to connect an interactive surface with a browser client:
+
+ * on a server host with sufficient CPU resources, run the mixing backend: `./webrtc_server.py`
+ * start the browser client:
+   * with Chrome or Firefox, go to https://server.host:8080/stream.html
+   * allow access to camera/microphone
+   * you should then see your own webcam stream and a pink surface with a bouncing ball after a few seconds, and hear a pilot tone
+   * try doodling on the pink surface (left mouse button draws, right button erases)
+ * start the interactive surface:
+   * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20`
+   * run the Python client: `./webrtc_client.py -t server.host -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
+   * put the `surface` window as fullscreen on the surface display, and the `front` window on the front display
+ * connect additional browser and/or surface clients (up to 4 in total)
+
 ## Clients
 
 * standalone Python client
