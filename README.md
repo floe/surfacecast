@@ -14,7 +14,7 @@ Here's an example walkthrough of how to connect an interactive surface with a br
 
  * on a server host with sufficient CPU resources, run the mixing backend: `./webrtc_server.py`
  * start the browser client:
-   * with Chrome or Firefox, go to https://${SERVER_HOST}:8080/stream.html
+   * with Chrome or Firefox, go to `https://${SERVER_HOST}:8080/stream.html`
    * allow access to camera/microphone
    * you should then see your own webcam stream and a pink surface with a bouncing ball after a few seconds, and hear a pilot tone
    * try doodling on the pink surface (left mouse button draws, right button erases)
