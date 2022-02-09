@@ -38,7 +38,7 @@ Here's an example walkthrough of how to connect an interactive surface with a br
 * Mixing server & standalone client
   * Ubuntu 20.04 LTS (Python 3.8, GStreamer 1.16)
   * Debian 11 "Bullseye" (Python 3.9, GStreamer 1.18)
-  * Install dependencies: `sudo apt install gstreamer1.0-libav gir1.2-soup-2.4 gir1.2-gstreamer-1.0 gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-nice-0.1 libnice10 gstreamer1.0-nice gstreamer1.0-plugins-bad`
+  * Install dependencies: `sudo apt install gstreamer1.0-libav gir1.2-soup-2.4 gir1.2-gstreamer-1.0 gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-nice-0.1 libnice10 gstreamer1.0-nice gstreamer1.0-plugins-bad gstreamer1.0-plugins-good`
 
 * HTML5 client
   * Firefox 78 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
