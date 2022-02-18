@@ -66,7 +66,7 @@ server.add_websocket_handler("/ws",None,None,ws_conn_handler,None)
 server.set_ssl_cert_file("cert.pem","key.pem")
 server.listen_all(8080,Soup.ServerListenOptions.HTTPS)
 
-if sys.argv[1] == "--sink":
+if len(sys.argv) > 1 and sys.argv[1] == "--sink":
     create_sink_client()
 
 run_mainloop()
