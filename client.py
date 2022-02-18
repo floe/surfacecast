@@ -59,13 +59,17 @@ class Client:
     def link_to_front(self):
 
         # FIXME: frontstream is separately encoded for each client ATM, should be one single encoder
-        if not "front" in self.inputs or not "front" in self.outputs:
+        if not "front" in self.inputs:
             return
 
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
+
+        # sanity check (important for sink client)
+        if not "front" in self.outputs:
+            return
 
         # request and link pads from tee and frontmixer
         sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
@@ -77,6 +81,10 @@ class Client:
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix,qparams):
+
+        # sanity check (important for sink client)
+        if not prefix in self.outputs:
+            return
 
         linkname = prefix+"_"+self.name+"_"+dest.name
         if not linkname in mixer_links:
@@ -180,3 +188,22 @@ def on_element_added(thebin, element):
         logging.info("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 
+# add a "fake" client to sink all incoming streams to file
+def create_sink_client():
+
+    logging.info("Adding file sink client...")
+
+    sink_client = Client("file_sink")
+
+    VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux ! filesink location=video.mp4"
+    AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! mp4mux ! filesink location=audio.mp4"
+
+    encoders = { "surface": VENCODER, "front": VENCODER, "audio": AENCODER }
+
+    for name in encoders:
+        logging.info("  Adding file sink encoder for "+name+"...")
+        selector = new_element("input-selector",myname="input_file_sink_"+name)
+        add_and_link([selector,new_element("fakesink")]) #Gst.parse_bin_from_description( encoders[name], True )])
+        sink_client.inputs[name] = selector
+
+    link_new_client(sink_client)
