@@ -65,6 +65,7 @@ class Client:
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
+        # FIXME: for the sink client, this must only happen _after_ the frontstream starts
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
 
         # sanity check (important for sink client)
@@ -183,8 +184,8 @@ def on_element_added(thebin, element):
     if direction == "input":
         client.inputs[stype] = element
 
-    # are all outputs in place?
-    if len(client.outputs) == 3:
+    # are all inputs and outputs in place?
+    if len(client.outputs) == 3 and len(client.inputs) == 3:
         logging.info("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 
@@ -194,16 +195,17 @@ def create_sink_client():
     logging.info("Adding file sink client...")
 
     sink_client = Client("file_sink")
+    # FIXME: hack to make it look like a "proper" client with 3 inputs and outputs
+    sink_client.outputs = { "foo": None, "bar": None, "baz": None }
 
-    VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux ! filesink location=video.mp4"
-    AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! mp4mux ! filesink location=audio.mp4"
+    # TODO: use only a single muxer and filesrc for all streams here (try to reuse code from webrtc_peer?)
+    VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux fragment-duration=1000 ! filesink sync=true location="
+    AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! mp4mux fragment-duration=1000 ! filesink sync=true location="
 
     encoders = { "surface": VENCODER, "front": VENCODER, "audio": AENCODER }
 
     for name in encoders:
         logging.info("  Adding file sink encoder for "+name+"...")
         selector = new_element("input-selector",myname="input_file_sink_"+name)
-        add_and_link([selector,new_element("fakesink")]) #Gst.parse_bin_from_description( encoders[name], True )])
-        sink_client.inputs[name] = selector
-
-    link_new_client(sink_client)
+        add_and_link([selector,Gst.parse_bin_from_description( encoders[name]+name+".mp4", True )])
+        link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
