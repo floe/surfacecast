@@ -1,0 +1,36 @@
+<html>
+<head>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script>
+var pc1 = new RTCPeerConnection(), pc2 = new RTCPeerConnection();
+
+var add = (pc, can) => can && pc.addIceCandidate(can).catch(failed);
+pc1.onicecandidate = e => add(pc2, e.candidate);
+pc2.onicecandidate = e => add(pc1, e.candidate);
+pc2.onaddstream = e => (log("onaddstream"),
+                        v2.srcObject = e.stream);
+pc2.onaddtrack = e => log("onaddtrack " + e.track.kind);
+pc1.oniceconnectionstatechange = e => log(pc1.iceConnectionState);
+
+function start() {
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then(stream => pc1.addStream(v1.srcObject = stream))
+  .then(() => pc1.createOffer())
+  .then(offer => pc1.setLocalDescription(offer))
+  .then(() => pc2.setRemoteDescription(pc1.localDescription))
+  .then(() => pc2.createAnswer())
+  .then(answer => pc2.setLocalDescription(answer))
+  .then(() => pc1.setRemoteDescription(pc2.localDescription))
+  .catch(failed);
+}
+
+var log = msg => div.innerHTML += "<p>" + msg + "</p>";
+var failed = e => log(e +", line "+ e.lineNumber);
+</script>
+</head>
+<body>
+<video id="v1" height="120" width="160" autoplay muted></video>
+<video id="v2" height="120" width="160" autoplay></video><br>
+<button onclick="start()">Start!</button>
+<div id="div"></div>
+</body>
