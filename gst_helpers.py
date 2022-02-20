@@ -82,12 +82,12 @@ def link_to_inputselector(el1, tpl1, el2):
     el2.set_property("active-pad", pad)
     return pad
 
-def dump_debug(name="debug"):
+def dump_debug(name="surfacestreams"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
         return
     logging.info("Writing graph snapshot to "+name+".dot")
     # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
-    Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails(15),name)
+    Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails.ALL,name)
 
 def get_by_name(name):
     return pipeline.get_by_name(name)
@@ -108,7 +108,7 @@ def init_pipeline(callback,mylevel=0):
     logging.basicConfig(format="%(levelname)s:: %(message)s",level=loglevels[mylevel])
 
     # signal handler to dump graph dot file on SIGUSR1
-    signal.signal(signal.SIGUSR1, lambda a,b: dump_debug("handler"))
+    signal.signal(signal.SIGUSR1, lambda a,b: dump_debug())
 
     Gst.init(None)
     pipeline = Gst.Pipeline()

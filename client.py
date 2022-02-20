@@ -161,8 +161,6 @@ def link_new_client(client):
     # add missing surface/audio mixer links
     client.link_all_streams(clients)
 
-    dump_debug("final")
-
 # new top-level element added to pipeline
 def on_element_added(thebin, element):
 

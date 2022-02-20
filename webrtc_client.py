@@ -51,8 +51,6 @@ def on_element_added(thebin, element):
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
-    dump_debug("client")
-
 # "main"
 print("\nSurfaceStreams frontend client v0.1.0 - https://github.com/floe/surfacestreams\n")
 
