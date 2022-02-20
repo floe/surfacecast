@@ -22,11 +22,23 @@ mixer_links = []
 # position offsets for 4 front streams
 # FIXME: how to handle > 4 clients?
 offsets = [
-    (640,360),
-    (  0,  0),
-    (640,  0),
-    (  0,360)
+    (640,360), # <- this one is for the initial test stream
+    (640,360), # bottom right (on top of the test stream)
+    (  0,  0), # top left
+    (640,  0), # top right
+    (  0,360)  # bottom left
 ]
+
+def link_to_frontmixer(tee):
+
+    # request and link pads from tee and frontmixer
+    sinkpad = link_request_pads(tee,"src_%u",frontmixer,"sink_%u")
+
+    # set xpos/ypos properties on pad according to sequence number
+    padnum = int(sinkpad.get_name().split("_")[1])
+    sinkpad.set_property("xpos",offsets[padnum][0])
+    sinkpad.set_property("ypos",offsets[padnum][1])
+
 
 class Client:
 
@@ -73,12 +85,7 @@ class Client:
             return
 
         # request and link pads from tee and frontmixer
-        sinkpad = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
-
-        # set xpos/ypos properties on pad according to sequence number
-        padnum = int(sinkpad.get_name().split("_")[1])
-        sinkpad.set_property("xpos",offsets[padnum][0])
-        sinkpad.set_property("ypos",offsets[padnum][1])
+        link_to_frontmixer(self.outputs["front"])
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix,qparams):
@@ -137,6 +144,7 @@ def create_frontmixer_queue():
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, frontstream ])
+    link_to_frontmixer(get_by_name("fronttestsource"))
 
 # link new client to mixers
 def link_new_client(client):
