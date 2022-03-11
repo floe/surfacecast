@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json
+import sys,gi,json,datetime
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -144,6 +144,8 @@ def create_frontmixer_queue():
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, frontstream ])
+
+    # link the test source so that the stream(s) can start immediately
     link_to_frontmixer(get_by_name("fronttestsource"))
 
 # link new client to mixers
@@ -202,16 +204,21 @@ def create_sink_client():
 
     sink_client = Client("file_sink")
     # FIXME: hack to make it look like a "proper" client with 3 inputs and outputs
-    sink_client.outputs = { "foo": None, "bar": None, "baz": None }
+    sink_client.outputs = {
+        "surface": get_by_name("surfacetestsource"),
+        "front":   get_by_name("fronttestsource"),
+        "audio":   get_by_name("audiotestsource")
+    }
 
     # TODO: use only a single muxer and filesrc for all streams here (try to reuse code from webrtc_peer?)
     VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux fragment-duration=1000 ! filesink sync=true location="
     AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! mp4mux fragment-duration=1000 ! filesink sync=true location="
 
     encoders = { "surface": VENCODER, "front": VENCODER, "audio": AENCODER }
+    suffix = datetime.datetime.now().strftime("-%Y%m%d-%H%M%S.mp4")
 
     for name in encoders:
         logging.info("  Adding file sink encoder for "+name+"...")
         selector = new_element("input-selector",myname="input_file_sink_"+name)
-        add_and_link([selector,Gst.parse_bin_from_description( encoders[name]+name+".mp4", True )])
+        add_and_link([selector,Gst.parse_bin_from_description( encoders[name]+name+suffix, True )])
         link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
