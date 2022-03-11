@@ -121,8 +121,9 @@ class WebRTCPeer:
         self.data_channel.connect("on-message-string", self.on_dc_message)
         self.data_channel.connect("on-message-data",   self.on_dc_message)
         # FIXME: doesn't seem to send anything?
-        self.data_channel.emit("send-data",GLib.Bytes.new("Hi!".encode("utf-8")))
-        self.data_channel.emit("send-string","Hi!")
+        hello = "Hi from "+self.address
+        self.data_channel.emit("send-data",GLib.Bytes.new(hello.encode("utf-8")))
+        self.data_channel.emit("send-string",hello)
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):

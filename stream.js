@@ -157,7 +157,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       webrtcPeerConnection.onicecandidate = onIceCandidate;
 
       datastream = webrtcPeerConnection.createDataChannel("events");
-      datastream.onopen = function(event) { datastream.send("Hi!"); console.log("Hi!"); }
+      datastream.onopen = function(event) { datastream.send("Hi from "+navigator.userAgent); }
       // datastream.onmessage = ...
 
       audiotrack = stream.getAudioTracks()[0];
@@ -179,6 +179,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
       //websocketConnection.onopen = function(event) { websocketConnection.send("Hoi!"); };
+      console.log("Capture setup complete.");
     } );
   }
 }
