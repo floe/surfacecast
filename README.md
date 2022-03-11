@@ -2,7 +2,7 @@
 
 A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
-![table surface with projected message](IMG_20220121_143509.JPG)
+![table surface with projected message](teaser.jpg)
 
 SurfaceStreams consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
