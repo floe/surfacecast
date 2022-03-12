@@ -189,6 +189,7 @@ class WebRTCPeer:
             return
 
         logging.info("New incoming stream, linking to decodebin...")
+        logging.trace("Stream caps: "+caps.to_string())
         decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
@@ -203,6 +204,7 @@ class WebRTCPeer:
 
         name = decodebin.get_name().split("_")[1]
         logging.info("Handling new decodebin pad of type: "+name)
+        logging.trace("Stream caps: "+pad.get_current_caps().to_string())
 
         # add named ghostpads ("src_front" etc.)
         ghostpad = Gst.GhostPad.new("src_"+name,pad)
