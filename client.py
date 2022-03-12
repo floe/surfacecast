@@ -22,8 +22,7 @@ mixer_links = []
 # position offsets for 4 front streams
 # FIXME: how to handle > 4 clients?
 offsets = [
-    (640,360), # <- this one is for the initial test stream
-    (640,360), # bottom right (on top of the test stream)
+    (640,360), # bottom right
     (  0,  0), # top left
     (640,  0), # top right
     (  0,360)  # bottom left
@@ -35,7 +34,7 @@ def link_to_frontmixer(tee):
     sinkpad = link_request_pads(tee,"src_%u",frontmixer,"sink_%u")
 
     # set xpos/ypos properties on pad according to sequence number
-    padnum = int(sinkpad.get_name().split("_")[1])
+    padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
     sinkpad.set_property("xpos",offsets[padnum][0])
     sinkpad.set_property("ypos",offsets[padnum][1])
 
@@ -145,9 +144,6 @@ def create_frontmixer_queue():
 
     add_and_link([ frontmixer, frontstream ])
 
-    # link the test source so that the stream(s) can start immediately
-    link_to_frontmixer(get_by_name("fronttestsource"))
-
 # link new client to mixers
 def link_new_client(client):
 
@@ -203,12 +199,6 @@ def create_sink_client():
     logging.info("Adding file sink client...")
 
     sink_client = Client("file_sink")
-    # FIXME: hack to make it look like a "proper" client with 3 inputs and outputs
-    sink_client.outputs = {
-        "surface": get_by_name("surfacetestsource"),
-        "front":   get_by_name("fronttestsource"),
-        "audio":   get_by_name("audiotestsource")
-    }
 
     # TODO: use only a single muxer and filesrc for all streams here (try to reuse code from webrtc_peer?)
     VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux fragment-duration=1000 ! filesink sync=true location="
@@ -219,6 +209,12 @@ def create_sink_client():
 
     for name in encoders:
         logging.info("  Adding file sink encoder for "+name+"...")
-        selector = new_element("input-selector",myname="input_file_sink_"+name)
+        selector = new_element("input-selector",myname="input_filesink_"+name)
+        testsrc = get_by_name(name+"testsource")
+        sink_client.outputs[name] = testsrc
+        sink_client.inputs[name] = selector
         add_and_link([selector,Gst.parse_bin_from_description( encoders[name]+name+suffix, True )])
-        link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
+        link_request_pads(testsrc,"src_%u",selector,"sink_%u")
+
+    logging.info("File sink client: all input/output elements complete.")
+    link_new_client(sink_client)
