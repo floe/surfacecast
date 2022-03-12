@@ -140,9 +140,10 @@ def create_frontmixer_queue():
     logging.info("  creating frontmixer subqueue")
 
     frontmixer  = new_element("compositor",myname="frontmixer")
+    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")})
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
-    add_and_link([ frontmixer, frontstream ])
+    add_and_link([ frontmixer, capsfilter, frontstream ])
 
 # link new client to mixers
 def link_new_client(client):

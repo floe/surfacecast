@@ -58,7 +58,11 @@ print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\
 
 init_pipeline(on_element_added,mylevel=1)
 
-add_test_sources(fake=True,bgcol=0xFFFF00FF,wave="sine")
+frontsrc   = "filesrc location=front.png ! pngdec ! videoconvert ! imagefreeze ! identity sync=true"
+surfacesrc = "videotestsrc is-live=true pattern=solid-color foreground-color=0"
+audiosrc   = "audiotestsrc is-live=true wave=silence"
+
+add_test_sources(frontsrc,surfacesrc,audiosrc,fake=True,bgcol=0xFFFF00FF,wave="sine")
 
 server = Soup.Server()
 server.add_handler("/",http_handler,None)
