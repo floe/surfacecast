@@ -214,7 +214,7 @@ class WebRTCPeer:
         alpha = None
         # TODO: not sure, should we disable alpha filtering for main client or not?
         if name == "surface" and self.msghandler and not "main" in self.msghandler.flags:
-            alpha = new_element("alpha", { "method": "green" } )
+            alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.address )
 
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
         add_and_link([alpha,tee])
