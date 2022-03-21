@@ -64,7 +64,9 @@ class Client:
             mixer = self.mixers[i]
             mixer.set_state(Gst.State.NULL)
             for p in mixer.sinkpads:
-                p.get_peer().unlink(p)
+                peer = p.get_peer()
+                if peer:
+                    peer.unlink(p)
             remove_element(mixer)
 
         # pause the bin
@@ -92,9 +94,8 @@ class Client:
         # TODO: remove queues from link_request_pad
         # maybe just loop through all queues and kill those with unconnected pads?
 
-        # TODO: remove capsfilters/converters from create_mixer
-
         # TODO: remove the request pads
+        logging.info("Client "+self.name+" unlinked.")
 
     # create mixer & converter
     def create_mixer(self,mtype,mixer,caps):
@@ -104,6 +105,7 @@ class Client:
 
         logging.info("    creating "+mtype+" mixer for client "+self.name)
         self.mixers[mtype] = mixer
+        self.mixers[mtype+"_caps"] = caps
         add_and_link([mixer,caps])
         link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
         link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
@@ -176,7 +178,7 @@ def create_frontmixer_queue():
     if frontmixer != None or frontstream != None:
         return
 
-    logging.info("  creating frontmixer subqueue")
+    logging.info("Creating frontmixer subqueue...")
 
     frontmixer  = new_element("compositor",myname="frontmixer")
     capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")})
