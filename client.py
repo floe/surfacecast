@@ -89,11 +89,11 @@ class Client:
         if not prefix in self.outputs:
             return
 
+        # FIXME: are the mixer_links still needed?
         linkname = prefix+"_"+self.name+"_"+dest.name
         if not linkname in mixer_links:
 
             logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-            # TODO: figure out the queue parameters
             sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
             mixer_links.append(linkname)
 
@@ -120,8 +120,9 @@ class Client:
 
     # link all other clients to local mixer, this client to other mixers
     def link_all_streams(self,clients):
-        self.link_streams(clients,"surface",{"max-size-buffers":1})
-        self.link_streams(clients,"audio",{"max-size-time":100000000})
+        # TODO: figure out the queue parameters (if any?)
+        self.link_streams(clients,"surface",{}) # {"max-size-buffers":1})
+        self.link_streams(clients,"audio",{}) # {"max-size-time":100000000})
 
 
 # create single mixer for front stream
