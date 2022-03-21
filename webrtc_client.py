@@ -63,7 +63,6 @@ parser.add_argument("-t","--target", help="server to connect to (%(default)s)", 
 parser.add_argument("-a","--audio",  help="audio source (device name or pipeline)",   default=""   )
 parser.add_argument("-f","--front",  help="front image source   (device or pipeline)",default=""   )
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
-parser.add_argument("-p","--perspective",help="perspective (9 floats: \"1,0,0,...\")",default=""   )
 
 args = parser.parse_args()
 print("Option",args,"\n")
@@ -74,13 +73,7 @@ connect_bus("message::element",message_cb)
 if not args.fake and (args.front == "" or args.surface == ""):
     logging.warning("Need to either specify --fake for test sources, or -f/-s for source devices/pipelines.")
 
-if args.perspective != "":
-    params = [ float(f) for f in args.perspective.split(",") ]
-    pt = new_element("perspective",{"matrix":params})
-else:
-    pt = None
-
-add_test_sources(args.front,args.surface,args.audio,args.fake,pt)
+add_test_sources(args.front,args.surface,args.audio,args.fake)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
