@@ -38,7 +38,7 @@ def link_to_frontmixer(tee):
     sinkpad.set_property("xpos",offsets[padnum][0])
     sinkpad.set_property("ypos",offsets[padnum][1])
 
-
+# TODO: turn into subclass of WebRTCPeer
 class Client:
 
     def __init__(self,name):
@@ -46,7 +46,6 @@ class Client:
         self.wrb = None
         self.name = name
         self.flags = {}
-        self.inputs  = {}
         self.outputs = {}
         self.mixers = {}
         clients[name] = self
@@ -64,20 +63,17 @@ class Client:
         logging.info("    creating "+mtype+" mixer for client "+self.name)
         self.mixers[mtype] = mixer
         add_and_link([mixer,convert,caps])
-        link_to_inputselector(caps,"src",self.inputs[mtype])
+        link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype)
         link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
 
     # link client to frontmixer
     def link_to_front(self):
 
         # FIXME: frontstream is separately encoded for each client ATM, should be one single encoder
-        if not "front" in self.inputs:
-            return
-
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
-        link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
+        link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front")
 
         # sanity check (important for sink client)
         if not "front" in self.outputs:
@@ -178,18 +174,16 @@ def on_element_added(thebin, element):
     #logging.debug("New element:",direction,source,stype)
 
     client = clients[source]
-
     if direction == "output":
         client.outputs[stype] = element
-    if direction == "input":
-        client.inputs[stype] = element
 
-    # are all inputs and outputs in place?
-    if len(client.outputs) == 3 and len(client.inputs) == 3:
+    # are all outputs in place?
+    if len(client.outputs) == 3:
         logging.info("Client "+source+": all input/output elements complete.")
         link_new_client(client)
 
 # add a "fake" client to sink all incoming streams to file
+# FIXME: still uses old-style input-selectors, switch to only using pads
 def create_sink_client():
 
     logging.info("Adding file sink client...")

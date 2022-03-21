@@ -65,6 +65,10 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
     pad2 = el2.get_static_pad(tpl2)
     if pad2 == None:
         pad2 = el2.request_pad(el2.get_pad_template(tpl2), None, None)
+    else:
+        peer = pad2.get_peer()
+        if peer:
+            peer.unlink(pad2)
 
     if do_queue:
         queue = new_element("queue",qp)
@@ -75,12 +79,6 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
     else:
         pad1.link(pad2)
     return pad2
-
-# link to input-selector and activate new link
-def link_to_inputselector(el1, tpl1, el2):
-    pad = link_request_pads(el1,tpl1,el2,"sink_%u",do_queue=False)
-    el2.set_property("active-pad", pad)
-    return pad
 
 def dump_debug(name="surfacestreams"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:

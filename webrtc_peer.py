@@ -72,6 +72,9 @@ class WebRTCPeer:
         self.mapping = None
         self.msghandler = msghandler
 
+        if self.msghandler:
+            self.msghandler.wrb = self
+
         self.bin = Gst.parse_bin_from_description(bindesc,False)
         self.bin.set_name("bin_"+address)
         add_and_link([self.bin])
@@ -87,12 +90,8 @@ class WebRTCPeer:
             ghostpad.set_active(True)
             self.bin.add_pad(ghostpad)
 
-            selector = new_element("input-selector",myname="input_"+self.address+"_"+name)
-            add_and_link([selector])
-            selector.get_static_pad("src").link(ghostpad)
-
             # TODO: source name should be configurable
-            link_request_pads(get_by_name(name+"testsource"),"src_%u",selector,"sink_%u")
+            link_request_pads(get_by_name(name+"testsource"),"src_%u",self.bin,"sink_"+name)
 
         self.connection.connect("message",self.on_ws_message)
 
