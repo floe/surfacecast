@@ -149,18 +149,12 @@ def create_frontmixer_queue():
 # link new client to mixers
 def link_new_client(client):
 
-    create_frontmixer_queue()
-
     logging.info("  setting up mixers for new client "+client.name)
 
-    # create surface/audio mixers for _all_ clients that don't have one yet
-    # needs to loop through all clients for the case where 2 or more clients
-    # appear simultaneously, otherwise there are no mixers to link to
-    if len(clients) >= 2:
-        for c in clients:
-            clients[c].create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),
+    # create surface/audio mixers
+    client.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),
             new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}))
-            clients[c].create_mixer(  "audio", new_element("audiomixer"), new_element("audioconvert"),
+    client.create_mixer(  "audio", new_element("audiomixer"), new_element("audioconvert"),
             new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
     # add missing frontmixer links
