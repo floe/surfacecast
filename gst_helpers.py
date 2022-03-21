@@ -92,6 +92,9 @@ def dump_debug(name="surfacestreams"):
 def get_by_name(name):
     return pipeline.get_by_name(name)
 
+def remove_element(item):
+    return pipeline.remove(item)
+
 # initialize pipeline and mainloop
 def init_pipeline(callback,mylevel=0):
 
@@ -151,7 +154,7 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,perspective=N
     ])
 
     add_and_link([ Gst.parse_bin_from_description( surfsrc, True ), perspective, vc, # <-- NOTE
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 

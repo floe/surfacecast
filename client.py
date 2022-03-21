@@ -65,6 +65,7 @@ class Client:
         self.mixers[mtype] = mixer
         add_and_link([mixer,convert,caps])
         link_to_inputselector(caps,"src",self.inputs[mtype])
+        link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
 
     # link client to frontmixer
     def link_to_front(self):
@@ -76,7 +77,6 @@ class Client:
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client-specific muxer
-        # FIXME: for the sink client, this must only happen _after_ the frontstream starts
         link_to_inputselector(frontstream,"src_%u",self.inputs["front"])
 
         # sanity check (important for sink client)
@@ -144,6 +144,7 @@ def create_frontmixer_queue():
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
+    link_to_frontmixer(get_by_name("fronttestsource"))
 
 # link new client to mixers
 def link_new_client(client):

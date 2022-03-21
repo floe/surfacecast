@@ -38,7 +38,7 @@ def http_handler(server,msg,path,query,client,user_data):
     msg.set_status(Soup.Status.OK)
 
 # Websocket connection was closed by remote
-def ws_close_handler(connection, wrb):
+def ws_close_handler(connection, client):
     # TODO actually handle closing (might be tricky, needs to rewire pipeline)
     logging.info("WebSocket closed by remote.")
 
@@ -50,7 +50,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 
     new_client = Client(source)
     wrb = WebRTCPeer(connection,source,new_client)
-    connection.connect("closed",ws_close_handler,wrb)
+    connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
 print("\nSurfaceStreams backend mixing server v0.1.0 - https://github.com/floe/surfacestreams\n")
