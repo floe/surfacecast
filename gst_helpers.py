@@ -56,6 +56,7 @@ def bus_call(bus, message, loop):
     return True
 
 # convenience function to link request pads
+# TODO: turn into a class method for client/webrtc_peer and store created queues internally
 def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
 
     pad1 = el1.get_static_pad(tpl1)
@@ -72,6 +73,7 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
             peer.unlink(pad2)
 
     # FIXME: need a way to keep track of the auto-generated queues
+    queue = None
     if do_queue:
         queue = new_element("queue",qp)
         pipeline.add(queue)
@@ -80,7 +82,7 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
         queue.get_static_pad("src").link(pad2)
     else:
         pad1.link(pad2)
-    return pad2
+    return pad2,queue
 
 def dump_debug(name="surfacestreams"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:

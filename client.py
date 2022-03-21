@@ -31,12 +31,14 @@ offsets = [
 def link_to_frontmixer(tee):
 
     # request and link pads from tee and frontmixer
-    sinkpad = link_request_pads(tee,"src_%u",frontmixer,"sink_%u")
+    sinkpad,q = link_request_pads(tee,"src_%u",frontmixer,"sink_%u")
 
     # set xpos/ypos properties on pad according to sequence number
     padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
     sinkpad.set_property("xpos",offsets[padnum][0])
     sinkpad.set_property("ypos",offsets[padnum][1])
+
+    return q
 
 # TODO: turn into subclass of WebRTCPeer
 class Client:
@@ -48,6 +50,7 @@ class Client:
         self.flags = {}
         self.outputs = {}
         self.mixers = {}
+        self.queues = []
         clients[name] = self
 
     def process(self, msg):
@@ -91,10 +94,18 @@ class Client:
             alpha.set_state(Gst.State.NULL)
             remove_element(alpha)
 
-        # TODO: remove queues from link_request_pad
-        # maybe just loop through all queues and kill those with unconnected pads?
+        # remove queues from link_request_pad
+        for q in self.queues:
+            q.set_state(Gst.State.NULL)
+            for p in q.pads:
+                peer = p.get_peer()
+                if not peer:
+                    continue
+                # all auto-generated queues have at least one request pad as peer
+                el = peer.get_parent_element()
+                el.release_request_pad(peer)
+            remove_element(q)
 
-        # TODO: remove the request pads
         logging.info("Client "+self.name+" unlinked.")
 
     # create mixer & converter
@@ -108,7 +119,8 @@ class Client:
         self.mixers[mtype+"_caps"] = caps
         add_and_link([mixer,caps])
         link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
-        link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
+        _,q = link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
+        self.queues.append(q)
 
     # link client to frontmixer
     def link_to_front(self):
@@ -117,14 +129,15 @@ class Client:
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client
-        link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front")
+        link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front",do_queue=False)
 
         # sanity check (important for sink client)
         if not "front" in self.outputs:
             return
 
         # request and link pads from tee and frontmixer
-        link_to_frontmixer(self.outputs["front"])
+        q = link_to_frontmixer(self.outputs["front"])
+        self.queues.append(q)
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix,qparams):
@@ -138,7 +151,8 @@ class Client:
         if not linkname in mixer_links:
 
             logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-            sinkpad = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
+            sinkpad,q = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
+            self.queues.append(q)
             mixer_links.append(linkname)
 
             # for the "main" surface, destination mixer pad needs zorder = 0
