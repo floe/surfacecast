@@ -108,7 +108,7 @@ def init_pipeline(callback,mylevel=0):
 
     # configure the logger
     loglevels = { 0: logging.INFO, 1: logging.DEBUG, 2: logging.TRACE }
-    logging.basicConfig(format="%(levelname)s:: %(message)s",level=loglevels[mylevel])
+    logging.basicConfig(format="[%(levelname)-5s] %(message)s",level=loglevels[mylevel])
 
     # signal handler to dump graph dot file on SIGUSR1
     signal.signal(signal.SIGUSR1, lambda a,b: dump_debug())
