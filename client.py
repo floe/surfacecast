@@ -59,6 +59,7 @@ class Client:
         clients.pop(self.name)
 
         # pause, unlink, and remove the mixers
+        logging.debug("  Removing mixers...")
         for i in self.mixers:
             mixer = self.mixers[i]
             mixer.set_state(Gst.State.NULL)
@@ -70,6 +71,7 @@ class Client:
         self.wrb.bin.set_state(Gst.State.NULL)
 
         # pause, unlink, and remove the output buffers
+        logging.debug("  Removing outputs...")
         for i in self.outputs:
             out_tee = self.outputs[i]
             out_tee.set_state(Gst.State.NULL)
@@ -78,6 +80,7 @@ class Client:
             remove_element(out_tee)
 
         # remove the bin
+        logging.debug("  Removing main bin...")
         remove_element(self.wrb.bin)
 
         # remove the alphafilter, if exists
@@ -94,16 +97,15 @@ class Client:
         # TODO: remove the request pads
 
     # create mixer & converter
-    def create_mixer(self,mtype,mixer,convert,caps):
+    def create_mixer(self,mtype,mixer,caps):
 
         if mtype in self.mixers:
             return
 
         logging.info("    creating "+mtype+" mixer for client "+self.name)
         self.mixers[mtype] = mixer
-        # TODO: is there maybe a superfluous converter and queue here?
-        add_and_link([mixer,convert,caps])
-        link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype)
+        add_and_link([mixer,caps])
+        link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
         link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
 
     # link client to frontmixer
@@ -189,10 +191,8 @@ def link_new_client(client):
     logging.info("  setting up mixers for new client "+client.name)
 
     # create surface/audio mixers
-    client.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("videoconvert"),
-            new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")}))
-    client.create_mixer(  "audio", new_element("audiomixer"), new_element("audioconvert"),
-            new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+    client.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}))
+    client.create_mixer(  "audio", new_element("audiomixer"                       ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
     # add missing frontmixer links
     client.link_to_front()

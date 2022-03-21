@@ -91,7 +91,7 @@ class WebRTCPeer:
             self.bin.add_pad(ghostpad)
 
             # TODO: source name should be configurable
-            link_request_pads(get_by_name(name+"testsource"),"src_%u",self.bin,"sink_"+name)
+            link_request_pads(get_by_name(name+"testsource"),"src_%u",self.bin,"sink_"+name,do_queue=False)
 
         self.connection.connect("message",self.on_ws_message)
 
@@ -192,7 +192,7 @@ class WebRTCPeer:
         decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
-        self.wrb.parent.add(decodebin) # TODO or self.bin.add(...)?
+        self.wrb.parent.add(decodebin)
         decodebin.sync_state_with_parent()
         pad.link(decodebin.get_static_pad("sink"))
 
@@ -211,7 +211,7 @@ class WebRTCPeer:
         decodebin.parent.add_pad(ghostpad)
 
         alpha = None
-        # TODO: not sure, should we disable alpha filtering for main client or not?
+        # disable alpha filtering for main client
         if name == "surface" and self.msghandler and not "main" in self.msghandler.flags:
             alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.address )
 
