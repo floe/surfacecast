@@ -54,6 +54,45 @@ class Client:
         self.flags[msg] = True
         logging.info("Setting flags for "+self.name+": "+str(self.flags))
 
+    def remove(self):
+        logging.info("Removing client: "+self.name)
+        clients.pop(self.name)
+
+        # pause, unlink, and remove the mixers
+        for i in self.mixers:
+            mixer = self.mixers[i]
+            mixer.set_state(Gst.State.NULL)
+            for p in mixer.sinkpads:
+                p.get_peer().unlink(p)
+            remove_element(mixer)
+
+        # pause the bin
+        self.wrb.bin.set_state(Gst.State.NULL)
+
+        # pause, unlink, and remove the output buffers
+        for i in self.outputs:
+            out_tee = self.outputs[i]
+            out_tee.set_state(Gst.State.NULL)
+            for p in out_tee.srcpads:
+                p.unlink(p.get_peer())
+            remove_element(out_tee)
+
+        # remove the bin
+        remove_element(self.wrb.bin)
+
+        # remove the alphafilter, if exists
+        alpha = get_by_name("alpha_"+self.name)
+        if alpha:
+            alpha.set_state(Gst.State.NULL)
+            remove_element(alpha)
+
+        # TODO: remove queues from link_request_pad
+        # maybe just loop through all queues and kill those with unconnected pads?
+
+        # TODO: remove capsfilters/converters from create_mixer
+
+        # TODO: remove the request pads
+
     # create mixer & converter
     def create_mixer(self,mtype,mixer,convert,caps):
 
@@ -62,6 +101,7 @@ class Client:
 
         logging.info("    creating "+mtype+" mixer for client "+self.name)
         self.mixers[mtype] = mixer
+        # TODO: is there maybe a superfluous converter and queue here?
         add_and_link([mixer,convert,caps])
         link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype)
         link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
@@ -72,7 +112,7 @@ class Client:
         # FIXME: frontstream is separately encoded for each client ATM, should be one single encoder
         logging.info("    linking client "+self.name+" to frontmixer")
 
-        # link frontstream tee to client-specific muxer
+        # link frontstream tee to client
         link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front")
 
         # sanity check (important for sink client)

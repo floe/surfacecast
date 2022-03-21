@@ -66,10 +66,12 @@ def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
     if pad2 == None:
         pad2 = el2.request_pad(el2.get_pad_template(tpl2), None, None)
     else:
+        # we have a static pad, check if it's already linked
         peer = pad2.get_peer()
         if peer:
             peer.unlink(pad2)
 
+    # FIXME: need a way to keep track of the auto-generated queues
     if do_queue:
         queue = new_element("queue",qp)
         pipeline.add(queue)
