@@ -9,6 +9,7 @@ gi.require_version('GstSdp', '1.0')
 from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 
 from gst_helpers import *
+from webrtc_peer import WebRTCPeer
 
 # client object pool
 clients = {}
@@ -43,19 +44,14 @@ def link_to_frontmixer(tee):
 # TODO: turn into subclass of WebRTCPeer
 class Client:
 
-    def __init__(self,name):
+    def __init__(self,name,wrb):
 
-        self.wrb = None
+        self.wrb = wrb
         self.name = name
-        self.flags = {}
         self.outputs = {}
         self.mixers = {}
         self.queues = []
         clients[name] = self
-
-    def process(self, msg):
-        self.flags[msg] = True
-        logging.info("Setting flags for "+self.name+": "+str(self.flags))
 
     def remove(self):
         logging.info("Removing client: "+self.name)
@@ -156,7 +152,7 @@ class Client:
             mixer_links.append(linkname)
 
             # for the "main" surface, destination mixer pad needs zorder = 0
-            if prefix == "surface" and "main" in self.flags:
+            if prefix == "surface" and "main" in self.wrb.flags:
                 logging.info("    fixing zorder for main client")
                 sinkpad.set_property("zorder",0)
 

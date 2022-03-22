@@ -63,20 +63,17 @@ def get_mids_from_sdp(sdptext):
 
 class WebRTCPeer:
 
-    def __init__(self, connection, address, msghandler = None, is_client=False, is_main=False):
+    def __init__(self, connection, name, is_client=False, is_main=False):
 
         self.connection = connection
         self.is_client = is_client
         self.data_channel = None
-        self.address = address
+        self.name = name
         self.mapping = None
-        self.msghandler = msghandler
-
-        if self.msghandler:
-            self.msghandler.wrb = self
+        self.flags = {}
 
         self.bin = Gst.parse_bin_from_description(bindesc,False)
-        self.bin.set_name("bin_"+address)
+        self.bin.set_name("bin_"+name)
         add_and_link([self.bin])
 
         self.wrb = self.bin.get_by_name("webrtcbin")
@@ -109,6 +106,11 @@ class WebRTCPeer:
             message = json.dumps({"type":"msg","data":"main"})
             self.connection.send_text(message)
 
+    # application-level message
+    def process(self, msg):
+        self.flags[msg] = True
+        logging.debug("Setting flags for "+self.name+": "+str(self.flags))
+
     # message on WebRTC data channel
     def on_dc_message(self, wrb, message):
         logging.debug("New data channel message: "+message)
@@ -120,7 +122,7 @@ class WebRTCPeer:
         self.data_channel.connect("on-message-string", self.on_dc_message)
         self.data_channel.connect("on-message-data",   self.on_dc_message)
         # FIXME: doesn't seem to send anything?
-        hello = "Hi from "+self.address
+        hello = "Hi from "+self.name
         self.data_channel.emit("send-data",GLib.Bytes.new(hello.encode("utf-8")))
         self.data_channel.emit("send-string",hello)
 
@@ -212,10 +214,11 @@ class WebRTCPeer:
 
         alpha = None
         # disable alpha filtering for main client
-        if name == "surface" and self.msghandler and not "main" in self.msghandler.flags:
-            alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.address )
+        if name == "surface" and not self.is_client and not "main" in self.flags:
+            logging.info("Adding alpha filter for "+self.name+" surface output")
+            alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.name )
 
-        tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.address+"_"+name)
+        tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.name+"_"+name)
         add_and_link([alpha,tee])
         last = tee if alpha == None else alpha
         ghostpad.link(last.get_static_pad("sink"))
@@ -272,6 +275,6 @@ class WebRTCPeer:
             self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
             logging.trace("Incoming ICE candidate: " + json.dumps(msg))
 
-        if msg["type"] == "msg" and self.msghandler:
-            self.msghandler.process(msg["data"])
+        if msg["type"] == "msg":
+            self.process(msg["data"])
             logging.debug("Incoming websocket message: "+msg["data"])

@@ -49,8 +49,8 @@ def ws_conn_handler(server, connection, path, client, user_data):
     source = get_client_address(client)
     logging.info("New WebSocket connection from: "+source)
 
-    new_client = Client(source)
-    wrb = WebRTCPeer(connection,source,new_client)
+    wrb = WebRTCPeer(connection,source)
+    new_client = Client(source,wrb)
     connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
