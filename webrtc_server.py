@@ -39,7 +39,6 @@ def http_handler(server,msg,path,query,client,user_data):
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, client):
-    # TODO actually handle closing (might be tricky, needs to rewire pipeline)
     logging.info("WebSocket closed by remote.")
     client.remove()
 

@@ -83,11 +83,11 @@ class WebRTCPeer:
 
             element = self.bin.get_by_name(name)
             realpad = element.get_static_pad("sink")
+
             ghostpad = Gst.GhostPad.new("sink_"+name,realpad)
             ghostpad.set_active(True)
             self.bin.add_pad(ghostpad)
 
-            # TODO: source name should be configurable
             link_request_pads(get_by_name(name+"testsource"),"src_%u",self.bin,"sink_"+name,do_queue=False)
 
         self.connection.connect("message",self.on_ws_message)

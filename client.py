@@ -26,19 +26,7 @@ offsets = [
     (  0,360)  # bottom left
 ]
 
-def link_to_frontmixer(tee):
 
-    # request and link pads from tee and frontmixer
-    sinkpad,q = link_request_pads(tee,"src_%u",frontmixer,"sink_%u")
-
-    # set xpos/ypos properties on pad according to sequence number
-    padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
-    sinkpad.set_property("xpos",offsets[padnum][0])
-    sinkpad.set_property("ypos",offsets[padnum][1])
-
-    return q
-
-# TODO: turn into subclass of WebRTCPeer
 class Client:
 
     def __init__(self,name,wrb):
@@ -129,8 +117,13 @@ class Client:
             return
 
         # request and link pads from tee and frontmixer
-        q = link_to_frontmixer(self.outputs["front"])
+        sinkpad,q = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
         self.queues.append(q)
+
+        # set xpos/ypos properties on pad according to sequence number
+        padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
+        sinkpad.set_property("xpos",offsets[padnum][0])
+        sinkpad.set_property("ypos",offsets[padnum][1])
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix,qparams):
@@ -187,7 +180,7 @@ def create_frontmixer_queue():
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
-    link_to_frontmixer(get_by_name("fronttestsource"))
+    link_request_pads(get_by_name("fronttestsource"),"src_%u",frontmixer,"sink_%u")
 
 # link new client to mixers
 def link_new_client(client):
@@ -208,7 +201,6 @@ def link_new_client(client):
 def on_element_added(thebin, element):
 
     # check format: {input,output}_IPADDR_PORT_{surface,front,audio}
-    # FIXME: fails if source name is not IPADDR_PORT
     elname = element.get_name().split("_")
     if len(elname) != 4:
         return
@@ -216,7 +208,7 @@ def on_element_added(thebin, element):
     direction = elname[0]
     source = elname[1]+"_"+elname[2]
     stype = elname[3]
-    #logging.debug("New element:",direction,source,stype)
+    #logging.debug("New element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
     if direction == "output":
