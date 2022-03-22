@@ -176,7 +176,7 @@ class WebRTCPeer:
 
         # ... and send to peer.
         message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
-        logging.debug("Outgoing SDP: " + message)
+        logging.trace("Outgoing SDP: " + message)
         self.connection.send_text(message)
 
     # new pad appears on WebRTCBin element
@@ -240,7 +240,7 @@ class WebRTCPeer:
                 return
 
             logging.info("Received SDP " + stype + ", parsing...")
-            logging.debug("Incoming SDP: " + json.dumps(msg))
+            logging.trace("Incoming SDP: " + json.dumps(msg))
 
             res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
             # as client, we need to parse an OFFER, as server, we need to parse an ANSWER

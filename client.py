@@ -17,9 +17,6 @@ clients = {}
 frontmixer  = None
 frontstream = None
 
-# links between individual client tee/mixer pairs
-mixer_links = []
-
 # position offsets for 4 front streams
 # FIXME: how to handle > 4 clients?
 offsets = [
@@ -142,19 +139,14 @@ class Client:
         if not prefix in self.outputs:
             return
 
-        # FIXME: are the mixer_links still needed?
-        linkname = prefix+"_"+self.name+"_"+dest.name
-        if not linkname in mixer_links:
+        logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
+        sinkpad,q = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
+        self.queues.append(q)
 
-            logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-            sinkpad,q = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
-            self.queues.append(q)
-            mixer_links.append(linkname)
-
-            # for the "main" surface, destination mixer pad needs zorder = 0
-            if prefix == "surface" and "main" in self.wrb.flags:
-                logging.info("    fixing zorder for main client")
-                sinkpad.set_property("zorder",0)
+        # for the "main" surface, destination mixer pad needs zorder = 0
+        if prefix == "surface" and "main" in self.wrb.flags:
+            logging.info("    fixing zorder for main client")
+            sinkpad.set_property("zorder",0)
 
     # link all other clients to this mixer, this client to other mixers
     def link_streams(self,clients,prefix,qparams):
