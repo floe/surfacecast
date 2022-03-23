@@ -14,7 +14,7 @@ VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast
 #VENCODER="queue max-size-buffers=1 ! vp8enc threads=2 deadline=2000 target-bitrate=600000 ! queue max-size-time=100000000 ! rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
 AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! opusparse ! "
 
-RTPVIDEO="rtph264pay config-interval=-1 ! application/x-rtp,media=video,encoding-name=H264,"
+RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
 FILESINK="mp4mux name=mux fragment-duration=1000 ! filesink sync=true location="
 
