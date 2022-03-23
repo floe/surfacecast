@@ -55,8 +55,25 @@ def bus_call(bus, message, loop):
         logging.warning("Pipeline clock lost!")
     return True
 
+# shortcut to request pad
 def get_request_pad(el,tpl):
     return el.request_pad(el.get_pad_template(tpl), None, None)
+
+# create single mixer for front stream
+def create_frontmixer_queue():
+
+    logging.info("Creating frontmixer subqueue...")
+
+    frontmixer  = new_element("compositor",myname="frontmixer")
+    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")})
+    frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
+
+    add_and_link([ frontmixer, capsfilter, frontstream ])
+
+    frontsource = get_by_name("fronttestsource")
+    pad1 = get_request_pad(frontsource,"src_%u")
+    pad2 = get_request_pad(frontmixer,"sink_%u")
+    pad1.link(pad2)
 
 # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
 def dump_debug(name="surfacestreams"):

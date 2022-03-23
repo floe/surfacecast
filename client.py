@@ -14,9 +14,6 @@ from webrtc_peer import WebRTCPeer
 # client object pool
 clients = {}
 
-frontmixer  = None
-frontstream = None
-
 # position offsets for 4 front streams
 # FIXME: how to handle > 4 clients?
 offsets = [
@@ -155,14 +152,14 @@ class Client(BaseClient):
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client
-        self.link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front",do_queue=False)
+        self.link_request_pads(get_by_name("frontstream"),"src_%u",self.wrb.bin,"sink_front",do_queue=False)
 
         # sanity check (important for sink client)
         if not "front" in self.outputs:
             return
 
         # request and link pads from tee and frontmixer
-        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
+        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
 
         # set xpos/ypos properties on pad according to sequence number
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
@@ -207,29 +204,6 @@ class Client(BaseClient):
         self.link_streams(clients,"audio",{}) # {"max-size-time":100000000})
 
 
-# create single mixer for front stream
-def create_frontmixer_queue():
-
-    global frontmixer
-    global frontstream
-
-    if frontmixer != None or frontstream != None:
-        return
-
-    logging.info("Creating frontmixer subqueue...")
-
-    frontmixer  = new_element("compositor",myname="frontmixer")
-    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")})
-    frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
-
-    add_and_link([ frontmixer, capsfilter, frontstream ])
-
-    # FIXME: this _should_ be done via Client.link_request_pads, but we don't yet have a client at this point.
-    frontsource = get_by_name("fronttestsource")
-    pad1 = get_request_pad(frontsource,"src_%u")
-    pad2 = get_request_pad(frontmixer,"sink_%u")
-    pad1.link(pad2)
-
 # link new client to mixers
 # FIXME: should be a class method?
 def link_new_client(client):
@@ -260,6 +234,7 @@ def on_element_added(thebin, element):
     #logging.debug("New element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
+    # TODO: perhaps store the alpha element in outputs as well?
     if direction == "output":
         client.outputs[stype] = element
 
