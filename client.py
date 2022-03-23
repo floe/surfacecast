@@ -119,16 +119,17 @@ class Client(BaseClient):
             remove_element(alpha)
 
         # remove queues from link_request_pad
+        logging.debug("  Removing queues...")
         for q in self.queues:
             q.set_state(Gst.State.NULL)
-            for p in q.pads:
-                peer = p.get_peer()
-                if not peer:
-                    continue
-                # all auto-generated queues have at least one request pad as peer
-                el = peer.get_parent_element()
-                el.release_request_pad(peer)
             remove_element(q)
+
+        # remove request pads
+        logging.debug("  Removing request pads...")
+        for p in self.reqpads:
+            el = p.get_parent_element()
+            if el != None:
+                el.release_request_pad(p)
 
         logging.info("Client "+self.name+" unlinked.")
 
