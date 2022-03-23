@@ -10,6 +10,7 @@ from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
+from client import BaseClient
 
 args = None
 sink = ""
@@ -23,6 +24,7 @@ def ws_close_handler(connection, wrb):
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
     wrb = WebRTCPeer(connection,"client",is_client=True,is_main=args.main)
+    client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
 # element message was posted on bus

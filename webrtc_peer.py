@@ -78,7 +78,7 @@ class WebRTCPeer:
 
         self.wrb = self.bin.get_by_name("webrtcbin")
 
-        # add ghostpads (proxy-pads) and input-selectors for the converters
+        # add ghostpads (proxy-pads)
         for name in ["surface","front","audio"]:
 
             element = self.bin.get_by_name(name)
@@ -87,8 +87,6 @@ class WebRTCPeer:
             ghostpad = Gst.GhostPad.new("sink_"+name,realpad)
             ghostpad.set_active(True)
             self.bin.add_pad(ghostpad)
-
-            link_request_pads(get_by_name(name+"testsource"),"src_%u",self.bin,"sink_"+name,do_queue=False)
 
         self.connection.connect("message",self.on_ws_message)
 

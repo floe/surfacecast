@@ -27,15 +27,61 @@ offsets = [
 ]
 
 
-class Client:
+class BaseClient:
 
     def __init__(self,name,wrb):
 
         self.wrb = wrb
         self.name = name
+        self.queues = []
+        self.reqpads = []
+
+        # link to sources
+        for name in ["surface","front","audio"]:
+            self.link_request_pads(get_by_name(name+"testsource"),"src_%u",self.wrb.bin,"sink_"+name,do_queue=False)
+
+    # get a (new) pad from an element
+    def get_pad(self, el, tpl):
+
+        pad = el.get_static_pad(tpl)
+
+        # pad doesn't exist yet, so request a new one (and store it)
+        if pad == None:
+            pad = get_request_pad(el,tpl)
+            self.reqpads.append(pad)
+        # we have a static pad, check if it's already linked
+        else:
+            peer = pad.get_peer()
+            if peer:
+                peer.unlink(pad)
+
+        return pad
+
+    # convenience function to link request pads (and keep track of pads/queues)
+    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={}):
+
+        pad1 = self.get_pad(el1,tpl1)
+        pad2 = self.get_pad(el2,tpl2)
+
+        if do_queue:
+            queue = new_element("queue",qp)
+            add_and_link([queue])
+            pad1.link(queue.get_static_pad("sink"))
+            queue.get_static_pad("src").link(pad2)
+            self.queues.append(queue)
+        else:
+            pad1.link(pad2)
+
+        return pad2
+
+
+class Client(BaseClient):
+
+    def __init__(self,name,wrb):
+
+        super().__init__(name,wrb)
         self.outputs = {}
         self.mixers = {}
-        self.queues = []
         clients[name] = self
 
     def remove(self):
@@ -99,9 +145,8 @@ class Client:
         self.mixers[mtype] = mixer
         self.mixers[mtype+"_caps"] = caps
         add_and_link([mixer,caps])
-        link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
-        _,q = link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
-        self.queues.append(q)
+        self.link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
+        self.link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
 
     # link client to frontmixer
     def link_to_front(self):
@@ -110,15 +155,14 @@ class Client:
         logging.info("    linking client "+self.name+" to frontmixer")
 
         # link frontstream tee to client
-        link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front",do_queue=False)
+        self.link_request_pads(frontstream,"src_%u",self.wrb.bin,"sink_front",do_queue=False)
 
         # sanity check (important for sink client)
         if not "front" in self.outputs:
             return
 
         # request and link pads from tee and frontmixer
-        sinkpad,q = link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
-        self.queues.append(q)
+        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",frontmixer,"sink_%u")
 
         # set xpos/ypos properties on pad according to sequence number
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
@@ -133,8 +177,7 @@ class Client:
             return
 
         logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-        sinkpad,q = link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
-        self.queues.append(q)
+        sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
 
         # for the "main" surface, destination mixer pad needs zorder = 0
         if prefix == "surface" and "main" in self.wrb.flags:
@@ -180,9 +223,15 @@ def create_frontmixer_queue():
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
-    link_request_pads(get_by_name("fronttestsource"),"src_%u",frontmixer,"sink_%u")
+
+    # FIXME: this _should_ be done via Client.link_request_pads, but we don't yet have a client at this point.
+    frontsource = get_by_name("fronttestsource")
+    pad1 = get_request_pad(frontsource,"src_%u")
+    pad2 = get_request_pad(frontmixer,"sink_%u")
+    pad1.link(pad2)
 
 # link new client to mixers
+# FIXME: should be a class method?
 def link_new_client(client):
 
     logging.info("  setting up mixers for new client "+client.name)

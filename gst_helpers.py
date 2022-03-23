@@ -55,40 +55,14 @@ def bus_call(bus, message, loop):
         logging.warning("Pipeline clock lost!")
     return True
 
-# convenience function to link request pads
-# TODO: turn into a class method for client/webrtc_peer and store created queues internally
-def link_request_pads(el1, tpl1, el2, tpl2, do_queue=True, qp={}):
+def get_request_pad(el,tpl):
+    return el.request_pad(el.get_pad_template(tpl), None, None)
 
-    pad1 = el1.get_static_pad(tpl1)
-    if pad1 == None:
-        pad1 = el1.request_pad(el1.get_pad_template(tpl1), None, None)
-
-    pad2 = el2.get_static_pad(tpl2)
-    if pad2 == None:
-        pad2 = el2.request_pad(el2.get_pad_template(tpl2), None, None)
-    else:
-        # we have a static pad, check if it's already linked
-        peer = pad2.get_peer()
-        if peer:
-            peer.unlink(pad2)
-
-    # FIXME: need a way to keep track of the auto-generated queues
-    queue = None
-    if do_queue:
-        queue = new_element("queue",qp)
-        pipeline.add(queue)
-        queue.sync_state_with_parent()
-        pad1.link(queue.get_static_pad("sink"))
-        queue.get_static_pad("src").link(pad2)
-    else:
-        pad1.link(pad2)
-    return pad2,queue
-
+# write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
 def dump_debug(name="surfacestreams"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
         return
     logging.info("Writing graph snapshot to "+name+".dot")
-    # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
     Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails.ALL,name)
 
 def get_by_name(name):
