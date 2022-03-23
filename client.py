@@ -239,30 +239,3 @@ def on_element_added(thebin, element):
     if len(client.outputs) == 3:
         logging.info("Client "+source+": all input/output elements complete.")
         client.link_new_client()
-
-# add a "fake" client to sink all incoming streams to file
-# FIXME: still uses old-style input-selectors, switch to only using pads
-def create_sink_client():
-
-    logging.info("Adding file sink client...")
-
-    sink_client = Client("file_sink")
-
-    # TODO: use only a single muxer and filesrc for all streams here (try to reuse code from webrtc_peer?)
-    VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! mp4mux fragment-duration=1000 ! filesink sync=true location="
-    AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! mp4mux fragment-duration=1000 ! filesink sync=true location="
-
-    encoders = { "surface": VENCODER, "front": VENCODER, "audio": AENCODER }
-    suffix = datetime.datetime.now().strftime("-%Y%m%d-%H%M%S.mp4")
-
-    for name in encoders:
-        logging.info("  Adding file sink encoder for "+name+"...")
-        selector = new_element("input-selector",myname="input_filesink_"+name)
-        testsrc = get_by_name(name+"testsource")
-        sink_client.outputs[name] = testsrc
-        sink_client.inputs[name] = selector
-        add_and_link([selector,Gst.parse_bin_from_description( encoders[name]+name+suffix, True )])
-        link_request_pads(testsrc,"src_%u",selector,"sink_%u")
-
-    logging.info("File sink client: all input/output elements complete.")
-    link_new_client(sink_client)

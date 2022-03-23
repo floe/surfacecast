@@ -9,16 +9,25 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 
 from gst_helpers import *
 
-VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! rtph264pay config-interval=-1 ! application/x-rtp,media=video,encoding-name=H264,"
+VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! "
 # TODO: vp8 would be better in terms of compatibility, but the quality is horrific?
 #VENCODER="queue max-size-buffers=1 ! vp8enc threads=2 deadline=2000 target-bitrate=600000 ! queue max-size-time=100000000 ! rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
-AENCODER="queue ! opusenc ! rtpopuspay ! queue max-size-time=100000000 ! application/x-rtp,media=audio,encoding-name=OPUS,"
+AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! opusparse ! "
 
-# TODO make stun server configurable? maybe print firewall info?
+RTPVIDEO="rtph264pay config-interval=-1 ! application/x-rtp,media=video,encoding-name=H264,"
+RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
+FILESINK="mp4mux name=mux fragment-duration=1000 ! filesink sync=true location="
+
+# TODO make stun server configurable
 bindesc="webrtcbin name=webrtcbin stun-server=stun://stun.l.google.com:19302 "+\
-  "videoconvert name=front   ! "+VENCODER+"payload=96 ! webrtcbin. "+\
-  "audioconvert name=audio   ! "+AENCODER+"payload=97 ! webrtcbin. "+\
-  "videoconvert name=surface ! "+VENCODER+"payload=98 ! webrtcbin. "
+  "videoconvert name=front   ! "+VENCODER+RTPVIDEO+"payload=96 ! webrtcbin. "+\
+  "audioconvert name=audio   ! "+AENCODER+RTPAUDIO+"payload=97 ! webrtcbin. "+\
+  "videoconvert name=surface ! "+VENCODER+RTPVIDEO+"payload=98 ! webrtcbin. "
+
+filebin=FILESINK+"test.mp4 "+\
+  "videoconvert name=front   ! "+VENCODER+" mux. "+\
+  "audioconvert name=audio   ! "+AENCODER+" mux. "+\
+  "videoconvert name=surface ! "+VENCODER+" mux. "
 
 response_type = {
     "offer":  GstWebRTC.WebRTCSDPType.OFFER,
@@ -61,25 +70,23 @@ def get_mids_from_sdp(sdptext):
 
     return result
 
-class WebRTCPeer:
+# base class: bin with 3 sink ghostpads
+class StreamSink:
 
-    def __init__(self, connection, name, is_client=False, is_main=False):
+    def __init__(self, name, bin_desc=filebin):
 
-        self.connection = connection
-        self.is_client = is_client
-        self.data_channel = None
         self.name = name
-        self.mapping = None
-        self.flags = {}
+        logging.info("Setting up stream handler for "+name)
+        logging.trace("Bin contents: "+bin_desc)
 
-        self.bin = Gst.parse_bin_from_description(bindesc,False)
+        self.bin = Gst.parse_bin_from_description(bin_desc,False)
         self.bin.set_name("bin_"+name)
         add_and_link([self.bin])
 
-        self.wrb = self.bin.get_by_name("webrtcbin")
-
         # add ghostpads (proxy-pads)
         for name in ["surface","front","audio"]:
+
+            logging.debug("Creating "+name+" ghostpad for "+self.name)
 
             element = self.bin.get_by_name(name)
             realpad = element.get_static_pad("sink")
@@ -88,7 +95,22 @@ class WebRTCPeer:
             ghostpad.set_active(True)
             self.bin.add_pad(ghostpad)
 
+
+# specialization: containing WebRTCBin and _lots_ of plumbing
+class WebRTCPeer(StreamSink):
+
+    def __init__(self, connection, name, is_client=False, is_main=False):
+
+        super().__init__(name,bindesc)
+
+        self.connection = connection
+        self.is_client = is_client
+        self.data_channel = None
+        self.mapping = None
+        self.flags = {}
+
         self.connection.connect("message",self.on_ws_message)
+        self.wrb = self.bin.get_by_name("webrtcbin")
 
         # connect signals (note: negotiation-needed will initially be empty on client side)
         self.wrb.connect("on-negotiation-needed", self.on_negotiation_needed)

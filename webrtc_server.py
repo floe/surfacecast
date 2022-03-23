@@ -10,7 +10,7 @@ from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 
 from gst_helpers import *
 from client import *
-from webrtc_peer import WebRTCPeer
+from webrtc_peer import *
 
 # get address and port from client
 def get_client_address(client):
@@ -72,6 +72,9 @@ server.set_ssl_cert_file("cert.pem","key.pem")
 server.listen_all(8080,Soup.ServerListenOptions.HTTPS)
 
 if len(sys.argv) > 1 and sys.argv[1] == "--sink":
-    create_sink_client()
+    logging.info("Adding file sink client...")
+    sink = StreamSink("file_sink")
+    client = Client("file_sink",sink)
+    client.link_new_client()
 
 run_mainloop()
