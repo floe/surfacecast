@@ -139,9 +139,11 @@ class Client(BaseClient):
             return
 
         logging.info("    creating "+mtype+" mixer for client "+self.name)
+
         self.mixers[mtype] = mixer
         self.mixers[mtype+"_caps"] = caps
         add_and_link([mixer,caps])
+
         self.link_request_pads(caps,"src",self.wrb.bin,"sink_"+mtype,do_queue=False)
         self.link_request_pads(get_by_name(mtype+"testsource"),"src_%u",mixer,"sink_%u")
 
@@ -182,7 +184,7 @@ class Client(BaseClient):
             sinkpad.set_property("zorder",0)
 
     # link all other clients to this mixer, this client to other mixers
-    def link_streams(self,clients,prefix,qparams):
+    def link_streams(self,prefix,qparams):
 
         for c in clients:
 
@@ -197,15 +199,7 @@ class Client(BaseClient):
             # for every _other_ tee, link that tee to my mixer
             other.link_streams_oneway(self,prefix,qparams)
 
-    # link all other clients to local mixer, this client to other mixers
-    def link_all_streams(self,clients):
-        # TODO: figure out the queue parameters (if any?)
-        self.link_streams(clients,"surface",{}) # {"max-size-buffers":1})
-        self.link_streams(clients,"audio",{}) # {"max-size-time":100000000})
-
-
     # link new client to mixers
-    # FIXME: should be a class method?
     def link_new_client(self):
 
         logging.info("  setting up mixers for new client "+self.name)
@@ -218,7 +212,9 @@ class Client(BaseClient):
         self.link_to_front()
 
         # add missing surface/audio mixer links
-        self.link_all_streams(clients)
+        # TODO: figure out the queue parameters (if any?)
+        self.link_streams("surface",{}) # {"max-size-buffers":1})
+        self.link_streams("audio",{}) # {"max-size-time":100000000})
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):
