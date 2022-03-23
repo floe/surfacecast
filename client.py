@@ -204,21 +204,21 @@ class Client(BaseClient):
         self.link_streams(clients,"audio",{}) # {"max-size-time":100000000})
 
 
-# link new client to mixers
-# FIXME: should be a class method?
-def link_new_client(client):
+    # link new client to mixers
+    # FIXME: should be a class method?
+    def link_new_client(self):
 
-    logging.info("  setting up mixers for new client "+client.name)
+        logging.info("  setting up mixers for new client "+self.name)
 
-    # create surface/audio mixers
-    client.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}))
-    client.create_mixer(  "audio", new_element("audiomixer"                       ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        # create surface/audio mixers
+        self.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}))
+        self.create_mixer(  "audio", new_element("audiomixer"                       ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
-    # add missing frontmixer links
-    client.link_to_front()
+        # add missing frontmixer links
+        self.link_to_front()
 
-    # add missing surface/audio mixer links
-    client.link_all_streams(clients)
+        # add missing surface/audio mixer links
+        self.link_all_streams(clients)
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):
@@ -241,7 +241,7 @@ def on_element_added(thebin, element):
     # are all outputs in place?
     if len(client.outputs) == 3:
         logging.info("Client "+source+": all input/output elements complete.")
-        link_new_client(client)
+        client.link_new_client()
 
 # add a "fake" client to sink all incoming streams to file
 # FIXME: still uses old-style input-selectors, switch to only using pads
