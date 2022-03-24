@@ -81,7 +81,7 @@ add_test_sources(args.front,args.surface,args.audio,args.fake)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
-msg = Soup.Message.new("GET", "wss://"+args.target+":"+args.port+"/ws")
+msg = Soup.Message.new("GET", "wss://"+args.target+":"+str(args.port)+"/ws")
 session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
 
 run_mainloop()
