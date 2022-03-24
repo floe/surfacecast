@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",is_client=True,is_main=args.main)
+    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -65,6 +65,8 @@ parser.add_argument("-t","--target", help="server to connect to (%(default)s)", 
 parser.add_argument("-a","--audio",  help="audio source (device name or pipeline)",   default=""   )
 parser.add_argument("-f","--front",  help="front image source   (device or pipeline)",default=""   )
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
+parser.add_argument("-u","--stun",   help="STUN server", default="stun://stun.l.google.com:19302"  )
+parser.add_argument("-p","--port",   help="server HTTPS listening port",  default=8080             )
 
 args = parser.parse_args()
 print("Option",args,"\n")
@@ -79,12 +81,7 @@ add_test_sources(args.front,args.surface,args.audio,args.fake)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
-msg = Soup.Message.new("GET", "wss://"+args.target+":8080/ws")
+msg = Soup.Message.new("GET", "wss://"+args.target+":"+args.port+"/ws")
 session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
 
-#msg = Soup.Message.new("GET", "https://127.0.0.1:8080/stream.html")
-#session.add_feature(Soup.Logger.new(Soup.LoggerLogLevel.BODY, -1))
-#session.queue_message(msg,ws_conn_handler,None)
-
 run_mainloop()
-

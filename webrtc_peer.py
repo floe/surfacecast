@@ -12,19 +12,19 @@ from gst_helpers import *
 VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! "
 # TODO: vp8 would be better in terms of compatibility, but the quality is horrific?
 #VENCODER="queue max-size-buffers=1 ! vp8enc threads=2 deadline=2000 target-bitrate=600000 ! queue max-size-time=100000000 ! rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
+# TODO: any other sensible audiocodec that can also be put into MP4 containers?
 AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! opusparse ! "
 
 RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
 FILESINK="mp4mux name=mux fragment-duration=1000 ! filesink sync=true location="
 
-# TODO make stun server configurable
-bindesc="webrtcbin name=webrtcbin stun-server=stun://stun.l.google.com:19302 "+\
+bindesc="webrtcbin name=webrtcbin stun-server=%s "+\
   "videoconvert name=front   ! "+VENCODER+RTPVIDEO+"payload=96 ! webrtcbin. "+\
   "audioconvert name=audio   ! "+AENCODER+RTPAUDIO+"payload=97 ! webrtcbin. "+\
   "videoconvert name=surface ! "+VENCODER+RTPVIDEO+"payload=98 ! webrtcbin. "
 
-filebin=FILESINK+"test.mp4 "+\
+filebin=FILESINK+"%s "+\
   "videoconvert name=front   ! "+VENCODER+" mux. "+\
   "audioconvert name=audio   ! "+AENCODER+" mux. "+\
   "videoconvert name=surface ! "+VENCODER+" mux. "
@@ -73,9 +73,11 @@ def get_mids_from_sdp(sdptext):
 # base class: bin with 3 sink ghostpads
 class StreamSink:
 
-    def __init__(self, name, bin_desc=filebin):
+    def __init__(self, name, param, bin_desc=filebin):
 
         self.name = name
+        bin_desc = bin_desc % param
+
         logging.info("Setting up stream handler for "+name)
         logging.trace("Bin contents: "+bin_desc)
 
@@ -99,9 +101,9 @@ class StreamSink:
 # specialization: containing WebRTCBin and _lots_ of plumbing
 class WebRTCPeer(StreamSink):
 
-    def __init__(self, connection, name, is_client=False, is_main=False):
+    def __init__(self, connection, name, stun, is_client=False, is_main=False):
 
-        super().__init__(name,bindesc)
+        super().__init__(name,stun,bindesc)
 
         self.connection = connection
         self.is_client = is_client

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,datetime
+import sys,gi,json
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
