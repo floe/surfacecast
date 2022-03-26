@@ -9,11 +9,11 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 
 from gst_helpers import *
 
-VENCODER="queue max-size-buffers=1 ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse ! "
+VENCODER="queue ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue ! h264parse ! "
 # TODO: vp8 would be better in terms of compatibility, but the quality is horrific?
 #VENCODER="queue max-size-buffers=1 ! vp8enc threads=2 deadline=2000 target-bitrate=600000 ! queue max-size-time=100000000 ! rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
 # TODO: any other sensible audiocodec that can also be put into MP4 containers?
-AENCODER="queue ! opusenc ! queue max-size-time=100000000 ! opusparse ! "
+AENCODER="queue ! opusenc ! queue ! opusparse ! "
 
 RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
