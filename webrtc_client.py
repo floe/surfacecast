@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main)
+    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -67,6 +67,7 @@ parser.add_argument("-f","--front",  help="front image source   (device or pipel
 parser.add_argument("-s","--surface",help="surface image source (device or pipeline)",default=""   )
 parser.add_argument("-u","--stun",   help="STUN server", default="stun://stun.l.google.com:19302"  )
 parser.add_argument("-p","--port",   help="server HTTPS listening port",  default=8080             )
+parser.add_argument("-n","--nick",   help="client nickname", default=""                            )
 
 args = parser.parse_args()
 print("Option",args,"\n")

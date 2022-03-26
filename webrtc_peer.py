@@ -101,7 +101,7 @@ class StreamSink:
 # specialization: containing WebRTCBin and _lots_ of plumbing
 class WebRTCPeer(StreamSink):
 
-    def __init__(self, connection, name, stun, is_client=False, is_main=False):
+    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick=""):
 
         super().__init__(name,stun,bindesc)
 
@@ -125,12 +125,17 @@ class WebRTCPeer(StreamSink):
 
         # send message to server if main client
         if is_main:
-            message = json.dumps({"type":"msg","data":"main"})
+            message = json.dumps({"type":"msg","data":{"main":True}})
+            self.connection.send_text(message)
+
+        # send nickname to server if given
+        if nick != "":
+            message = json.dumps({"type":"msg","data":{"nick":nick}})
             self.connection.send_text(message)
 
     # application-level message
     def process(self, msg):
-        self.flags[msg] = True
+        self.flags.update(msg)
         logging.debug("Setting flags for "+self.name+": "+str(self.flags))
 
     # message on WebRTC data channel
@@ -240,10 +245,19 @@ class WebRTCPeer(StreamSink):
             logging.info("Adding alpha filter for "+self.name+" surface output")
             alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.name )
 
+        text = None
+        # add a nickname text overlay if given
+        if name == "front" and not self.is_client and "nick" in self.flags:
+            text = new_element("textoverlay",{"halignment":"left","valignment":"bottom","text":self.flags["nick"]},myname="text_"+self.name)
+
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.name+"_"+name)
-        add_and_link([alpha,tee])
-        last = tee if alpha == None else alpha
-        ghostpad.link(last.get_static_pad("sink"))
+        add_and_link([text,alpha,tee])
+        if text != None:
+            ghostpad.link(text.get_static_pad("video_sink"))
+        elif alpha != None:
+            ghostpad.link(alpha.get_static_pad("sink"))
+        else:
+            ghostpad.link(tee.get_static_pad("sink"))
 
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):
@@ -299,4 +313,3 @@ class WebRTCPeer(StreamSink):
 
         if msg["type"] == "msg":
             self.process(msg["data"])
-            logging.debug("Incoming websocket message: "+msg["data"])

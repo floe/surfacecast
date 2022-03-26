@@ -118,6 +118,12 @@ class Client(BaseClient):
             alpha.set_state(Gst.State.NULL)
             remove_element(alpha)
 
+        # remove the textoverlay, if exists
+        text = get_by_name("text_"+self.name)
+        if text:
+            text.set_state(Gst.State.NULL)
+            remove_element(text)
+
         # remove queues from link_request_pad
         logging.debug("  Removing queues...")
         for q in self.queues:
