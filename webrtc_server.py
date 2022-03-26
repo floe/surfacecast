@@ -25,19 +25,21 @@ def http_handler(server,msg,path,query,client,user_data):
     #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
-        data = open(path[1:],"r").read()
+        data = open("webclient"+path,"r").read()
         if path.endswith(".js"):
             content_type = "text/javascript"
+        msg.set_status(Soup.Status.OK)
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
+        data=path+" not found"
         if path == "/quit":
             logging.info("Well... bye.")
-            quit_mainloop()
-        return
+            GLib.timeout_add(100,quit_mainloop)
+            data="Server exiting/restarting..."
+
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
     msg.response_body.append(data.encode("utf-8"))
-    msg.set_status(Soup.Status.OK)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, client):
@@ -72,8 +74,8 @@ print("Option",args,"\n")
 
 init_pipeline(on_element_added,args.debug)
 
-frontsrc   = "filesrc location=front.png ! pngdec ! videoconvert ! imagefreeze ! identity sync=true"
-surfacesrc = "videotestsrc is-live=true pattern=solid-color foreground-color=0"
+frontsrc   = "filesrc location=assets/front.png ! pngdec ! videoconvert ! imagefreeze ! identity sync=true"
+surfacesrc = "videotestsrc is-live=true pattern=solid-color foreground-color=0" #ball motion=sweep background-color=0
 audiosrc   = "audiotestsrc is-live=true wave=silence"
 
 add_test_sources(frontsrc,surfacesrc,audiosrc,fake=True,bgcol=0xFFFF00FF,wave="sine")
@@ -82,7 +84,7 @@ create_frontmixer_queue()
 server = Soup.Server()
 server.add_handler("/",http_handler,None)
 server.add_websocket_handler("/ws",None,None,ws_conn_handler,None)
-server.set_ssl_cert_file("cert.pem","key.pem")
+server.set_ssl_cert_file("assets/tls-cert.pem","assets/tls-key.pem")
 server.listen_all(int(args.port),Soup.ServerListenOptions.HTTPS)
 
 if args.sink:
