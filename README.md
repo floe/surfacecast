@@ -29,7 +29,7 @@ Here's an example walkthrough of how to connect an interactive surface with a br
 
 ## Clients
 
-Python client commandline parameters:
+### Python commandline client parameters
 
 ```
   --fake                use fake sources (desc. from -f/-s)
@@ -69,7 +69,17 @@ Can be used to give a label (e.g. "Alice" or "Bob") to the frontstream.
 
 ## Server
 
-...
+```
+  -s, --sink            save all streams to MP4 file (default: False)
+  -o OUT, --out OUT     MP4 output filename (default: surfacestreams-20220327-125732.mp4)
+```
+If `-s/--sink` is given, write the combined front, surface, and audio streams to a MP4 file. Optional target filename can be set via `-o/--out`. Note that the file contains OPUS audio inside an MP4 container, which is not supported by all players. If necessary, use `scripts/playback.sh` to recode to MP3 and play all streams simultaneously in VLC.
+
+```
+  -p PORT, --port PORT  server HTTPS listening port (default: 8080)
+  -u STUN, --stun STUN  STUN server (default: stun://stun.l.google.com:19302)
+```
+If you want to use a different STUN server than the default (stun://stun.l.google.com:19302), or a different listening port, specify here.
 
 ## Requirements
 
