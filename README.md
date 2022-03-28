@@ -19,8 +19,8 @@ Here's an example walkthrough of how to connect an interactive surface with a br
  * start the browser client:
    * with Chrome or Firefox, go to `https://${SERVER_HOST}:8080/stream.html`
    * allow access to camera/microphone
-   * you should then see your own webcam stream and a pink surface with a bouncing ball after a few seconds, and hear a pilot tone
-   * try doodling on the pink surface (left mouse button draws, right button erases)
+   * you should then see your own webcam stream and a black canvas after a few seconds
+   * try doodling on the black canvas (left mouse button draws, right button erases)
  * start the interactive surface:
    * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20` (see Usage - Example 2)
    * run the Python client: `./webrtc_client.py -t ${SERVER_HOST} -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
@@ -29,16 +29,57 @@ Here's an example walkthrough of how to connect an interactive surface with a br
 
 ## Clients
 
-* standalone Python client
-  * any two V4L2 video sources (also virtual ones, e.g. from https://github.com/floe/surfacecast)
-* HTML5 client
-  * virtual drawing board surface
-* VR client
-  * tbd
+### Python commandline client parameters
+
+```
+  --fake                use fake sources (desc. from -f/-s)
+```
+Mostly useful for testing, will create default outgoing streams with fake test data (TV test image, moving ball, tick sounds).
+If any of `-f/-s/-a` are also given, the string will be interpreted as a GStreamer bin description.
+
+```
+  -m, --main            flag this client as main (lowest z)
+```
+If a client does not have background filtering (i.e. a plain webcam), then you can use this flag to make sure that the surface stream from this client is always placed below all others. Note you can only have one "main" client per session, otherwise the surface mixing will get messed up.
+
+```
+  -a AUDIO, --audio AUDIO
+  -f FRONT, --front FRONT
+  -s SURFACE, --surface SURFACE
+                        audio/front/surface source (device name or pipeline)
+```
+If any of these are given without ``--fake``, they will be interpreted as a device name (e.g. `/dev/video0`). Otherwise, they will be interpreted as a GStreamer bin description (e.g. `"videotestsrc ! timeoverlay"`). Note that in the second case the whole string needs to be quoted.
+
+```
+  -p PORT, --port PORT  server HTTPS listening port (8080)
+  -t TARGET, --target TARGET
+                        server to connect to (127.0.0.1)
+```
+Used to give the hostname or IP address of the server, and optionally a non-default port to connect to.
+
+```
+  -u STUN, --stun STUN  STUN server
+```
+If you want to use a different STUN server than the default (stun://stun.l.google.com:19302), specify here.
+
+```
+  -n NICK, --nick NICK  client nickname
+```
+Can be used to give a label (e.g. "Alice" or "Bob") to the frontstream.
 
 ## Server
 
-...
+```
+  -s, --sink            save all streams to MP4 file (default: False)
+  -o OUT, --out OUT     MP4 output filename (default: surfacestreams-20220327-125732.mp4)
+```
+If `-s/--sink` is given, write the combined front, surface, and audio streams to a MP4 file. Optional target filename can be set via `-o/--out`. Note that the file contains OPUS audio inside an MP4 container, which is not supported by all players. If necessary, use `scripts/playback.sh` to recode to MP3 and play all streams simultaneously in VLC.
+
+```
+  -p PORT, --port PORT  server HTTPS listening port (default: 8080)
+  -u STUN, --stun STUN  STUN server (default: stun://stun.l.google.com:19302)
+```
+If you want to use a different STUN server than the default (stun://stun.l.google.com:19302), or a different listening port, specify here.
 
 ## Requirements
 
