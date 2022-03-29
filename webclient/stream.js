@@ -5,8 +5,8 @@ var webrtcPeerConnection;
 var webrtcConfiguration;
 var reportError;
 var datastream;
-var canvas;
-var context,c2;
+var canvas,canvas2,canvas3;
+var context,c2,c3;
 var canvasstream;
 var mousedown;
 var mycolor;
@@ -109,8 +109,14 @@ function onIceCandidate(event) {
 }
 
 function getLocalStreams() {
-  var constraints = {video: { width: { ideal: 640 }, height: { ideal: 360 }, aspectRatio: { ideal: 1.7777777778 }, facingMode: "user" }, audio: true};
-  return navigator.mediaDevices.getUserMedia(constraints);
+  // courtesy of https://stackoverflow.com/a/33770858
+  var vidconst = { width: { ideal: 640 }, height: { ideal: 360 }, facingMode: "user" };
+  return navigator.mediaDevices.enumerateDevices().then(devices => {
+    const cams = devices.filter(device => device.kind == "videoinput");
+    const mics = devices.filter(device => device.kind == "audioinput");
+    const constraints = { video: (cams.length > 0 ? vidconst : false), audio: mics.length > 0 };
+    return navigator.mediaDevices.getUserMedia(constraints);
+  });
 }
 
 
