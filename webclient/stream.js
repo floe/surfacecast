@@ -156,6 +156,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
   surfacestream = new MediaStream();
 
   if (!webrtcPeerConnection) {
+
     getLocalStreams().then( (stream) => {
       
       webrtcPeerConnection = new RTCPeerConnection(webrtcConfiguration);
@@ -170,7 +171,14 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       audiotrans = audiotrack.id;
       webrtcPeerConnection.addTrack(audiotrack);
 
-      fronttrack = stream.getVideoTracks()[0];
+      var vidtracks = stream.getVideoTracks();
+      if (vidtracks.length > 0) {
+        fronttrack = vidtracks[0];
+      } else {
+        canvasstream = canvas3.captureStream(15);
+        fronttrack = canvasstream.getVideoTracks()[0];
+        //fronttrack.contentHint = "detail";
+      }
       fronttrans = fronttrack.id;
       webrtcPeerConnection.addTrack(fronttrack);
 
@@ -181,6 +189,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       webrtcPeerConnection.addTrack(canvastrack, stream);
       // make sure that the canvas stream starts by triggering a delayed paint operation
       setTimeout(() => { c2.fillRect(0, 0, canvas2.width, canvas2.height); }, 1000);
+      setTimeout(() => { c3.fillRect(0, 0, canvas3.width, canvas3.height); }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
@@ -212,11 +221,20 @@ window.onload = function() {
   playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
+  context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 
   canvas2 = document.getElementById("canvas2");
   c2 = canvas2.getContext("2d");
   canvas2.width=1280;
   canvas2.height=720;
+
+  canvas3 = document.getElementById("canvas3");
+  c3 = canvas3.getContext("2d");
+  canvas3.width=640;
+  canvas3.height=360;
+
+  c3.fillStyle = "rgba(255,0,255,255)";
+  c3.fillRect(0, 0, canvas3.width, canvas3.height);
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
