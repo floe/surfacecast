@@ -101,7 +101,7 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * Python Client
     * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YUYV/YUV2 (see also [issue #4](https://github.com/floe/surfacestreams/issues/4)). The front/face cam needs to support 640x360 natively, the surface cam needs to support 1280x720 natively. Good results with Logitech C270 (front/face) and C920 (surface). Note: environment variable `GST_V4L2_USE_LIBV4L2=1` can sometimes be used to fix format mismatch issues.
     * The Python client has a noticeable delay (sometimes on the order of 30 seconds) before the surface stream finally starts running, unlike e.g. the browser client (see also [issue #2](https://github.com/floe/surfacestreams/issues/2)). Once it runs, the delay is negligible, but the waiting time until things synchronize is iffy.
-    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceCast perspective transform. Overclocking to 1800 core/600 GPU is recommended.
+    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceCast perspective transform. Overclocking to 1800 core/600 GPU is recommended (and don't forget to add active cooling, otherwise it will just go into thermal throttling right away, and you're back to square one).
   * HTML5 client
     * not working on Chromium (non-free codec problem, see [issue #8](https://github.com/floe/surfacestreams/issues/8))
     * not working on Safari (reason unknown, see [issue #6](https://github.com/floe/surfacestreams/issues/6))
