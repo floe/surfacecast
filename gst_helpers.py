@@ -156,6 +156,7 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00F
 
 def run_mainloop():
     pipeline.set_state(Gst.State.PLAYING)
+    logging.info("Pipeline starting (library version "+Gst.version_string()+")")
     mainloop.run()
 
 def quit_mainloop():
