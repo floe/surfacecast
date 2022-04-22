@@ -155,7 +155,8 @@ class WebRTCPeer(StreamSink):
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
-        icemsg = json.dumps({"type":"ice","data":{"sdpMLineIndex":index,"candidate":candidate}})
+        # throw in a fake sdpMid attribute to work around https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1174
+        icemsg = json.dumps({"type":"ice","data":{"sdpMLineIndex":index,"candidate":candidate,"sdpMid":"video0"}})
         logging.trace("New local ICE candidate: "+icemsg)
         self.connection.send_text(icemsg)
 
