@@ -173,7 +173,7 @@ class WebRTCPeer(StreamSink):
     def on_negotiation_created(self, promise, kind):
         
         reply = promise.get_reply()
-        if reply == None:
+        if reply == None or reply.get_value(kind) == None:
             # Note: this is okay on client side, the initial on-negotiation-needed signal will fire before
             # the remote offer has been received, so it has to be re-triggered once the offer has arrived
             logging.debug("Received empty "+kind+" from webrtcbin, retrying...")
