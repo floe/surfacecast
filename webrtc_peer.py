@@ -121,7 +121,8 @@ class WebRTCPeer(StreamSink):
         self.wrb.connect("pad-added",             self.on_pad_added         )
 
         # create the data channel
-        self.wrb.emit("create-data-channel", "events", None)
+        self.data_channel = self.wrb.emit("create-data-channel", "events", None)
+        self.data_channel.connect("on-open", self.on_channel_open)
 
         # send message to server if main client
         if is_main:
@@ -138,20 +139,21 @@ class WebRTCPeer(StreamSink):
         self.flags.update(msg)
         logging.debug("Setting flags for "+self.name+": "+str(self.flags))
 
-    # message on WebRTC data channel
-    def on_dc_message(self, wrb, message):
-        logging.debug("New data channel message: "+message)
-
-    # new data channel created
-    def on_data_channel(self, wrb, data_channel):
-        logging.info("New data channel created.")
-        self.data_channel = data_channel
-        self.data_channel.connect("on-message-string", self.on_dc_message)
-        self.data_channel.connect("on-message-data",   self.on_dc_message)
-        # FIXME: doesn't seem to send anything?
+    # outgoing data channel is open
+    def on_channel_open(self, channel):
         hello = "Hi from "+self.name
         self.data_channel.emit("send-data",GLib.Bytes.new(hello.encode("utf-8")))
         self.data_channel.emit("send-string",hello)
+
+    # message on WebRTC data channel
+    def on_dc_message(self, channel, message):
+        logging.debug("New data channel message: "+str(message))
+
+    # new data channel created
+    def on_data_channel(self, wrb, data_channel):
+        logging.info("New incoming data channel created.")
+        data_channel.connect("on-message-string", self.on_dc_message)
+        data_channel.connect("on-message-data",   self.on_dc_message)
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
