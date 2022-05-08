@@ -73,6 +73,7 @@ function onIncomingSDP(sdp) {
 
 
 function onIncomingICE(ice) {
+  ice.sdpMid = null; // sdpMid is currently fake, ignore
   var candidate = new RTCIceCandidate(ice);
   //console.log("Incoming ICE: " + JSON.stringify(ice));
   webrtcPeerConnection.addIceCandidate(candidate).catch(reportError);
