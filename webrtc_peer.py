@@ -152,8 +152,9 @@ class WebRTCPeer(StreamSink):
     # new data channel created
     def on_data_channel(self, wrb, data_channel):
         logging.info("New incoming data channel created.")
-        data_channel.connect("on-message-string", self.on_dc_message)
-        data_channel.connect("on-message-data",   self.on_dc_message)
+        self.in_channel = data_channel
+        self.in_channel.connect("on-message-string", self.on_dc_message)
+        self.in_channel.connect("on-message-data",   self.on_dc_message)
 
     # ICE connection candidate received, forward to peer
     def on_ice_candidate(self, wrb, index, candidate):
