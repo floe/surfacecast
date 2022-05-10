@@ -163,10 +163,10 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       webrtcPeerConnection = new RTCPeerConnection(webrtcConfiguration);
       webrtcPeerConnection.ontrack = onAddRemoteStream;
       webrtcPeerConnection.onicecandidate = onIceCandidate;
+      webrtcPeerConnection.ondatachannel = function(event) { event.channel.onmessage = function(event) { console.log(event); } }
 
       datastream = webrtcPeerConnection.createDataChannel("events");
       datastream.onopen = function(event) { datastream.send("Hi from "+navigator.userAgent); }
-      // datastream.onmessage = ...
 
       audiotrack = stream.getAudioTracks()[0];
       audiotrans = audiotrack.id;
