@@ -10,13 +10,14 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 from gst_helpers import *
 
 VENCODER="queue ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue ! h264parse ! "
-VENCODER="queue ! vp8enc threads=2 deadline=2000 target-bitrate=1500000 ! queue ! "
-HWENCODER='video/x-raw,format=YV12 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1500000,video_bitrate_mode=1" ! video/x-h264,profile=constrained-baseline,level=(string)3.1 ! queue ! h264parse ! '
+# TODO: VP8 has better compatibility (esp. wrt to Firefox), but the encoder performance and error recovery suck, switch back to H.264 for now
+#VENCODER="queue ! vp8enc threads=2 deadline=2000 target-bitrate=1500000 ! queue ! "
+HWENCODER='video/x-raw,format=I420 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1500000,video_bitrate_mode=1" ! video/x-h264,profile=constrained-baseline,level=(string)3.1 ! queue ! h264parse ! '
 # TODO: any other sensible audiocodec that can also be put into MP4 containers?
 AENCODER="queue ! opusenc ! queue ! opusparse ! "
 
 RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
-RTPVIDEO="rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
+#RTPVIDEO="rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
 FILESINK="mp4mux name=mux fragment-duration=1000 ! filesink sync=true location="
 
