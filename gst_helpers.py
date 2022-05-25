@@ -65,7 +65,7 @@ def create_frontmixer_queue():
     logging.info("Creating frontmixer subqueue...")
 
     frontmixer  = new_element("compositor",myname="frontmixer")
-    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=1280,height=720,framerate=15/1")})
+    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")})
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
@@ -139,12 +139,12 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00F
     logging.debug("  Audio Source: "+audiosrc)
 
     add_and_link([ Gst.parse_bin_from_description( frontsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=YV12,width=640,height=360,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=640,height=360,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
     add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 
