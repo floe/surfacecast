@@ -106,3 +106,4 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * HTML5 client
     * not working on Chromium (non-free codec problem, see [issue #8](https://github.com/floe/surfacestreams/issues/8))
     * not working on Safari (reason unknown, see [issue #6](https://github.com/floe/surfacestreams/issues/6))
+    * not working on recent Firefox (problem with H.264 encoding, see [issue #36](https://github.com/floe/surfacestreams/issues/36))
