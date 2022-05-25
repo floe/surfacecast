@@ -90,9 +90,9 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * Install dependencies: `sudo apt install gstreamer1.0-libav gir1.2-soup-2.4 gir1.2-gstreamer-1.0 gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-nice-0.1 libnice10 gstreamer1.0-nice gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly`
 
 * HTML5 client
-  * Firefox 78 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
+  * Chrome 92 - 102
   * Firefox 94 - 96
-  * Chrome 92 - 97
+  * Firefox 78 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
 
 ## Known issues
 
