@@ -98,6 +98,7 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
 ## Known issues
 
   * Server
+    * WebRTC (or more specifically, the STUN protocol) is primarily designed to deal with peers behind home NAT connections. If the server itself is heavily firewalled, this might need adjusting.
     * The server will repeatedly issue the warning `[...]: loop detected in the graph of bin 'pipeline0'!!`, which can be safely ignored.
     * Some race conditions when setting up the mixers still seem to be present, but hard to pin down. This happens particularly when a client connects within a few seconds of the previous client, before negotiation has completed. Usually shows up as a black surface stream, restart the client in this case.
   * Python Client
