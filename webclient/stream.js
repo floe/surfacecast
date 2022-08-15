@@ -35,12 +35,19 @@ function paint(ctx, centerX, centerY, clearcolor, clearmode) {
 }
 
 
-function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;           }
+function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
+function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;                                            }
 
 function onCanvasMove(evt) {
 
   if (mousedown == 0) return;
+
+  if (evt.type == "touchmove") {
+    evt.preventDefault();
+    evt.offsetX = evt.changedTouches[0].pageX;
+    evt.offsetY = evt.changedTouches[0].pageY;
+  }
+
   const centerX = evt.offsetX;
   const centerY = evt.offsetY;
 
@@ -216,6 +223,7 @@ window.onload = function() {
   canvas.onmouseup   = onCanvasUp;
   canvas.ontouchend = onCanvasUp;
   canvas.onmousemove = onCanvasMove;
+  canvas.ontouchmove = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
