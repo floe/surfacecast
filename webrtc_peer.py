@@ -192,6 +192,9 @@ class WebRTCPeer(StreamSink):
         # To avoid this issue altogether, get rid of the entire SPS parameter in the generated SDP.
         text = re.sub(";sprop-parameter-sets=.*","",text)
 
+        # 1.20 doesn't properly set the profile-level-id, so chuck in a generic one to appease FF
+        text = re.sub("packetization-mode=1$","packetization-mode=1;profile-level-id=42c01f",text,flags=re.M)
+
         # FIXME this is an extremly ugly hack, treating SDP as "string soup"
         # see https://stackoverflow.com/q/65408744/838719 for some background
         # a (slightly) better solution would be to use the result.sdp object
