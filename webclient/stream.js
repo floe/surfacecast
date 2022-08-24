@@ -247,4 +247,12 @@ window.onload = function() {
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
+
+  inputelem = document.getElementById("fileElem");
+
+  inputelem.addEventListener("change", function(e) {
+    const img = new Image(); //document.getElementById("buffer");
+    img.src = URL.createObjectURL(e.target.files[0]);
+    img.onload = () => { URL.revokeObjectURL(img.src); context.drawImage(img,0,0); c2.drawImage(img,0,0); }
+  } );
 };
