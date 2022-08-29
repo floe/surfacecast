@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick)
+    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick,is_self=args.own)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -60,6 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(     "--fake",   help="use fake sources (desc. from -f/-s)",action="store_true")
 parser.add_argument("-m","--main",   help="flag this client as main (lowest z)",action="store_true")
+parser.add_argument("-o","--own",    help="include own surfacestream in output",action="store_true")
 parser.add_argument("-d","--debug",  help="more debug output (-dd=max)",action="count",default=0   )
 parser.add_argument("-t","--target", help="server to connect to (%(default)s)", default="127.0.0.1")
 parser.add_argument("-a","--audio",  help="audio source (device name or pipeline)",   default=""   )

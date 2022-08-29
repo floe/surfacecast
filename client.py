@@ -196,7 +196,8 @@ class Client(BaseClient):
         for c in clients:
 
             if c == self.name: # skip own ssrc
-                continue
+                if not "own" in self.wrb.flags or prefix == "audio":
+                    continue
 
             other = clients[c]
 

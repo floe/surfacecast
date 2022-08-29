@@ -103,7 +103,7 @@ class StreamSink:
 # specialization: containing WebRTCBin and _lots_ of plumbing
 class WebRTCPeer(StreamSink):
 
-    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick=""):
+    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick="", is_own=False):
 
         super().__init__(name,stun,bindesc)
 
@@ -125,6 +125,12 @@ class WebRTCPeer(StreamSink):
         # create the data channel
         self.data_channel = self.wrb.emit("create-data-channel", "events", None)
         self.data_channel.connect("on-open", self.on_channel_open)
+
+        # TODO: this is positively screaming for a generic solution
+        # send message if own stream should be included
+        if is_own:
+            message = json.dumps({"type":"msg","data":{"own":True}})
+            self.connection.send_text(message)
 
         # send message to server if main client
         if is_main:
