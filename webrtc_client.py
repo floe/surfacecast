@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick,is_self=args.own)
+    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick,is_own=args.own)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
