@@ -2,27 +2,26 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="210mm"
    height="297mm"
    viewBox="0 0 210 297"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="diagram.svg">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="diagram.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
     <linearGradient
        id="linearGradient2660"
-       osb:paint="solid">
+       inkscape:swatch="solid">
       <stop
          style="stop-color:#c0ffc0;stop-opacity:1;"
          offset="0"
@@ -1156,15 +1155,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="1566.3032"
-     inkscape:cy="1529.4484"
+     inkscape:zoom="1.4"
+     inkscape:cx="1326.0714"
+     inkscape:cy="-646.42857"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1440"
+     inkscape:window-width="3840"
+     inkscape:window-height="2160"
      inkscape:window-x="0"
      inkscape:window-y="-37"
      inkscape:window-maximized="1"
@@ -1173,7 +1172,8 @@
      inkscape:object-paths="true"
      inkscape:snap-smooth-nodes="true"
      inkscape:snap-midpoints="true"
-     showborder="false" />
+     showborder="false"
+     inkscape:pagecheckerboard="0" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -1182,7 +1182,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1637,7 +1637,8 @@
        id="g13562"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96"
-       transform="translate(127.75595,-236.6131)">
+       transform="translate(127.75595,-236.6131)"
+       inkscape:export-filename="/home/floe/Dropbox/Apps/ShareLaTeX/SurfaceCast/g13562.png">
       <g
          transform="translate(-18.807872,192.35981)"
          id="g3337">
@@ -1764,7 +1765,7 @@
              ry="3.1453905" />
           <text
              xml:space="preserve"
-             style="font-style:normal;font-weight:normal;font-size:14.11881447px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.35297033"
+             style="font-style:normal;font-weight:normal;font-size:14.1188px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.35297"
              x="-100.40246"
              y="-63.923286"
              id="text4223-5-6"
@@ -1773,7 +1774,7 @@
                id="tspan4221-6-6"
                x="-100.40246"
                y="-63.923286"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64752531px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.35297033">surface</tspan></text>
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64753px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.35297">surface</tspan></text>
           <rect
              style="opacity:1;fill:#c0ffff;fill-opacity:1;stroke:#000000;stroke-width:0.60032761;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
              id="rect3083-8-5"
@@ -1813,7 +1814,7 @@
              transform="scale(-1)" />
           <text
              xml:space="preserve"
-             style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+             style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
              x="82.043037"
              y="-22.442831"
              id="text4223-2"><tspan
@@ -1821,7 +1822,7 @@
                id="tspan4221-60"
                x="82.043037"
                y="-22.442831"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332">front</tspan></text>
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">front</tspan></text>
         </g>
       </g>
       <path
@@ -1871,7 +1872,7 @@
           </g>
           <text
              xml:space="preserve"
-             style="font-style:normal;font-weight:normal;font-size:14.11881447px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.35297033"
+             style="font-style:normal;font-weight:normal;font-size:14.1188px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.35297"
              x="-100.40246"
              y="-63.923286"
              id="text4223-5"
@@ -1880,7 +1881,7 @@
                id="tspan4221-6"
                x="-100.40246"
                y="-63.923286"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64752531px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.35297033">surface</tspan></text>
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64753px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.35297">surface</tspan></text>
           <rect
              style="opacity:1;fill:#ffc0ff;fill-opacity:1;stroke:#000000;stroke-width:0.60032767;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
              id="rect3083-8-4-2"
@@ -1928,9 +1929,9 @@
              id="text4223"
              y="19.923141"
              x="143.36525"
-             style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+             style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
              xml:space="preserve"><tspan
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583"
                y="19.923141"
                x="143.36525"
                id="tspan4221"
@@ -2023,7 +2024,7 @@
            style="opacity:1;fill:#c0ffff;fill-opacity:1;stroke:#000000;stroke-width:0.45000005;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
         <text
            xml:space="preserve"
-           style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458329"
+           style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="244.18538"
            y="76.921715"
            id="text4223-5-6-7"><tspan
@@ -2031,7 +2032,7 @@
              id="tspan4221-6-6-4"
              x="244.18538"
              y="76.921715"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333263px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458329">surface</tspan></text>
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">surface</tspan></text>
       </g>
       <g
          id="g6510-6-7"
@@ -2114,9 +2115,9 @@
            id="text4223-52"
            y="-53.039486"
            x="130.20078"
-           style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+           style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
            xml:space="preserve"><tspan
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583"
              y="-53.039486"
              x="130.20078"
              id="tspan4221-5"
@@ -2307,7 +2308,7 @@
         <text
            transform="scale(0.97994859,1.0204617)"
            xml:space="preserve"
-           style="font-style:normal;font-weight:normal;font-size:10.37112236px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+           style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="103.90617"
            y="15.947701"
            id="text4223-0"><tspan
@@ -2315,7 +2316,7 @@
              id="tspan4221-63"
              x="103.90617"
              y="15.947701"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14844894px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332">server</tspan></text>
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">server</tspan></text>
         <path
            inkscape:connector-curvature="0"
            id="path13671"
@@ -2324,7 +2325,7 @@
         <text
            transform="scale(0.97994859,1.0204617)"
            xml:space="preserve"
-           style="font-style:normal;font-weight:normal;font-size:10.37112331px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+           style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="152.44666"
            y="186.58533"
            id="text4223-0-4"><tspan
@@ -2332,11 +2333,11 @@
              id="tspan4221-63-7"
              x="152.44666"
              y="186.58533"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14844894px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332">incoming</tspan></text>
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">incoming</tspan></text>
         <text
            transform="scale(0.97994859,1.0204617)"
            xml:space="preserve"
-           style="font-style:normal;font-weight:normal;font-size:10.37112331px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+           style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="271.23825"
            y="186.58533"
            id="text4223-0-4-4"><tspan
@@ -2344,7 +2345,7 @@
              id="tspan4221-63-7-4"
              x="271.23825"
              y="186.58533"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14844894px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.26458332">outgoing</tspan></text>
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">outgoing</tspan></text>
       </g>
       <g
          transform="translate(2.2571237e-7,9.7243097e-6)"
@@ -2403,6 +2404,69 @@
              transform="matrix(1,0,0.04112362,0.99915407,0,0)" />
         </g>
       </g>
+      <rect
+         ry="2.9467528"
+         rx="3.0914903"
+         y="15.306607"
+         x="-37.789764"
+         height="79.974213"
+         width="100.33644"
+         id="rect815-6-9-5-3-3-1-3"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.500002;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         transform="scale(0.97994859,1.0204617)"
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="-36.32972"
+         y="20.566679"
+         id="text4223-0-6"><tspan
+           sodipodi:role="line"
+           id="tspan4221-63-75"
+           x="-36.32972"
+           y="20.566679"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">client 1</tspan></text>
+      <rect
+         ry="2.9467528"
+         rx="3.0914903"
+         y="29.062674"
+         x="369.19208"
+         height="79.974213"
+         width="100.33644"
+         id="rect815-6-9-5-3-3-1-3-27"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.500002;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         transform="scale(0.97994859,1.0204617)"
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="378.97964"
+         y="34.046913"
+         id="text4223-0-6-0"><tspan
+           sodipodi:role="line"
+           id="tspan4221-63-75-9"
+           x="378.97964"
+           y="34.046913"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">client 3</tspan></text>
+      <rect
+         ry="2.9467528"
+         rx="3.0914903"
+         y="110.13722"
+         x="-37.789764"
+         height="79.974213"
+         width="100.33644"
+         id="rect815-6-9-5-3-3-1-3-2"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.500002;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         transform="scale(0.97994859,1.0204617)"
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.3711px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="-36.32972"
+         y="113.49581"
+         id="text4223-0-6-9"><tspan
+           sodipodi:role="line"
+           id="tspan4221-63-75-1"
+           x="-36.32972"
+           y="113.49581"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.14845px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;stroke-width:0.264583">client 2</tspan></text>
     </g>
   </g>
 </svg>
