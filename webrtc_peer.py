@@ -78,6 +78,7 @@ class StreamSink:
     def __init__(self, name, param, bin_desc=filebin):
 
         self.name = name
+        self.flags = {}
         bin_desc = bin_desc % param
 
         logging.info("Setting up stream handler for "+name)
