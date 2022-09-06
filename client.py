@@ -141,6 +141,11 @@ class Client(BaseClient):
                 el.release_request_pad(p)
         self.reqpads.clear()
 
+        # should probably move to WebRTCPeer class
+        self.wrb.data_channel = None
+        self.wrb.in_channel = None
+        self.wrb.connection = None
+
         self.wrb.bin = None
         self.wrb.wrb = None
         self.wrb = None
