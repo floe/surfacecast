@@ -160,4 +160,6 @@ def run_mainloop():
     mainloop.run()
 
 def quit_mainloop():
+    pipeline.set_state(Gst.State.NULL)
+    Gst.deinit()
     mainloop.quit()
