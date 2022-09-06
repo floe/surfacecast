@@ -142,6 +142,7 @@ class Client(BaseClient):
         self.reqpads.clear()
 
         self.wrb.bin = None
+        self.wrb.wrb = None
         self.wrb = None
 
         logging.info("Client "+self.name+" unlinked.")
