@@ -95,6 +95,7 @@ class Client(BaseClient):
                 if peer:
                     peer.unlink(p)
             remove_element(mixer)
+        self.mixers.clear()
 
         # pause the bin
         self.wrb.bin.set_state(Gst.State.NULL)
@@ -107,6 +108,7 @@ class Client(BaseClient):
             for p in out_tee.srcpads:
                 p.unlink(p.get_peer())
             remove_element(out_tee)
+        self.outputs.clear()
 
         # remove the bin
         logging.debug("  Removing main bin...")
@@ -129,6 +131,7 @@ class Client(BaseClient):
         for q in self.queues:
             q.set_state(Gst.State.NULL)
             remove_element(q)
+        self.queues.clear()
 
         # remove request pads
         logging.debug("  Removing request pads...")
@@ -136,6 +139,10 @@ class Client(BaseClient):
             el = p.get_parent_element()
             if el != None:
                 el.release_request_pad(p)
+        self.reqpads.clear()
+
+        self.wrb.bin = None
+        self.wrb = None
 
         logging.info("Client "+self.name+" unlinked.")
 
