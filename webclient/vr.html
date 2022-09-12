@@ -28,7 +28,7 @@
         init: function() {
           this.el.addEventListener("loaded", e => {
             const mesh = this.el.getObject3D("mesh");
-            this.texture = mesh.material.map
+            this.texture = mesh.material.map;
           })
         },
         tick: function() {
@@ -42,7 +42,7 @@
   </head>
   <body>
     <a-scene play>
-      <a-camera><a-cursor cursor-listener/></a-camera>
+      <a-camera><a-cursor/></a-camera>
       <a-assets>
         <video id="stream" autoplay muted playsinline>Your browser does not support video</video>
         <video id="stream2" autoplay muted playsinline>Your browser does not support video</video>
@@ -52,9 +52,9 @@
       </a-assets>
       <a-entity laser-controls="hand: left" cursor-listener></a-entity>
       <a-entity laser-controls="hand: right" cursor-listener></a-entity>
-      <a-plane id="front" position="0 1.1 -0.8" rotation="  0 0 0" width="0.9" height="0.5" play-on-click material="src: #stream"></a-plane>
-      <a-plane id="table" position="0 0.8 -0.5" rotation="-90 0 0" width="0.9" height="0.5" cursor-listener material="src: #stream2"></a-plane>
-      <a-plane id="table2" position="0 0.8 -0.5" rotation="-90 0 0" width="0.9" height="0.5" update-texture material="transparent: true; src:#canvas"></a-plane>
+      <a-plane id="front" position="0 1.1 -0.8" rotation="  0 0 0" width="0.9" height="0.5" play-on-click material="shader: flat; src: #stream"></a-plane>
+      <a-plane id="table" position="0 0.7 -0.5" rotation="-90 0 0" width="0.9" height="0.5" play-on-click material="shader: flat; src: #stream2"></a-plane>
+      <a-plane id="table2" position="0 0.7 -0.5" rotation="-90 0 0" width="0.9" height="0.5" update-texture cursor-listener material="transparent: true; src: #canvas"></a-plane>
       <a-entity environment="preset: tron"></a-entity>
     </a-scene>
   </body>

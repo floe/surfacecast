@@ -182,9 +182,11 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       var vidtracks = stream.getVideoTracks();
       if (vidtracks.length > 0) {
         fronttrack = vidtracks[0];
+        console.log("using camera track for front");
       } else {
         canvasstream = canvas3.captureStream(15);
         fronttrack = canvasstream.getVideoTracks()[0];
+        console.log("using fake front stream");
         //fronttrack.contentHint = "detail";
       }
       fronttrans = fronttrack.id;
@@ -250,7 +252,7 @@ window.onload = function() {
 
   inputelem = document.getElementById("fileElem");
 
-  inputelem.addEventListener("change", function(e) {
+  if (inputelem) inputelem.addEventListener("change", function(e) {
     const img = new Image(); //document.getElementById("buffer");
     img.src = URL.createObjectURL(e.target.files[0]);
     img.onload = () => { URL.revokeObjectURL(img.src); context.drawImage(img,0,0); c2.drawImage(img,0,0); }
