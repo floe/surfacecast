@@ -17,19 +17,16 @@
       AFRAME.registerComponent("raycaster-listen", {
         init: function () {
           // Use events to figure out what raycaster is listening so we don't have to hardcode the raycaster.
-          this.el.addEventListener("raycaster-intersected", evt => { this.raycaster = evt.detail.el; });
-          this.el.addEventListener("raycaster-intersected-cleared", evt => { this.raycaster = null; });
+          this.el.addEventListener("raycaster-intersected", evt => { this.raycaster = evt.detail.el; mousedown = 1; });
+          this.el.addEventListener("raycaster-intersected-cleared", evt => { this.raycaster = null; mousedown = 0; });
           this.el.addEventListener("loaded", e => { const mesh = this.el.getObject3D("mesh"); this.texture = mesh.material; });
         },
         tick: function () {
           if (!this.raycaster) { return; }  // Not intersecting.
           let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
           if (!intersection) { return; }
-			    console.log(intersection.uv);
-	  const evt = { offsetX: 100+Math.round(intersection.point.x*100), offsetY: 100+Math.round(intersection.point.z)*100, buttons: 1, type: "fakemouse" };
-	  onCanvasMove(evt);
-          context.fillRect(100, 100, 100, 100);
-          c2.fillRect(100, 100, 100, 100);
+          const evt = { offsetX: Math.round(intersection.uv.x*1280), offsetY: 720-Math.round(intersection.uv.y*720), buttons: 1, type: "fakemouse" };
+          onCanvasMove(evt);
           // courtesy of https://stackoverflow.com/a/66313477
           if (this.texture.map) { this.texture.map.needsUpdate = true; }
         }
