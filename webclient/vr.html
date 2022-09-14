@@ -17,9 +17,11 @@
       AFRAME.registerComponent("raycaster-listen", {
         init: function () {
           // Use events to figure out what raycaster is listening so we don't have to hardcode the raycaster.
-          this.el.addEventListener("raycaster-intersected", evt => { this.raycaster = evt.detail.el; mousedown = 1; });
+          this.el.addEventListener("raycaster-intersected", evt => { this.raycaster = evt.detail.el; });
           this.el.addEventListener("raycaster-intersected-cleared", evt => { this.raycaster = null; mousedown = 0; });
           this.el.addEventListener("loaded", e => { const mesh = this.el.getObject3D("mesh"); this.texture = mesh.material; });
+          this.el.addEventListener("mousedown", evt => { mousedown = 1; } );
+          this.el.addEventListener("mouseup",   evt => { mousedown = 0; } );
         },
         tick: function () {
           if (!this.raycaster) { return; }  // Not intersecting.
