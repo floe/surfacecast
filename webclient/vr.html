@@ -20,14 +20,15 @@
           this.el.addEventListener("raycaster-intersected", evt => { this.raycaster = evt.detail.el; });
           this.el.addEventListener("raycaster-intersected-cleared", evt => { this.raycaster = null; mousedown = 0; });
           this.el.addEventListener("loaded", e => { const mesh = this.el.getObject3D("mesh"); this.texture = mesh.material; });
-          this.el.addEventListener("mousedown", evt => { mousedown = 1; } );
-          this.el.addEventListener("mouseup",   evt => { mousedown = 0; } );
+          this.el.addEventListener("mousedown", evt => { mousedown = -1; } );
+          this.el.addEventListener("mouseup",   evt => { mousedown =  0; } );
         },
         tick: function () {
           if (!this.raycaster) { return; }  // Not intersecting.
           let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
           if (!intersection) { return; }
           const evt = { offsetX: Math.round(intersection.uv.x*1280), offsetY: 720-Math.round(intersection.uv.y*720), buttons: 1, type: "fakemouse" };
+          if (mousedown == -1) onCanvasDown(evt);
           onCanvasMove(evt);
           // courtesy of https://stackoverflow.com/a/66313477
           if (this.texture.map) { this.texture.map.needsUpdate = true; }
