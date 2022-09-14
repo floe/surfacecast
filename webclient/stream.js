@@ -204,19 +204,13 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
         c3.fillStyle = "rgba(128,128,255,255)";
         c3.fillRect(0, 0, canvas3.width, canvas3.height);
 
-        c3.strokeStyle = "black"; c3.lineWidth = 5;
+        c3.fillStyle = "white";
+        c3.strokeStyle = "black";
+        c3.lineWidth = 5;
 
-        c3.fillStyle = "rgba(255,128,128,255)";
-        c3.beginPath();
-        c3.ellipse(320,320,100,180,0,0,2*Math.PI);
-        c3.stroke();
-        c3.fill();
+        c3.beginPath(); c3.ellipse(320,320,100,180,0,0,2*Math.PI); c3.stroke(); c3.fill();
+        c3.beginPath(); c3.ellipse(320,150, 50, 50,0,0,2*Math.PI); c3.stroke(); c3.fill();
 
-        c3.fillStyle = "rgba(255,0,255,255)";
-        c3.beginPath();
-        c3.ellipse(320,160, 50, 50,0,0,2*Math.PI);
-        c3.stroke();
-        c3.fill();
       }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
