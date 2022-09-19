@@ -78,6 +78,7 @@ def create_frontmixer_queue():
 # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
 def dump_debug(name="surfacestreams"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
+        logging.info("Cannot dump graph, GST_DEBUG_DUMP_DOT_DIR is unset.")
         return
     logging.info("Writing graph snapshot to "+name+".dot")
     Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails.ALL,name)
