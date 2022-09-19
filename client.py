@@ -181,7 +181,7 @@ class Client(BaseClient):
             return
 
         # request and link pads from tee and frontmixer
-        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
+        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u",qp={"leaky":"downstream"})
 
         # set xpos/ypos properties on pad according to sequence number
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
@@ -196,7 +196,7 @@ class Client(BaseClient):
             return
 
         logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-        sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp=qparams)
+        sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp={"leaky":"downstream"})
 
         # for the "main" surface, destination mixer pad needs zorder = 0
         if prefix == "surface" and "main" in self.wrb.flags:
@@ -226,8 +226,8 @@ class Client(BaseClient):
         logging.info("  setting up mixers for new client "+self.name)
 
         # create surface/audio mixers
-        self.create_mixer("surface", new_element("compositor",{"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}))
-        self.create_mixer(  "audio", new_element("audiomixer"                       ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        self.create_mixer("surface", new_element("compositor",{"latency":1000000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}))
+        self.create_mixer(  "audio", new_element("audiomixer"                                            ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
         # add missing frontmixer links
         self.link_to_front()

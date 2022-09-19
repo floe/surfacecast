@@ -64,7 +64,7 @@ def create_frontmixer_queue():
 
     logging.info("Creating frontmixer subqueue...")
 
-    frontmixer  = new_element("compositor",{"latency":1000000},myname="frontmixer")
+    frontmixer  = new_element("compositor",{"latency":1000000000},myname="frontmixer")
     capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")})
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
