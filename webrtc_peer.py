@@ -104,7 +104,7 @@ class StreamSink:
 # specialization: containing WebRTCBin and _lots_ of plumbing
 class WebRTCPeer(StreamSink):
 
-    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick="", is_own=False):
+    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick="", is_own=False, persp=""):
 
         super().__init__(name,stun,bindesc)
 
@@ -141,6 +141,11 @@ class WebRTCPeer(StreamSink):
         # send nickname to server if given
         if nick != "":
             message = json.dumps({"type":"msg","data":{"nick":nick}})
+            self.connection.send_text(message)
+
+        # send perspective to server if given
+        if persp != "":
+            message = json.dumps({"type":"msg","data":{"perspective":persp}})
             self.connection.send_text(message)
 
     # application-level message
@@ -255,6 +260,15 @@ class WebRTCPeer(StreamSink):
         ghostpad.set_active(True)
         decodebin.parent.add_pad(ghostpad)
 
+        perspective = None
+        videoconvert = None
+        # add perspective transform if requested
+        if name == "surface" and "perspective" in self.flags:
+            logging.info("Adding perspective transform for "+self.name+" surface output")
+            params = [ float(f) for f in self.flags["perspective"].split(",") ]
+            perspective = new_element("perspective",{"matrix":params})
+            videoconvert = new_element("videoconvert")
+
         alpha = None
         # disable alpha filtering for main client
         if name == "surface" and not self.is_client and not "main" in self.flags:
@@ -267,8 +281,10 @@ class WebRTCPeer(StreamSink):
             text = new_element("textoverlay",{"halignment":"left","valignment":"bottom","text":self.flags["nick"]},myname="text_"+self.name)
 
         tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.name+"_"+name)
-        add_and_link([text,alpha,tee])
-        if text != None:
+        add_and_link([videoconvert,perspective,text,alpha,tee])
+        if videoconvert != None:
+            ghostpad.link(videoconvert.get_static_pad("sink"))
+        elif text != None:
             ghostpad.link(text.get_static_pad("video_sink"))
         elif alpha != None:
             ghostpad.link(alpha.get_static_pad("sink"))
