@@ -236,7 +236,7 @@ class WebRTCPeer(StreamSink):
 
         logging.info("New incoming stream, linking to decodebin...")
         logging.trace("Stream caps: "+caps.to_string())
-        decodebin = new_element("decodebin",myname="decodebin_"+self.mapping[str(ssrc)])
+        decodebin = new_element("decodebin",{"force-sw-decoders":True},myname="decodebin_"+self.mapping[str(ssrc)])
         decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin)
