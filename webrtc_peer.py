@@ -199,13 +199,10 @@ class WebRTCPeer(StreamSink):
         result = reply.get_value(kind)
         text = result.sdp.as_text()
 
-        # 1.16 generates sprop-parameter-sets containing the substring "DAILS", 1.18 contains "DAwNS".
+        # Different GStreamer versions generate slightly different sprop-parameter-sets.
         # This can confuse caps negotiation on the client side, and subsequently transceiver matching.
         # To avoid this issue altogether, get rid of the entire SPS parameter in the generated SDP.
-        text = re.sub(";sprop-parameter-sets=.*","",text)
-
-        # 1.20 doesn't properly set the profile-level-id, so chuck in a generic one to appease FF
-        text = re.sub("packetization-mode=1$","packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42e01f",text,flags=re.M)
+        text = re.sub(";?sprop-parameter-sets=.*?(;|\r\n)","\\1",text)
 
         # FIXME this is an extremly ugly hack, treating SDP as "string soup"
         # see https://stackoverflow.com/q/65408744/838719 for some background
