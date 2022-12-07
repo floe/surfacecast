@@ -55,7 +55,7 @@ class BaseClient:
         return pad
 
     # convenience function to link request pads (and keep track of pads/queues)
-    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={}):
+    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={"leaky":"downstream","max-size-time":100000000}):
 
         pad1 = self.get_pad(el1,tpl1)
         pad2 = self.get_pad(el2,tpl2)
@@ -181,7 +181,7 @@ class Client(BaseClient):
             return
 
         # request and link pads from tee and frontmixer
-        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u",qp={"leaky":"downstream"})
+        sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
 
         # set xpos/ypos properties on pad according to sequence number
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
@@ -189,14 +189,14 @@ class Client(BaseClient):
         sinkpad.set_property("ypos",offsets[padnum][1])
 
     # helper function to link source tees to destination mixers
-    def link_streams_oneway(self,dest,prefix,qparams):
+    def link_streams_oneway(self,dest,prefix):
 
         # sanity check (important for sink client)
         if not prefix in self.outputs:
             return
 
         logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
-        sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u",qp={"leaky":"downstream"})
+        sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
 
         # for the "main" surface, destination mixer pad needs zorder = 0
         if prefix == "surface" and "main" in self.wrb.flags:
@@ -204,7 +204,7 @@ class Client(BaseClient):
             sinkpad.set_property("zorder",0)
 
     # link all other clients to this mixer, this client to other mixers
-    def link_streams(self,prefix,qparams):
+    def link_streams(self,prefix):
 
         for c in clients:
 
@@ -215,10 +215,10 @@ class Client(BaseClient):
             other = clients[c]
 
             # for every _other_ mixer, link my tee to that mixer
-            self.link_streams_oneway(other,prefix,qparams)
+            self.link_streams_oneway(other,prefix)
 
             # for every _other_ tee, link that tee to my mixer
-            other.link_streams_oneway(self,prefix,qparams)
+            other.link_streams_oneway(self,prefix)
 
     # link new client to mixers
     def link_new_client(self):
@@ -233,9 +233,8 @@ class Client(BaseClient):
         self.link_to_front()
 
         # add missing surface/audio mixer links
-        # TODO: figure out the queue parameters (if any?)
-        self.link_streams("surface",{}) # {"max-size-buffers":1})
-        self.link_streams("audio",{}) # {"max-size-time":100000000})
+        self.link_streams("surface")
+        self.link_streams("audio")
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):

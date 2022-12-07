@@ -9,12 +9,12 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 
 from gst_helpers import *
 
-VENCODER="queue ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline,stream-format=byte-stream ! queue ! h264parse config-interval=-1 ! "
+VENCODER="queue max-size-time=100000000 leaky=downstream ! x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline,stream-format=byte-stream ! queue ! h264parse config-interval=-1 ! "
 # TODO: VP8 has better compatibility (esp. wrt to Firefox), but the encoder performance and error recovery suck, switch back to H.264 for now
 #VENCODER="queue ! vp8enc threads=2 deadline=2000 target-bitrate=1500000 ! queue ! "
 HWENCODER='video/x-raw,format=I420 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1500000,video_bitrate_mode=1" ! video/x-h264,profile=constrained-baseline,level=(string)3.1 ! queue ! h264parse ! '
 # TODO: any other sensible audiocodec that can also be put into MP4 containers?
-AENCODER="queue ! opusenc ! queue ! opusparse ! "
+AENCODER="queue max-size-time=100000000 leaky=downstream ! opusenc ! queue ! opusparse ! "
 
 RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
 #RTPVIDEO="rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
@@ -30,6 +30,11 @@ filebin=FILESINK+"%s "+\
   "videoconvert name=front   ! "+VENCODER+" mux. "+\
   "audioconvert name=audio   ! "+AENCODER+" mux. "+\
   "videoconvert name=surface ! "+VENCODER+" mux. "
+
+viewbin=\
+  "videoconvert name=front   ! fpsdisplaysink "+\
+  "audioconvert name=audio   ! autoaudiosink  "+\
+  "videoconvert name=surface ! fpsdisplaysink "
 
 response_type = {
     "offer":  GstWebRTC.WebRTCSDPType.OFFER,
