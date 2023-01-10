@@ -240,8 +240,8 @@ class Client(BaseClient):
         logging.info("  setting up mixers for new client "+self.name)
 
         # create surface/audio mixers
-        self.create_mixer("surface", new_element("compositor",{"latency":1000000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720")}))
-        self.create_mixer(  "audio", new_element("audiomixer"                                            ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        self.create_mixer("surface", new_element("compositor",{"ignore-inactive-pads":True,"latency":100000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720")}))
+        self.create_mixer(  "audio", new_element("audiomixer",{"ignore-inactive-pads":True,"latency":100000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
         # add missing frontmixer links
         self.link_to_front()
