@@ -23,6 +23,18 @@ offsets = [
     (  0,360)  # bottom left
 ]
 
+# last DTS for compositor pads
+last_pts = {}
+
+# pad probe for fixing timestamps (UUUUGLY hack, use after link_request_pads:)
+def probe_callback(pad,info,pdata):
+    buf = info.get_buffer()
+    if buf.pts == Gst.CLOCK_TIME_NONE:
+        logging.warn("Fixing decoded buffer with null timestamp")
+        buf.pts = last_pts[pad]
+    else:
+        last_pts[pad] = buf.pts
+    return Gst.PadProbeReturn.OK
 
 class BaseClient:
 
@@ -182,6 +194,7 @@ class Client(BaseClient):
 
         # request and link pads from tee and frontmixer
         sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
+        sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
         # set xpos/ypos properties on pad according to sequence number
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
@@ -197,6 +210,7 @@ class Client(BaseClient):
 
         logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
         sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
+        sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
         # for the "main" surface, destination mixer pad needs zorder = 0
         if prefix == "surface" and "main" in self.wrb.flags:
