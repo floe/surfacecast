@@ -208,8 +208,10 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
         c3.strokeStyle = "black";
         c3.lineWidth = 5;
 
-        c3.beginPath(); c3.ellipse(320,320,100,180,0,0,2*Math.PI); c3.stroke(); c3.fill();
-        c3.beginPath(); c3.ellipse(320,150, 50, 50,0,0,2*Math.PI); c3.stroke(); c3.fill();
+        c3.beginPath(); c3.ellipse(320,320,100,180,0,0,2*Math.PI); c3.stroke(); c3.fill(); // body
+        c3.beginPath(); c3.ellipse(320,150, 50, 50,0,0,2*Math.PI); c3.stroke(); c3.fill(); // head
+        c3.beginPath(); c3.ellipse(300,140, 10, 10,0,0,2*Math.PI); c3.stroke(); c3.fill(); // eye
+        c3.beginPath(); c3.ellipse(340,140, 10, 10,0,0,2*Math.PI); c3.stroke(); c3.fill(); // eye
 
       }, 1000);
 
