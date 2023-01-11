@@ -47,6 +47,7 @@ class BaseClient:
 
         # link to sources
         for name in ["surface","front","audio"]:
+            logging.debug("Linking "+name+" test source to webrtcbin")
             self.link_request_pads(get_by_name(name+"testsource"),"src_%u",self.wrb.bin,"sink_"+name,do_queue=False)
 
     # get a (new) pad from an element

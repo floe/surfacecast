@@ -74,7 +74,7 @@ print("Option",args,"\n")
 
 init_pipeline(on_element_added,args.debug)
 
-frontsrc   = "filesrc location=assets/front.png ! pngdec ! videoconvert ! imagefreeze ! identity sync=true"
+frontsrc   = "filesrc location=assets/front.png ! pngdec ! videoconvert ! imagefreeze is-live=true ! queue"
 surfacesrc = "videotestsrc is-live=true pattern=solid-color foreground-color=0" #ball motion=sweep background-color=0
 audiosrc   = "audiotestsrc is-live=true wave=silence"
 
