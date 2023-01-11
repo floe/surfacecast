@@ -87,11 +87,12 @@ class BaseClient:
 
 class Client(BaseClient):
 
-    def __init__(self,name,wrb):
+    def __init__(self,name,wrb,mutex=None):
 
         super().__init__(name,wrb)
         self.outputs = {}
         self.mixers = {}
+        self.mutex = mutex
         clients[name] = self
 
     def remove(self):
@@ -250,6 +251,10 @@ class Client(BaseClient):
         # add missing surface/audio mixer links
         self.link_streams("surface")
         self.link_streams("audio")
+
+        # unlock the new connection mutex
+        if self.mutex != None:
+            self.mutex.release()
 
 # new top-level element added to pipeline
 def on_element_added(thebin, element):

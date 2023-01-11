@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,argparse,datetime
+import sys,gi,json,argparse,datetime,threading
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -13,6 +13,7 @@ from webrtc_peer import *
 from client import *
 
 args = None
+mutex = threading.Lock()
 
 # get address and port from client
 def get_client_address(client):
@@ -52,8 +53,10 @@ def ws_conn_handler(server, connection, path, client, user_data):
     source = get_client_address(client)
     logging.info("New WebSocket connection from: "+source)
 
+    mutex.acquire()
+
     wrb = WebRTCPeer(connection,source,args.stun)
-    new_client = Client(source,wrb)
+    new_client = Client(source,wrb,mutex)
     connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
