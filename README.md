@@ -103,8 +103,12 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
     * Some race conditions when setting up the mixers still seem to be present, but hard to pin down. This happens particularly when a client connects within a few seconds of the previous client, before negotiation has completed. Usually shows up as a black surface stream, restart the client in this case.
   * Python Client
     * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YUYV/YUV2. The front/face cam needs to support 640x360 natively, the surface cam needs to support 1280x720 natively. Good results with Logitech C270 (front/face) and C920 (surface). Note: environment variable `GST_V4L2_USE_LIBV4L2=1` can sometimes be used to fix format mismatch issues.
-    * The Python client has a noticeable delay (sometimes on the order of 60+ seconds) before the surface stream finally starts running, unlike e.g. the browser client (see also [issue #2](https://github.com/floe/surfacestreams/issues/2)). Once it runs, the delay is negligible, but the waiting time until things synchronize is iffy.
-    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceCast perspective transform. Overclocking to 1900 core/700 GPU is recommended (and don't forget to add active cooling, otherwise it will just go into thermal throttling right away, and you're back to square one).
+    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceCast perspective transform. Some additional notes: 
+        * Overclocking to at least 1800 core/600 GPU is recommended (and don't forget to add active cooling, otherwise it will just go into thermal throttling right away, and you're back to square one).
+        * "Outsource" the perspective transform to the server using the `--persp` parameter.
+        * Don't plug the cameras into the USB3 ports (blue), but into USB2 instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?t=275492))
+        * Avoid using the analogue audio output, use HDMI instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?f=28&t=306408))
+        * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. https://github.com/floe/surfacestreams/commit/39c60206fb0797f97e825718ff5deba41b53008d)
   * HTML5 client
     * not working on Safari (reason unknown, see [issue #6](https://github.com/floe/surfacestreams/issues/6))
     * not working on recent Firefox (problem with H.264 encoding, see [issue #36](https://github.com/floe/surfacestreams/issues/36))
