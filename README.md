@@ -109,6 +109,4 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
         * Don't plug the cameras into the USB3 ports (blue), but into USB2 instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?t=275492))
         * Avoid using the analogue audio output, use HDMI instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?f=28&t=306408))
         * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. https://github.com/floe/surfacestreams/commit/39c60206fb0797f97e825718ff5deba41b53008d)
-  * HTML5 client
-    * not working on Safari (reason unknown, see [issue #6](https://github.com/floe/surfacestreams/issues/6))
-    * not working on recent Firefox (problem with H.264 encoding, see [issue #36](https://github.com/floe/surfacestreams/issues/36))
+  * HTML5 client not working on Safari (reason unknown, see [issue #6](https://github.com/floe/surfacestreams/issues/6))
