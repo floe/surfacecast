@@ -109,7 +109,7 @@ class StreamSink:
 # specialization: containing WebRTCBin and _lots_ of plumbing
 class WebRTCPeer(StreamSink):
 
-    def __init__(self, connection, name, stun, is_client=False, is_main=False, nick="", is_own=False, persp=""):
+    def __init__(self, connection, name, stun, is_client=False, flags=[]):
 
         super().__init__(name,stun,bindesc)
 
@@ -117,6 +117,7 @@ class WebRTCPeer(StreamSink):
         self.is_client = is_client
         self.data_channel = None
         self.mapping = None
+        self.filters = []
         self.flags = {}
 
         self.connection.connect("message",self.on_ws_message)
@@ -132,29 +133,17 @@ class WebRTCPeer(StreamSink):
         self.data_channel = self.wrb.emit("create-data-channel", "events", None)
         self.data_channel.connect("on-open", self.on_channel_open)
 
-        # TODO: this is positively screaming for a generic solution
-        # send message if own stream should be included
-        if is_own:
-            message = json.dumps({"type":"msg","data":{"own":True}})
-            self.connection.send_text(message)
-
-        # send message to server if main client
-        if is_main:
-            message = json.dumps({"type":"msg","data":{"main":True}})
-            self.connection.send_text(message)
-
-        # send nickname to server if given
-        if nick != "":
-            message = json.dumps({"type":"msg","data":{"nick":nick}})
-            self.connection.send_text(message)
-
-        # send perspective to server if given
-        if persp != "":
-            message = json.dumps({"type":"msg","data":{"perspective":persp}})
+        # send flags to server
+        for flag in flags:
+            message = json.dumps({"type":"msg","data":flag})
             self.connection.send_text(message)
 
     # remove leftover object references
     def cleanup(self):
+        for f in self.filters:
+            f.set_state(Gst.State.NULL)
+            remove_element(f)
+        self.filters = None
         self.data_channel = None
         self.in_channel = None
         self.connection = None

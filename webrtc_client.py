@@ -13,6 +13,7 @@ from webrtc_peer import WebRTCPeer
 from client import BaseClient
 
 args = None
+flags = []
 sink = ""
 
 # Websocket connection was closed by remote
@@ -23,7 +24,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,is_main=args.main,nick=args.nick,is_own=args.own,persp=args.persp)
+    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,flags)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -73,6 +74,15 @@ parser.add_argument(     "--persp",  help="perspective transform", default=""   
 
 args = parser.parse_args()
 print("Option",args,"\n")
+
+if args.main:
+    flags.append({"main":True})
+if args.own:
+    flags.append({"own":True})
+if args.nick != "":
+    flags.append({"nick":args.nick})
+if args.persp != "":
+    flags.append({"persp":args.persp})
 
 init_pipeline(on_element_added,args.debug)
 connect_bus("message::element",message_cb)
