@@ -24,7 +24,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,is_client=True,flags)
+    wrb = WebRTCPeer(connection,"client",args.stun,True,flags)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -82,7 +82,7 @@ if args.own:
 if args.nick != "":
     flags.append({"nick":args.nick})
 if args.persp != "":
-    flags.append({"persp":args.persp})
+    flags.append({"perspective":args.persp})
 
 init_pipeline(on_element_added,args.debug)
 connect_bus("message::element",message_cb)
