@@ -155,13 +155,8 @@ class Client(BaseClient):
                 el.release_request_pad(p)
         self.reqpads.clear()
 
-        # should probably move to WebRTCPeer class
-        self.wrb.data_channel = None
-        self.wrb.in_channel = None
-        self.wrb.connection = None
-
-        self.wrb.bin = None
-        self.wrb.wrb = None
+        # remove stale references
+        self.wrb.cleanup()
         self.wrb = None
 
         logging.info("Client "+self.name+" unlinked.")
@@ -270,7 +265,6 @@ def on_element_added(thebin, element):
     #logging.debug("New element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
-    # TODO: perhaps store the alpha element in outputs as well?
     if direction == "output":
         client.outputs[stype] = element
 

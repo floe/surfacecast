@@ -153,6 +153,14 @@ class WebRTCPeer(StreamSink):
             message = json.dumps({"type":"msg","data":{"perspective":persp}})
             self.connection.send_text(message)
 
+    # remove leftover object references
+    def cleanup(self):
+        self.data_channel = None
+        self.in_channel = None
+        self.connection = None
+        self.bin = None
+        self.wrb = None
+
     # application-level message
     def process(self, msg):
         self.flags.update(msg)
