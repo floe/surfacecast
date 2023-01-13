@@ -245,6 +245,35 @@ class WebRTCPeer(StreamSink):
         decodebin.sync_state_with_parent()
         pad.link(decodebin.get_static_pad("sink"))
 
+    def create_filters(self,name):
+
+        # prepare the output tee (and return on client side)
+        current = [ new_element("tee",{"allow-not-linked":True},myname="output_"+self.name+"_"+name) ]
+        padname = "sink"
+
+        if self.is_client:
+            return current,padname
+
+        # add alpha filtering (unless main client)
+        if name == "surface" and not "main" in self.flags:
+            logging.info("Adding alpha filter for "+self.name+" surface output")
+            current.insert(0,new_element("alpha", { "method": "green" }, myname="alpha_"+self.name ))
+
+        # add perspective transform if requested
+        if name == "surface" and "perspective" in self.flags:
+            logging.info("Adding perspective transform for "+self.name+" surface output")
+            params = [ float(f) for f in self.flags["perspective"].split(",") ]
+            current.insert(0,new_element("perspective",{"matrix":params},myname="persp_"+self.name))
+            current.insert(0,new_element("videoconvert"))
+
+        # add a nickname text overlay if given
+        if name == "front" and "nick" in self.flags:
+            logging.info("Adding nickname overlay for "+self.name+" front output")
+            current.insert(0,new_element("textoverlay",{"halignment":"left","valignment":"bottom","text":self.flags["nick"]},myname="text_"+self.name))
+            padname = "video_sink" # FIXME ugly, but probably unavoidable
+
+        return current,padname
+
     def on_decodebin_pad(self, decodebin, pad):
 
         if not pad.has_current_caps():
@@ -259,36 +288,13 @@ class WebRTCPeer(StreamSink):
         ghostpad.set_active(True)
         decodebin.parent.add_pad(ghostpad)
 
-        perspective = None
-        videoconvert = None
-        # add perspective transform if requested
-        if name == "surface" and "perspective" in self.flags:
-            logging.info("Adding perspective transform for "+self.name+" surface output")
-            params = [ float(f) for f in self.flags["perspective"].split(",") ]
-            perspective = new_element("perspective",{"matrix":params})
-            videoconvert = new_element("videoconvert")
+        # prepare the output tee and optional filters
+        chain,padname = self.create_filters(name)
+        self.filters.extend(chain)
 
-        alpha = None
-        # disable alpha filtering for main client
-        if name == "surface" and not self.is_client and not "main" in self.flags:
-            logging.info("Adding alpha filter for "+self.name+" surface output")
-            alpha = new_element("alpha", { "method": "green" }, myname="alpha_"+self.name )
-
-        text = None
-        # add a nickname text overlay if given
-        if name == "front" and not self.is_client and "nick" in self.flags:
-            text = new_element("textoverlay",{"halignment":"left","valignment":"bottom","text":self.flags["nick"]},myname="text_"+self.name)
-
-        tee = new_element("tee",{"allow-not-linked":True},myname="output_"+self.name+"_"+name)
-        add_and_link([videoconvert,perspective,text,alpha,tee])
-        if videoconvert != None:
-            ghostpad.link(videoconvert.get_static_pad("sink"))
-        elif text != None:
-            ghostpad.link(text.get_static_pad("video_sink"))
-        elif alpha != None:
-            ghostpad.link(alpha.get_static_pad("sink"))
-        else:
-            ghostpad.link(tee.get_static_pad("sink"))
+        # add to pipeline and link everything together
+        add_and_link(chain)
+        ghostpad.link(chain[0].get_static_pad(padname))
 
     # incoming Websocket message
     def on_ws_message(self, connection, mtype, data):

@@ -128,18 +128,6 @@ class Client(BaseClient):
         logging.debug("  Removing main bin...")
         remove_element(self.wrb.bin)
 
-        # remove the alphafilter, if exists
-        alpha = get_by_name("alpha_"+self.name)
-        if alpha:
-            alpha.set_state(Gst.State.NULL)
-            remove_element(alpha)
-
-        # remove the textoverlay, if exists
-        text = get_by_name("text_"+self.name)
-        if text:
-            text.set_state(Gst.State.NULL)
-            remove_element(text)
-
         # remove queues from link_request_pad
         logging.debug("  Removing queues...")
         for q in self.queues:
