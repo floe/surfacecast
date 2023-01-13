@@ -97,7 +97,8 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
 * HTML5 client
   * Chrome 92 - 102
   * Firefox 94 - 96
-  * Firefox 78 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
+  * Safari 15 - 16
+  * Firefox 78 ESR, 102 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
   * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacestreams/issues/8))
 
 ## Known issues
