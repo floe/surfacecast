@@ -67,6 +67,11 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
 ```
 Can be used to give a label (e.g. "Alice" or "Bob") to the frontstream.
 
+```
+  --persp PERSPECTIVE   perspective transformation
+```
+Can be used to "outsource" the perspective transformation of the surface feed to the server. PERSPECTIVE needs to be a transformation matrix as nine comma-separated float values in row-major order. Note: when your perspective transform happens to start with a minus, the argument parser gets confused. Use it with an explicit equals sign as in `--persp="-1,0,0,1,0,0,0,0,1"`.
+
 ## Server
 
 ```
