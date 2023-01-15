@@ -179,6 +179,17 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       audiotrans = audiotrack.id;
       webrtcPeerConnection.addTrack(audiotrack);
 
+      // from https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
+      /*const audioCtx = new AudioContext();
+      const analyser = audioCtx.createAnalyser();
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      analyser.fftSize = 256;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(dataArray);*/
+
       var vidtracks = stream.getVideoTracks();
       if (vidtracks.length > 0) {
         fronttrack = vidtracks[0];
