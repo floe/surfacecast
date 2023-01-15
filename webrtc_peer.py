@@ -21,7 +21,7 @@ RTPVIDEO="rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
 FILESINK="mp4mux name=mux fragment-duration=1000 ! filesink sync=true location="
 
-bindesc="webrtcbin name=webrtcbin stun-server=%s "+\
+bindesc="webrtcbin name=webrtcbin bundle-policy=max-bundle stun-server=%s "+\
   "videoconvert name=front   ! "+VENCODER+RTPVIDEO+"payload=96 ! webrtcbin. "+\
   "audioconvert name=audio   ! "+AENCODER+RTPAUDIO+"payload=97 ! webrtcbin. "+\
   "videoconvert name=surface ! "+VENCODER+RTPVIDEO+"payload=98 ! webrtcbin. "
@@ -153,7 +153,7 @@ class WebRTCPeer(StreamSink):
     # application-level message
     def process(self, msg):
         self.flags.update(msg)
-        logging.debug("Setting flags for "+self.name+": "+str(self.flags))
+        logging.debug("Setting flags for "+self.name+": "+str(msg))
 
     # outgoing data channel is open
     def on_channel_open(self, channel):
