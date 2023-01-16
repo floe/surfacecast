@@ -210,21 +210,6 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       webrtcPeerConnection.addTrack(canvastrack, stream);
       // make sure that the canvas stream starts by triggering a delayed paint operation
       setTimeout(() => { c2.fillRect(0, 0, canvas2.width, canvas2.height); }, 1000);
-      setTimeout(() => {
-
-        c3.fillStyle = "rgba(128,128,255,255)";
-        c3.fillRect(0, 0, canvas3.width, canvas3.height);
-
-        c3.fillStyle = "white";
-        c3.strokeStyle = "black";
-        c3.lineWidth = 5;
-
-        c3.beginPath(); c3.ellipse(320,320,100,180,0,0,2*Math.PI); c3.stroke(); c3.fill(); // body
-        c3.beginPath(); c3.ellipse(320,150, 50, 50,0,0,2*Math.PI); c3.stroke(); c3.fill(); // head
-        c3.beginPath(); c3.ellipse(300,140, 10, 10,0,0,2*Math.PI); c3.stroke(); c3.fill(); // eye
-        c3.beginPath(); c3.ellipse(340,140, 10, 10,0,0,2*Math.PI); c3.stroke(); c3.fill(); // eye
-
-      }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
@@ -265,12 +250,9 @@ window.onload = function() {
   canvas2.height=720;
 
   canvas3 = document.getElementById("canvas3");
-  c3 = canvas3.getContext("2d");
+  c3 = canvas3.getContext("webgl");
   canvas3.width=640;
   canvas3.height=360;
-
-  c3.fillStyle = "rgba(255,0,255,255)";
-  c3.fillRect(0, 0, canvas3.width, canvas3.height);
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
