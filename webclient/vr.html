@@ -46,6 +46,14 @@
         <canvas id="canvas2"></canvas>
         <canvas id="canvas3"></canvas>
       </a-assets>
+      <a-entity camera="active: true" look-controls wasd-controls position="0 1.6 0">
+        <a-entity avatar position="0 0 0" rotation="0 180 0"> <!-- avatar head, not visible as camera is inside -->
+          <a-entity geometry="primitive: box; width: 0.2; height: 0.2; depth: 0.2" material="color: blue" position="0 0 0"></a-entity>
+          <a-entity geometry="primitive: cylinder; height:0.02; radius: 0.02" material="color: white" position=" 0.05 0.05 0.1" rotation="90 0 0"></a-entity>
+          <a-entity geometry="primitive: cylinder; height:0.02; radius: 0.02" material="color: white" position="-0.05 0.05 0.1" rotation="90 0 0"></a-entity>
+          <a-entity geometry="primitive: cylinder; height:0.1; radius: 0.1" material="color: white" position="0 0.02 0.05" rotation="60 0 0"></a-entity>
+        </a-entity>
+      </a-entity>
       <a-entity laser-controls="hand: left"  raycaster="objects: #table2"></a-entity>
       <a-entity laser-controls="hand: right" raycaster="objects: #table2"></a-entity>
       <a-plane id="front" position="0 1.1 -0.8" rotation="  0 0 0" width="0.9" height="0.5" play-on-click material="shader: flat; src: #stream"></a-plane>
