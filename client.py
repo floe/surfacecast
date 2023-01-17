@@ -87,12 +87,14 @@ class BaseClient:
 
 class Client(BaseClient):
 
-    def __init__(self,name,wrb,mutex=None):
+    def __init__(self,name,wrb,sw=1280,sh=720,mutex=None):
 
         super().__init__(name,wrb)
         self.outputs = {}
         self.mixers = {}
         self.mutex = mutex
+        self.sw = sw
+        self.sh = sh
         clients[name] = self
 
     def remove(self):
@@ -226,8 +228,8 @@ class Client(BaseClient):
         logging.info("  setting up mixers for new client "+self.name)
 
         # create surface/audio mixers
-        self.create_mixer("surface", new_element("compositor",{"latency":100000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720")}))
-        self.create_mixer(  "audio", new_element("audiomixer",{"latency":100000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string("audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        self.create_mixer("surface", new_element("compositor",{"latency":100000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={self.sw},height={self.sh}")}))
+        self.create_mixer(  "audio", new_element("audiomixer",{"latency":100000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
         # add missing frontmixer links
         self.link_to_front()

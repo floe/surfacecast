@@ -123,7 +123,7 @@ def connect_bus(msgtype, callback, *args):
     bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks"):
+def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks",sw=1280,sh=720):
 
     if fake:
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay text="+wave if frontdev == "" else frontdev
@@ -145,7 +145,7 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00F
     ])
 
     add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={sw},height={sh},framerate=15/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 
