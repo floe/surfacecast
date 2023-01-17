@@ -2,6 +2,8 @@
 
 A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
+![shared table surfaces with real and projected objects](assets/teaser0.jpg)
+
 ![shared table surfaces with real and projected objects](assets/teaser.jpg)
 Image credit: ©️ Stadt Regensburg, ©️ Stefan Effenhauser (see also the [VIGITIA](https://vigitia.de/) project)
 
