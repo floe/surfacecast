@@ -19,6 +19,10 @@ var remotemap;
 var frontstream;
 var surfacestream;
 
+var audioCtx;
+var analyser;
+var source;
+
 function paint(ctx, centerX, centerY, clearcolor, clearmode) {
   const radius = (mousedown == 1) ? 5 : 20;
   ctx.beginPath();
@@ -148,6 +152,21 @@ function onServerMessage(event) {
   }
 }
 
+function updateAudioFeedback() {
+
+    var target = document.getElementById("mouth");
+    if (target === null) return;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(dataArray);
+
+    scale = (dataArray[1]/255.0)+ (dataArray[2]/255.0);
+
+    target.object3D.scale.set(scale,scale,scale);
+    setTimeout(updateAudioFeedback,50);
+}
+
 function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
   var l = window.location;
   var wsHost = (hostname != undefined) ? hostname : l.hostname;
@@ -180,15 +199,12 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       webrtcPeerConnection.addTrack(audiotrack);
 
       // from https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
-      /*const audioCtx = new AudioContext();
-      const analyser = audioCtx.createAnalyser();
-      const source = audioCtx.createMediaStreamSource(stream);
-      source.connect(analyser);
-
+      audioCtx = new AudioContext();
+      analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      analyser.getByteFrequencyData(dataArray);*/
+      source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+      setTimeout(updateAudioFeedback,50);
 
       var vidtracks = stream.getVideoTracks();
       if (vidtracks.length > 0) {
