@@ -182,6 +182,7 @@ class Client(BaseClient):
         sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
         # set xpos/ypos properties on pad according to sequence number
+        # FIXME: can this actually lead to front streams overlapping after some reconnects?
         padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
         sinkpad.set_property("xpos",offsets[padnum][0])
         sinkpad.set_property("ypos",offsets[padnum][1])

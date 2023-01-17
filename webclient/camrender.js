@@ -52,19 +52,7 @@ AFRAME.registerComponent('camrender',{
         };
     },
     'tick': function(time, timeDelta) {
+        if (time < 5000) return; // FIXME super ugly hack to allow everything to settle
         this.renderer.render( this.el.sceneEl.object3D , this.el.object3DMap.camera );
-    }
-});
-
-AFRAME.registerComponent('canvas-updater', {
-    dependencies: ['geometry', 'material'],
-
-    tick: function () {
-	    var el = this.el;
-	    var material;
-
-	    material = el.getObject3D('mesh').material;
-	    if (!material.map) { return; }
-        material.map.needsUpdate = true;
     }
 });
