@@ -26,9 +26,11 @@ def http_handler(server,msg,path,query,client,user_data):
     #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
-        data = open("webclient"+path,"r").read()
+        data = open("webclient"+path,"rb").read()
         if path.endswith(".js"):
             content_type = "text/javascript"
+        if path.endswith(".jpg"):
+            content_type = "image/jpeg"
         msg.set_status(Soup.Status.OK)
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
@@ -40,7 +42,7 @@ def http_handler(server,msg,path,query,client,user_data):
 
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
-    msg.response_body.append(data.encode("utf-8"))
+    msg.response_body.append(data)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, client):
