@@ -122,7 +122,9 @@ class Client(BaseClient):
             out_tee = self.outputs[i]
             out_tee.set_state(Gst.State.NULL)
             for p in out_tee.srcpads:
-                p.unlink(p.get_peer())
+                other = p.get_peer()
+                if other != None:
+                    p.unlink(other)
             remove_element(out_tee)
         self.outputs.clear()
 
@@ -199,6 +201,11 @@ class Client(BaseClient):
         logging.info("    linking client "+self.name+" to "+prefix+"mixer "+dest.name)
         sinkpad = self.link_request_pads(self.outputs[prefix],"src_%u",dest.mixers[prefix],"sink_%u")
         sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
+
+        # "inter-client" queues and reqpads need to be deleted by either side, whichever is removed
+        # first. so add the newly created items to the respective list for the other client as well.
+        dest.queues.append (self.queues [-1])
+        dest.reqpads.append(self.reqpads[-1])
 
         # for the "main" surface, destination mixer pad needs zorder = 0
         if prefix == "surface" and "main" in self.wrb.flags:
