@@ -186,10 +186,16 @@ class Client(BaseClient):
         sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
         # set xpos/ypos properties on pad according to sequence number
-        # FIXME: can this actually lead to front streams overlapping after some reconnects?
-        padnum = int(sinkpad.get_name().split("_")[1]) % len(offsets)
-        sinkpad.set_property("xpos",offsets[padnum][0])
-        sinkpad.set_property("ypos",offsets[padnum][1])
+        fm = get_by_name("frontmixer")
+        count = 0
+        for pad in fm.sinkpads:
+            padnum = int(pad.get_name().split("_")[1])
+            if padnum == 0: # skip testsource pad
+                continue
+            padnum = count % len(offsets)
+            pad.set_property("xpos",offsets[padnum][0])
+            pad.set_property("ypos",offsets[padnum][1])
+            count += 1
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix):
