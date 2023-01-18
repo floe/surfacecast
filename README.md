@@ -4,8 +4,8 @@ A framework to mix and distribute live video feeds from interactive surfaces via
 
 ![shared table surfaces with real and projected objects](assets/teaser0.jpg)
 
-![shared table surfaces with real and projected objects](assets/teaser.jpg)
-Image credit: ©️ Stadt Regensburg, ©️ Stefan Effenhauser (see also the [VIGITIA](https://vigitia.de/) project)
+![shared table surfaces with real and projected objects](assets/teaser1.jpg)
+2nd image credit: ©️ Stadt Regensburg, ©️ Stefan Effenhauser (see also the [VIGITIA](https://vigitia.de/) project)
 
 SurfaceStreams consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
