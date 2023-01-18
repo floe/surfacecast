@@ -35,11 +35,11 @@ def http_handler(server,msg,path,query,client,user_data):
         msg.set_status(Soup.Status.OK)
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
-        data=path+" not found"
+        data=(path+" not found").encode("utf-8")
         if path == "/quit":
             logging.info("Well... bye.")
             GLib.timeout_add(100,quit_mainloop)
-            data="Server exiting/restarting..."
+            data=b"Server exiting/restarting..."
 
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
