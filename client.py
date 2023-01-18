@@ -218,8 +218,9 @@ class Client(BaseClient):
         for c in clients:
 
             if c == self.name: # skip own ssrc
-                if not "own" in self.wrb.flags or prefix == "audio":
-                    continue
+                if prefix == "surface" and "own" in self.wrb.flags:
+                    self.link_streams_oneway(self,prefix)
+                continue
 
             other = clients[c]
 
