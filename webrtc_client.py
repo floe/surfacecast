@@ -3,7 +3,7 @@
 import sys,gi,json,argparse,os
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
-gi.require_version('Soup', '2.4')
+gi.require_version('Soup', '3.0')
 gi.require_version('GstWebRTC', '1.0')
 gi.require_version('GstSdp', '1.0')
 from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
@@ -54,6 +54,10 @@ def on_element_added(thebin, element):
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
+# accept any certificate, no matter what
+def yesman(msg, cert, flags):
+       return True
+
 # "main"
 print("\nSurfaceStreams frontend client v0.1.0 - https://github.com/floe/surfacestreams\n")
 
@@ -95,8 +99,8 @@ if not args.fake and (args.front == "" or args.surface == ""):
 add_test_sources(args.front,args.surface,args.audio,args.fake,sw=args.size[0],sh=args.size[1])
 
 session = Soup.Session()
-session.set_property("ssl-strict", False)
 msg = Soup.Message.new("GET", "wss://"+args.target+":"+str(args.port)+"/ws")
-session.websocket_connect_async(msg, None, None, None, ws_conn_handler)
+msg.connect("accept-certificate",yesman)
+session.websocket_connect_async(msg, None, None, 0, None, ws_conn_handler)
 
 run_mainloop()
