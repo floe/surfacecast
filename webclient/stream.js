@@ -18,6 +18,8 @@ var fronttrans;
 var remotemap;
 var frontstream;
 var surfacestream;
+var windowstream = null;
+var video3;
 
 var audioCtx;
 var analyser;
@@ -167,6 +169,11 @@ function updateAudioFeedback() {
     setTimeout(updateAudioFeedback,50);
 }
 
+function drawVideo() {
+  c2.drawImage( video3, 0, 0, 1280, 720 );
+  requestAnimationFrame(drawVideo);
+}
+
 function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
   var l = window.location;
   var wsHost = (hostname != undefined) ? hostname : l.hostname;
@@ -279,5 +286,19 @@ window.onload = function() {
     const img = new Image(); //document.getElementById("buffer");
     img.src = URL.createObjectURL(e.target.files[0]);
     img.onload = () => { URL.revokeObjectURL(img.src); context.drawImage(img,0,0); c2.drawImage(img,0,0); }
+  } );
+
+  video3 = document.getElementById("stream3");
+  startbtn = document.getElementById("start");
+
+  if (startbtn) startbtn.addEventListener("click", function(e) {
+    let captureopts = { video: { width: 1280 }, audio: false, surfaceSwitching: "include", selfBrowserSurface: "exclude" };
+    navigator.mediaDevices.getDisplayMedia(captureopts).then( (stream) => {
+      console.log(stream);
+      windowstream = stream.getVideoTracks()[0];
+      video3.srcObject = stream;
+      video3.play().catch(reportError);
+      drawVideo();
+    } );
   } );
 };
