@@ -171,7 +171,9 @@ function updateAudioFeedback() {
 
 function drawVideo() {
   c2.drawImage( video3, 0, 0, 1280, 720 );
-  requestAnimationFrame(drawVideo);
+  c2.drawImage( canvas, 0, 0, 1280, 720 );
+  // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
+  setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
 }
 
 function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
@@ -279,14 +281,6 @@ window.onload = function() {
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
-
-  inputelem = document.getElementById("fileElem");
-
-  if (inputelem) inputelem.addEventListener("change", function(e) {
-    const img = new Image(); //document.getElementById("buffer");
-    img.src = URL.createObjectURL(e.target.files[0]);
-    img.onload = () => { URL.revokeObjectURL(img.src); context.drawImage(img,0,0); c2.drawImage(img,0,0); }
-  } );
 
   video3 = document.getElementById("stream3");
   startbtn = document.getElementById("start");
