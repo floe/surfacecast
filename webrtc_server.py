@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys,gi,json,argparse,datetime,threading
+from mnemonicode import mnemonicode
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -52,7 +53,7 @@ def ws_close_handler(connection, client):
 # incoming Websocket connection
 def ws_conn_handler(server, connection, path, client, user_data):
 
-    source = get_client_address(client)
+    source = mnemonicode(get_client_address(client))
     logging.info("New WebSocket connection from: "+source)
 
     mutex.acquire()

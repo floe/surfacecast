@@ -260,12 +260,12 @@ def on_element_added(thebin, element):
 
     # check format: {input,output}_IPADDR_PORT_{surface,front,audio}
     elname = element.get_name().split("_")
-    if len(elname) != 4:
+    if len(elname) != 3:
         return
 
     direction = elname[0]
-    source = elname[1]+"_"+elname[2]
-    stype = elname[3]
+    source = elname[1]
+    stype = elname[2]
     #logging.debug("New element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
