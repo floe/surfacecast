@@ -14,7 +14,6 @@ from client import BaseClient
 
 args = None
 flags = []
-sink = ""
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
@@ -30,15 +29,20 @@ def ws_conn_handler(session, result):
 
 # element message was posted on bus
 def message_cb(bus, message):
+    name = message.src.name
     struct = message.get_structure()
-    res, val = struct.get_uint64("window-handle")
-    if res:
+    # use window-handle message to set title
+    if "fps-display" in name and "have-window-handle" in struct.get_name():
+        toplevel = message.src.parent.parent.name
+        logging.debug("Setting window name for "+toplevel+"...")
+        res, val = struct.get_uint64("window-handle")
         # FIXME: this is obviously a hack...
-        os.system("xprop -id "+str(val)+" -format _NET_WM_NAME 8u -set _NET_WM_NAME "+sink)
+        os.system("xprop -id "+str(val)+" -format _NET_WM_NAME 8u -set _NET_WM_NAME "+toplevel)
+    # debug output for automated tests
+    if "zbar" in name:
+        logging.debug(message.get_structure().to_string())
 
 def on_element_added(thebin, element):
-
-    global sink
 
     name = element.get_name()
     if not name.startswith("output_"):
@@ -48,9 +52,8 @@ def on_element_added(thebin, element):
 
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
-        videopipe = "videoconvert ! fpsdisplaysink text-overlay="+str(args.debug) if args.out == "" else args.out
+        videopipe = "videoconvert ! fpsdisplaysink name="+name+"-output text-overlay="+str(args.debug) if args.out == "" else args.out
         add_and_link([ element, Gst.parse_bin_from_description( videopipe, True ) ])
-        sink = name
     elif name == "audio":
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
