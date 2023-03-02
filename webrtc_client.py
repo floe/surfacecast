@@ -48,7 +48,8 @@ def on_element_added(thebin, element):
 
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
-        add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink", {"text-overlay":args.debug}) ])
+        videopipe = "videoconvert ! fpsdisplaysink text-overlay="+str(args.debug) if args.out == "" else args.out
+        add_and_link([ element, Gst.parse_bin_from_description( videopipe, True ) ])
         sink = name
     elif name == "audio":
         logging.info("Starting audio output")
@@ -72,6 +73,7 @@ parser.add_argument("-p","--port",   help="server HTTPS listening port",  defaul
 parser.add_argument("-n","--nick",   help="client nickname", default=""                            )
 parser.add_argument(     "--persp",  help="perspective transform", default=""                      )
 parser.add_argument(     "--size",   help="surface stream output size", default="1280x720"         )
+parser.add_argument(     "--out",    help="video output pipeline", default=""                      )
 
 args = parser.parse_args()
 args.size = [ int(n) for n in args.size.split("x") ]
