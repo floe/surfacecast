@@ -52,7 +52,7 @@ def on_element_added(thebin, element):
 
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
-        videopipe = "videoconvert ! fpsdisplaysink name={name} text-overlay={args.debug!s}" if args.out == "" else args.out
+        videopipe = "videoconvert ! fpsdisplaysink sync=false name={name} text-overlay={args.debug!s}" if args.out == "" else args.out
         add_and_link([ element, Gst.parse_bin_from_description( videopipe.format(name=name,args=args), True ) ])
     elif name == "audio":
         logging.info("Starting audio output")
