@@ -49,10 +49,6 @@ def bus_call(bus, message, loop):
     elif t == Gst.MessageType.WARNING:
         err, debug = message.parse_warning()
         logging.warning("Pipeline warning: %s: %s", err, debug)
-    elif t == Gst.MessageType.NEW_CLOCK:
-        logging.info("New pipeline clock source selected.")
-    elif t == Gst.MessageType.CLOCK_LOST:
-        logging.warning("Pipeline clock lost!")
     return True
 
 # shortcut to request pad
