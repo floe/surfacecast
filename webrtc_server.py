@@ -62,7 +62,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
     connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
-print("\nSurfaceStreams backend mixing server v0.1.0 - https://github.com/floe/surfacestreams\n")
+print("\nSurfaceStreams backend mixing server v0.2.2 - https://github.com/floe/surfacestreams\n")
 print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
