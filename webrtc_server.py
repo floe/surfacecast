@@ -23,6 +23,8 @@ def get_client_address(client):
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
     logging.info("HTTP(S) request for: "+path)
+    if path == "/":
+        path = "/index.html"
     #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
@@ -31,6 +33,8 @@ def http_handler(server,msg,path,query,client,user_data):
             content_type = "text/javascript"
         if path.endswith(".jpg"):
             content_type = "image/jpeg"
+        if path.endswith(".css"):
+            content_type = "text/css"
         msg.set_status(Soup.Status.OK)
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
