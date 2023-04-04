@@ -11,11 +11,11 @@ $('#bg_btn').on("click", function() {
 function changeBg(btn){
     let id = "#" + btn.id;
     let url = $(id).css("background-image");
-    $('#canvas').css("background-image", url);
-    $('#canvas').css("background-size", "cover");
+    $('#fakecanvas').css("background-image", url);
+    $('#fakecanvas').css("background-size", "cover");
 }
 
-function defaultBg(){$('#canvas').css("background", "none");}
+function defaultBg(){$('#fakecanvas').css("background", "none");}
 
 $('#effect_btn').on("click", function() {
     effectBtnActive();  
@@ -161,7 +161,7 @@ function add_sticker(elem) {
     sticker.appendChild(confirm_btn);
     if(elem.className == "rotatable"){sticker.appendChild(rotate_btn);}
   
-    $('#canvas').append(sticker);
+    $('#fakecanvas').append(sticker);
 }
 
 
@@ -197,7 +197,7 @@ function effectBtnDeactive() {
 
 let selected_effect = "none";
 
-$('#canvas').on('click', function(e) {
+$('#fakecanvas').on('click', function(e) {
     if(bgSubmenuIsOpen){
       bgBtnDeactive();
     }
