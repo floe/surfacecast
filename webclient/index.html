@@ -8,6 +8,9 @@
 </head>
 <body>
 <!-- partial:index.partial.html -->
+<canvas style="position:absolute;top:0px;left:0px;width:100%" id="canvas2" ></canvas> <!-- surface stream source canvas (green background) -->
+<video  style="position:absolute;top:0px;left:0px;width:100%" id="stream2" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
+<canvas style="position:absolute;top:0px;left:0px;width:100%" id="canvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
 <div id="fakecanvas"></div>
 
 <div id="Painting_tools">
@@ -63,29 +66,33 @@
   </button>
   
   <div id="side_panel">
-    <img src="https://lh5.googleusercontent.com/BYdWrF3D8GsE2EAhO5kYZ_E73eoP5Hg63xr01yEiA-e4nzsD8bYFFIdvkeOv7_J4Vwg=w2400" onclick="add_sticker(this);">
-    <img src="https://lh4.googleusercontent.com/TVYZ5-MVGpGSUts6zpgWu1uoH0du5HEt2Bec82Ch_fBkkcByKrj4xCEnTbk4poGnvEU=w2400" onclick="add_sticker(this);">
-    <img src="https://lh5.googleusercontent.com/s9HTCvYdxCxyrXKIRjzcLLyS1CvFZuRk-yiID_rkKw6UkxsYVH2qU71MJOIo9aM_zF0=w2400" onclick="add_sticker(this);">
+    <img src="images/BYdWrF3D8GsE2EAhO5kYZ_E73eoP5Hg63xr01yEiA-e4nzsD8bYFFIdvkeOv7_J4Vwg=w2400" onclick="add_sticker(this);">
+    <img src="images/TVYZ5-MVGpGSUts6zpgWu1uoH0du5HEt2Bec82Ch_fBkkcByKrj4xCEnTbk4poGnvEU=w2400" onclick="add_sticker(this);">
+    <img src="images/s9HTCvYdxCxyrXKIRjzcLLyS1CvFZuRk-yiID_rkKw6UkxsYVH2qU71MJOIo9aM_zF0=w2400" onclick="add_sticker(this);">
     
-    <img src="https://lh6.googleusercontent.com/VjAsWgbNOmuBjIlK4_Y5FgiosQNaAotsmiLyzeR2_urJ83PSQn8-eb8dhtLKY-5HBMY=w2400" onclick="add_sticker(this);">
-    <img src="https://lh3.googleusercontent.com/qMjyeLXLs9d_38mrWA1YEUyvg5gum2rcQVfrn80xSl8W-wOUExLwVg1SKXe_qKoHkBc=w2400" onclick="add_sticker(this);">
-    <img src="https://lh3.googleusercontent.com/hNUKYRjFVqRbSVvboOU7guXuW0agT3syp6KSiaqaO7SYDOwxgnwHAdQraNTkt15C6Z4=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/VjAsWgbNOmuBjIlK4_Y5FgiosQNaAotsmiLyzeR2_urJ83PSQn8-eb8dhtLKY-5HBMY=w2400" onclick="add_sticker(this);">
+    <img src="images/qMjyeLXLs9d_38mrWA1YEUyvg5gum2rcQVfrn80xSl8W-wOUExLwVg1SKXe_qKoHkBc=w2400" onclick="add_sticker(this);">
+    <img src="images/hNUKYRjFVqRbSVvboOU7guXuW0agT3syp6KSiaqaO7SYDOwxgnwHAdQraNTkt15C6Z4=w2400" onclick="add_sticker(this);" class="rotatable">
     
-    <img src="https://lh5.googleusercontent.com/GpEtdVldFR7CbRg9_A1wNqREyQ9Imu-7T70FoUeKhtqhoP3pk35Mu6vULeewetgMG54=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh6.googleusercontent.com/GlacXUGnJZgk0CCyNtiQuPlivktnpdhWCSGqWWWH3zcB-RBZeVyk1ncjrnh9KKpaeDg=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/GpEtdVldFR7CbRg9_A1wNqREyQ9Imu-7T70FoUeKhtqhoP3pk35Mu6vULeewetgMG54=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/GlacXUGnJZgk0CCyNtiQuPlivktnpdhWCSGqWWWH3zcB-RBZeVyk1ncjrnh9KKpaeDg=w2400" onclick="add_sticker(this);" class="rotatable">
     
-    <img src="https://lh3.googleusercontent.com/HfuHNBEtfrx2s2yvVttvFzlx-4VJmcx7IqiQ35LyNssWNTvYA-Uj6_dE4QNbG5HSTmc=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh3.googleusercontent.com/LfnJvQB0oL-qr6fOf6trjANHJcZfUhSTaDtmikT5xWFhSzKH22PmLatUXOOrlabKDS4=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh6.googleusercontent.com/GJk9d6lV616rbWIfDk1QWgiwShPvTraHCIKD_O3pyOLf9CXsIvDFm7bWf2OL3c4A4pk=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/HfuHNBEtfrx2s2yvVttvFzlx-4VJmcx7IqiQ35LyNssWNTvYA-Uj6_dE4QNbG5HSTmc=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/LfnJvQB0oL-qr6fOf6trjANHJcZfUhSTaDtmikT5xWFhSzKH22PmLatUXOOrlabKDS4=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/GJk9d6lV616rbWIfDk1QWgiwShPvTraHCIKD_O3pyOLf9CXsIvDFm7bWf2OL3c4A4pk=w2400" onclick="add_sticker(this);" class="rotatable">
     
-    <img src="https://lh3.googleusercontent.com/w2_dACBnlTw11JKwsBGJXocJbBCbilDxzvrg08IRPddHEodvdZNejydBFQxo9NbTWlo=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh3.googleusercontent.com/uoxzo663EhtvuXRN_MBENlE7IJc5DzvpN34qoEy8gHC1yzNjjDU2nWhyGKi76HvzZgo=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh4.googleusercontent.com/ja_7IUbE1g9813F7LdeeCWEUFWDpkthX6KwtVA_5fwegbk4SEVKd544uERaZKS7vSW0=w2400" onclick="add_sticker(this);" class="rotatable">
-    <img src="https://lh4.googleusercontent.com/XtdsojZQ2pVO_4MLkvne7gRKI5WN6SO70JCDeSv5SbtPumCHQesAszJNYDViz2WHe_8=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/w2_dACBnlTw11JKwsBGJXocJbBCbilDxzvrg08IRPddHEodvdZNejydBFQxo9NbTWlo=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/uoxzo663EhtvuXRN_MBENlE7IJc5DzvpN34qoEy8gHC1yzNjjDU2nWhyGKi76HvzZgo=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/ja_7IUbE1g9813F7LdeeCWEUFWDpkthX6KwtVA_5fwegbk4SEVKd544uERaZKS7vSW0=w2400" onclick="add_sticker(this);" class="rotatable">
+    <img src="images/XtdsojZQ2pVO_4MLkvne7gRKI5WN6SO70JCDeSv5SbtPumCHQesAszJNYDViz2WHe_8=w2400" onclick="add_sticker(this);" class="rotatable">
   </div>
 </div>
+
+<video style="position:absolute;top:80%;width:720px" id="stream" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
+
 <!-- partial -->
   <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script><script  src="./script.js"></script>
+  <script src="stream.js"></script>
 
 </body>
 </html>

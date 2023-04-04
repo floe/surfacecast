@@ -162,6 +162,8 @@ function add_sticker(elem) {
     if(elem.className == "rotatable"){sticker.appendChild(rotate_btn);}
   
     $('#fakecanvas').append(sticker);
+    c2.drawImage(sticker_img,sticker.offsetLeft,sticker.offsetTop);
+    console.log(sticker_img,sticker.offsetLeft,sticker.offsetTop);
 }
 
 
