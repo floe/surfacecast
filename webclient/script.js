@@ -1,6 +1,6 @@
 let bgSubmenuIsOpen = false;
 let effectSubmenuIsOpen = false;
-
+var background = "";
 
 
 $('#bg_btn').on("click", function() {
@@ -11,8 +11,11 @@ $('#bg_btn').on("click", function() {
 function changeBg(btn){
     let id = "#" + btn.id;
     let url = $(id).css("background-image");
-    $('#fakecanvas').css("background-image", url);
-    $('#fakecanvas').css("background-size", "cover");
+    //$('#fakecanvas').css("background-image", url);
+    //$('#fakecanvas').css("background-size", "cover");
+    url = url.split("/");
+    background = document.createElement("img");
+    background.src = url[3]+"/"+url[4].split("\"")[0];
 }
 
 function defaultBg(){$('#fakecanvas').css("background", "none");}
@@ -308,6 +311,7 @@ function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
 function drawStickers() {
   var stickers = $('#fakecanvas')[0].childNodes;
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
+  if (background) { console.log(background); myDrawImage(c2,background,0,0); }
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
     var transform = sticker.firstChild.style.transform;
