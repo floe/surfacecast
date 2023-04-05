@@ -46,6 +46,7 @@ def http_handler(server,msg,path,query,client,user_data):
 
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
+    #msg.response_headers.append("Access-Control-Allow-Origin","*")
     msg.response_body.append(data)
 
 # Websocket connection was closed by remote
