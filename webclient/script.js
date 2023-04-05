@@ -162,8 +162,7 @@ function add_sticker(elem) {
     if(elem.className == "rotatable"){sticker.appendChild(rotate_btn);}
   
     $('#fakecanvas').append(sticker);
-    c2.drawImage(sticker_img,sticker.offsetLeft,sticker.offsetTop);
-    console.log(sticker_img,sticker.offsetLeft,sticker.offsetTop);
+    drawStickers();
 }
 
 
@@ -292,4 +291,15 @@ function playWaterGif(x, y) {
   gif.css('top', y - gif.height() / 2);
   
   setTimeout(function(){gif.remove(); gifIsFinished = true;}, 2000);
+}
+
+function drawStickers() {
+  var stickers = $('#fakecanvas')[0].childNodes;
+  c2.fillRect(0, 0, canvas2.width, canvas2.height);
+  for (const sticker of stickers) {
+    c2.drawImage(sticker.firstChild,sticker.offsetLeft,sticker.offsetTop);
+    //console.log(sticker.firstChild,sticker.offsetLeft,sticker.offsetTop);
+  }
+  // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
+  setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
