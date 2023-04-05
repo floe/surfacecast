@@ -293,12 +293,29 @@ function playWaterGif(x, y) {
   setTimeout(function(){gif.remove(); gifIsFinished = true;}, 2000);
 }
 
+// courtesy of https://gist.github.com/Luftare/fd238b7aac27c4e82c13b4a9526c878f
+function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
+  ctx.save();
+  ctx.translate(x + img.width * scale / 2, y + img.height * scale / 2);
+  ctx.rotate(2 * Math.PI * angle/360.0);
+  ctx.translate(- x - img.width * scale / 2, - y - img.height * scale / 2);
+  ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+  ctx.restore();
+}
+
+// TODO: backgrounds
+// TODO: animations
 function drawStickers() {
   var stickers = $('#fakecanvas')[0].childNodes;
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
   for (const sticker of stickers) {
-    c2.drawImage(sticker.firstChild,sticker.offsetLeft,sticker.offsetTop);
-    //console.log(sticker.firstChild,sticker.offsetLeft,sticker.offsetTop);
+    //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
+    var transform = sticker.firstChild.style.transform;
+    var angle = 0;
+    var scale = 1;
+    if (transform.includes("rotate")) angle = transform.split("(")[1].split("d")[0];
+    if (transform.includes("scale"))  scale = transform.split("(")[1].split(")")[0];
+    myDrawImage(c2,sticker.firstChild,sticker.offsetLeft,sticker.offsetTop,angle,scale);
   }
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
