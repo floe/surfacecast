@@ -36,7 +36,6 @@ def add_and_link(elements):
 
 # capture and handle bus messages
 def bus_call(bus, message, loop):
-    # TODO: handle more message types? see https://lazka.github.io/pgi-docs/index.html#Gst-1.0/flags.html#Gst.MessageType
     t = message.type
     logging.trace(str(message.src)+str(t))
     if t == Gst.MessageType.EOS:
@@ -45,7 +44,6 @@ def bus_call(bus, message, loop):
     elif t == Gst.MessageType.ERROR:
         err, debug = message.parse_error()
         logging.error("Pipeline error: %s: %s", err, debug)
-        loop.quit()
     elif t == Gst.MessageType.WARNING:
         err, debug = message.parse_warning()
         logging.warning("Pipeline warning: %s: %s", err, debug)
