@@ -62,7 +62,7 @@ def ws_conn_handler(server, connection, path, client, user_data):
 
     mutex.acquire()
 
-    wrb = WebRTCPeer(connection,source,args.stun)
+    wrb = WebRTCDecoder(connection,source,args.stun)
     new_client = Client(source,wrb,args.size[0],args.size[1],mutex)
     connection.connect("closed",ws_close_handler,new_client)
 

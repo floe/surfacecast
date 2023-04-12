@@ -9,7 +9,7 @@ gi.require_version('GstSdp', '1.0')
 from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 
 from gst_helpers import *
-from webrtc_peer import WebRTCPeer
+from webrtc_peer import WebRTCDecoder
 from client import BaseClient
 
 args = None
@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,True,flags)
+    wrb = WebRTCDecoder(connection,"client",args.stun,True,flags)
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 

@@ -228,6 +228,72 @@ class WebRTCPeer(StreamSink):
 
     # new pad appears on WebRTCBin element
     def on_pad_added(self, wrb, pad):
+        # to be overwritten in subclass
+        print("NOPE")
+
+    # incoming Websocket message
+    def on_ws_message(self, connection, mtype, data):
+
+        try:
+            msg = json.loads(data.get_data())
+        except:
+            return
+
+        if msg["type"] == "sdp":
+
+            reply = msg["data"]
+            stype = reply["type"]
+            sdp = reply["sdp"]
+            if len(sdp) == 0:
+                return
+
+            logging.info("Received SDP " + stype + ", parsing...")
+            logging.debug("Incoming SDP: " + json.dumps(msg))
+
+            res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
+            # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
+            result = GstWebRTC.WebRTCSessionDescription.new(response_type[stype], sdpmsg)
+            self.wrb.emit("set-remote-description", result, None)
+
+            # mapping contains only MediaIDs, but we need SSRC locally
+            if "mapping" in msg:
+                self.mapping = msg["mapping"]
+
+                # lookup corresponding SSRC for each MediaID
+                for i in range(sdpmsg.medias_len()):
+                    media = sdpmsg.get_media(i)
+                    mid  = media.get_attribute_val("mid").split(" ")[0]
+                    ssrc = media.get_attribute_val("ssrc")
+                    if ssrc and mid in self.mapping:
+                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
+
+                logging.debug("Incoming stream mapping: "+json.dumps(self.mapping))
+
+            # on the client side, we need to manually trigger the negotiation answer
+            if self.is_client:
+                self.on_negotiation_needed(self.wrb)
+
+        if msg["type"] == "ice":
+
+            ice = msg["data"]
+            candidate = ice["candidate"]
+            if len(candidate) == 0:
+                return
+            sdpmlineindex = ice["sdpMLineIndex"]
+            self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
+            logging.trace("Incoming ICE candidate: " + json.dumps(msg))
+
+        if msg["type"] == "msg":
+            self.process(msg["data"])
+
+
+class WebRTCDecoder(WebRTCPeer):
+
+    def __init__(self, connection, name, stun, is_client=False, flags=[]):
+        super().__init__(connection, name, stun, is_client, flags)
+
+    # new pad appears on WebRTCBin element
+    def on_pad_added(self, wrb, pad):
 
         caps = pad.get_current_caps()
         struct = caps.get_structure(0)
@@ -296,57 +362,3 @@ class WebRTCPeer(StreamSink):
         add_and_link(chain)
         ghostpad.link(chain[0].get_static_pad(padname))
 
-    # incoming Websocket message
-    def on_ws_message(self, connection, mtype, data):
-
-        try:
-            msg = json.loads(data.get_data())
-        except:
-            return
-
-        if msg["type"] == "sdp":
-
-            reply = msg["data"]
-            stype = reply["type"]
-            sdp = reply["sdp"]
-            if len(sdp) == 0:
-                return
-
-            logging.info("Received SDP " + stype + ", parsing...")
-            logging.debug("Incoming SDP: " + json.dumps(msg))
-
-            res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
-            # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
-            result = GstWebRTC.WebRTCSessionDescription.new(response_type[stype], sdpmsg)
-            self.wrb.emit("set-remote-description", result, None)
-
-            # mapping contains only MediaIDs, but we need SSRC locally
-            if "mapping" in msg:
-                self.mapping = msg["mapping"]
-
-                # lookup corresponding SSRC for each MediaID
-                for i in range(sdpmsg.medias_len()):
-                    media = sdpmsg.get_media(i)
-                    mid  = media.get_attribute_val("mid").split(" ")[0]
-                    ssrc = media.get_attribute_val("ssrc")
-                    if ssrc and mid in self.mapping:
-                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
-
-                logging.debug("Incoming stream mapping: "+json.dumps(self.mapping))
-
-            # on the client side, we need to manually trigger the negotiation answer
-            if self.is_client:
-                self.on_negotiation_needed(self.wrb)
-
-        if msg["type"] == "ice":
-
-            ice = msg["data"]
-            candidate = ice["candidate"]
-            if len(candidate) == 0:
-                return
-            sdpmlineindex = ice["sdpMLineIndex"]
-            self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
-            logging.trace("Incoming ICE candidate: " + json.dumps(msg))
-
-        if msg["type"] == "msg":
-            self.process(msg["data"])
