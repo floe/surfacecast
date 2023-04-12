@@ -286,11 +286,12 @@ class WebRTCPeer(StreamSink):
         if msg["type"] == "msg":
             self.process(msg["data"])
 
-
+# decoding/filtering of incoming streams
 class WebRTCDecoder(WebRTCPeer):
 
-    def __init__(self, connection, name, stun, is_client=False, flags=[]):
+    def __init__(self, connection, name, stun, is_client=False, flags=[], surf_pipe=""):
         super().__init__(connection, name, stun, is_client, flags)
+        self.surf_pipe = surf_pipe
 
     # new pad appears on WebRTCBin element
     def on_pad_added(self, wrb, pad):
@@ -302,10 +303,18 @@ class WebRTCDecoder(WebRTCPeer):
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
-        logging.info("New incoming stream, linking to decodebin...")
+        name = self.mapping[str(ssrc)]
+        logging.info("New incoming "+name+" stream, linking...")
         logging.trace("Stream caps: "+caps.to_string())
-        decodebin = new_element("decodebin",{"force-sw-decoders":True},myname="decodebin_"+self.mapping[str(ssrc)])
-        decodebin.connect("pad-added", self.on_decodebin_pad)
+
+        if name == "surface" and self.surf_pipe != "":
+            # Note: the first element in surf_pipe needs to have a sink pad
+            logging.debug("Creating bin from description: "+self.surf_pipe)
+            decodebin = Gst.parse_bin_from_description( self.surf_pipe, True )
+        else:
+            logging.debug("Creating default decodebin...")
+            decodebin = new_element("decodebin",{"force-sw-decoders":True},myname="decodebin_"+name)
+            decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin)
         decodebin.sync_state_with_parent()
