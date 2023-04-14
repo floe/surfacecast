@@ -228,6 +228,73 @@ class WebRTCPeer(StreamSink):
 
     # new pad appears on WebRTCBin element
     def on_pad_added(self, wrb, pad):
+        # to be overwritten in subclass
+        print("NOPE")
+
+    # incoming Websocket message
+    def on_ws_message(self, connection, mtype, data):
+
+        try:
+            msg = json.loads(data.get_data())
+        except:
+            return
+
+        if msg["type"] == "sdp":
+
+            reply = msg["data"]
+            stype = reply["type"]
+            sdp = reply["sdp"]
+            if len(sdp) == 0:
+                return
+
+            logging.info("Received SDP " + stype + ", parsing...")
+            logging.debug("Incoming SDP: " + json.dumps(msg))
+
+            res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
+            # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
+            result = GstWebRTC.WebRTCSessionDescription.new(response_type[stype], sdpmsg)
+            self.wrb.emit("set-remote-description", result, None)
+
+            # mapping contains only MediaIDs, but we need SSRC locally
+            if "mapping" in msg:
+                self.mapping = msg["mapping"]
+
+                # lookup corresponding SSRC for each MediaID
+                for i in range(sdpmsg.medias_len()):
+                    media = sdpmsg.get_media(i)
+                    mid  = media.get_attribute_val("mid").split(" ")[0]
+                    ssrc = media.get_attribute_val("ssrc")
+                    if ssrc and mid in self.mapping:
+                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
+
+                logging.debug("Incoming stream mapping: "+json.dumps(self.mapping))
+
+            # on the client side, we need to manually trigger the negotiation answer
+            if self.is_client:
+                self.on_negotiation_needed(self.wrb)
+
+        if msg["type"] == "ice":
+
+            ice = msg["data"]
+            candidate = ice["candidate"]
+            if len(candidate) == 0:
+                return
+            sdpmlineindex = ice["sdpMLineIndex"]
+            self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
+            logging.trace("Incoming ICE candidate: " + json.dumps(msg))
+
+        if msg["type"] == "msg":
+            self.process(msg["data"])
+
+# decoding/filtering of incoming streams
+class WebRTCDecoder(WebRTCPeer):
+
+    def __init__(self, connection, name, stun, is_client=False, flags=[], surf_pipe=""):
+        super().__init__(connection, name, stun, is_client, flags)
+        self.surf_pipe = surf_pipe
+
+    # new pad appears on WebRTCBin element
+    def on_pad_added(self, wrb, pad):
 
         caps = pad.get_current_caps()
         struct = caps.get_structure(0)
@@ -236,10 +303,18 @@ class WebRTCPeer(StreamSink):
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
-        logging.info("New incoming stream, linking to decodebin...")
+        name = self.mapping[str(ssrc)]
+        logging.info("New incoming "+name+" stream, linking...")
         logging.trace("Stream caps: "+caps.to_string())
-        decodebin = new_element("decodebin",{"force-sw-decoders":True},myname="decodebin_"+self.mapping[str(ssrc)])
-        decodebin.connect("pad-added", self.on_decodebin_pad)
+
+        if name == "surface" and self.surf_pipe != "":
+            # Note: the first element in surf_pipe needs to have a sink pad
+            logging.debug("Creating bin from description: "+self.surf_pipe)
+            decodebin = Gst.parse_bin_from_description( self.surf_pipe, True )
+        else:
+            logging.debug("Creating default decodebin...")
+            decodebin = new_element("decodebin",{"force-sw-decoders":True},myname="decodebin_"+name)
+            decodebin.connect("pad-added", self.on_decodebin_pad)
 
         self.wrb.parent.add(decodebin)
         decodebin.sync_state_with_parent()
@@ -296,57 +371,3 @@ class WebRTCPeer(StreamSink):
         add_and_link(chain)
         ghostpad.link(chain[0].get_static_pad(padname))
 
-    # incoming Websocket message
-    def on_ws_message(self, connection, mtype, data):
-
-        try:
-            msg = json.loads(data.get_data())
-        except:
-            return
-
-        if msg["type"] == "sdp":
-
-            reply = msg["data"]
-            stype = reply["type"]
-            sdp = reply["sdp"]
-            if len(sdp) == 0:
-                return
-
-            logging.info("Received SDP " + stype + ", parsing...")
-            logging.debug("Incoming SDP: " + json.dumps(msg))
-
-            res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
-            # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
-            result = GstWebRTC.WebRTCSessionDescription.new(response_type[stype], sdpmsg)
-            self.wrb.emit("set-remote-description", result, None)
-
-            # mapping contains only MediaIDs, but we need SSRC locally
-            if "mapping" in msg:
-                self.mapping = msg["mapping"]
-
-                # lookup corresponding SSRC for each MediaID
-                for i in range(sdpmsg.medias_len()):
-                    media = sdpmsg.get_media(i)
-                    mid  = media.get_attribute_val("mid").split(" ")[0]
-                    ssrc = media.get_attribute_val("ssrc")
-                    if ssrc and mid in self.mapping:
-                        self.mapping[ssrc.split(" ")[0]] = self.mapping[mid]
-
-                logging.debug("Incoming stream mapping: "+json.dumps(self.mapping))
-
-            # on the client side, we need to manually trigger the negotiation answer
-            if self.is_client:
-                self.on_negotiation_needed(self.wrb)
-
-        if msg["type"] == "ice":
-
-            ice = msg["data"]
-            candidate = ice["candidate"]
-            if len(candidate) == 0:
-                return
-            sdpmlineindex = ice["sdpMLineIndex"]
-            self.wrb.emit("add-ice-candidate", sdpmlineindex, candidate)
-            logging.trace("Incoming ICE candidate: " + json.dumps(msg))
-
-        if msg["type"] == "msg":
-            self.process(msg["data"])

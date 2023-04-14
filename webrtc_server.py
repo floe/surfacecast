@@ -24,6 +24,8 @@ def get_client_address(client):
 # incoming HTTP(S) request
 def http_handler(server,msg,path,query,client,user_data):
     logging.info("HTTP(S) request for: "+path)
+    if path == "/":
+        path = "/index.html"
     #flags[get_client_address(client)] = query
     content_type = "text/html"
     try:
@@ -32,6 +34,8 @@ def http_handler(server,msg,path,query,client,user_data):
             content_type = "text/javascript"
         if path.endswith(".jpg"):
             content_type = "image/jpeg"
+        if path.endswith(".css"):
+            content_type = "text/css"
         msg.set_status(Soup.Status.OK)
     except:
         msg.set_status(Soup.Status.NOT_FOUND)
@@ -43,6 +47,7 @@ def http_handler(server,msg,path,query,client,user_data):
 
     msg.response_headers.append("Content-Type",content_type)
     msg.response_headers.append("Cache-Control","no-store")
+    #msg.response_headers.append("Access-Control-Allow-Origin","*")
     msg.response_body.append(data)
 
 # Websocket connection was closed by remote
@@ -58,12 +63,12 @@ def ws_conn_handler(server, client, path, connection, user_data):
 
     mutex.acquire()
 
-    wrb = WebRTCPeer(connection,source,args.stun)
+    wrb = WebRTCDecoder(connection,source,args.stun)
     new_client = Client(source,wrb,args.size[0],args.size[1],mutex)
     connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
-print("\nSurfaceStreams backend mixing server v0.1.0 - https://github.com/floe/surfacestreams\n")
+print("\nSurfaceStreams backend mixing server v0.2.2 - https://github.com/floe/surfacestreams\n")
 print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)

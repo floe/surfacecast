@@ -1,1 +1,0 @@
-./webrtc_client.py --fake --own -t butterbrot.org -s "foobar. ! videoconvert ! fpsdisplaysink  videotestsrc is-live=true pattern=ball ! timeoverlay ! video/x-raw,format=AYUV,width=1280,height=720,framerate=15/1 ! tee name=foobar ! identity"

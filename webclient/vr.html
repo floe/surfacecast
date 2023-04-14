@@ -28,7 +28,9 @@
           if (!this.raycaster) { return; }  // Not intersecting.
           let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
           if (!intersection) { return; }
-          const evt = { offsetX: Math.round(intersection.uv.x*1280), offsetY: 720-Math.round(intersection.uv.y*720), buttons: 1, type: "fakemouse" };
+          let btn = (this.raycaster.components["laser-controls"].attrValue["hand"] == "right") ? 1 : 2;
+          // FIXME: hardcoded canvas size
+          const evt = { offsetX: Math.round(intersection.uv.x*1280), offsetY: 720-Math.round(intersection.uv.y*720), buttons: btn, type: "fakemouse" };
           if (mousedown == -1) onCanvasDown(evt);
           onCanvasMove(evt);
           // courtesy of https://stackoverflow.com/a/66313477

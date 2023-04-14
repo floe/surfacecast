@@ -1,0 +1,226 @@
+.mainBtn {
+  width:94px;
+  height:94px;
+  background: none;
+  border-style: none;
+  margin-right: 7px;
+  margin-left: 7px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center; /* centers items vertically */
+  justify-content: center;
+}
+
+#bg_btn {
+  margin-left: 10px;
+} 
+  
+#Main_btns {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+  width: fit-content;
+  height: fit-content;
+  background: rgba(230, 230, 230, 0.7);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 50px;
+}
+
+#Bg_options {
+  display: flex;
+  flex-direction: column;
+  width:fit-content;
+  visibility: hidden;
+  background: none;
+  margin-left: 11px;
+  margin-right: 27px;
+}
+
+.Bg_btns {
+  width: 80px;
+  height: 80px;
+  border-radius: 50px;
+  border: none;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+  background: white;
+}
+
+#bg_option1 {
+  background-image: url('images/background1.jpg');
+  background-size: cover;
+}
+
+#bg_option2 {
+  background-image: url('images/background2.jpg');
+  background-size: cover;
+}
+
+#bg_option3 {
+  background-image: url('images/background3.png');
+  background-size: cover;
+}
+
+#effect_option1 {
+  background-image: url('images/effect1.jpg');
+  background-size: cover;
+}
+
+#effect_option2 {
+  background-image: url('images/effect2.jpg');
+  background-size: cover;
+}
+
+#effect_option3 {
+  background-image: url('images/effect3.jpg');
+  background-size: cover;
+}
+
+#deselect_btn {
+  border: none;
+}
+
+#Effect_options {
+  display: flex;
+  flex-direction: column;
+  width:fit-content;
+  visibility: hidden;
+}
+
+#submenu_container {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  margin-top: 8px;
+  margin-left: 17px;
+}
+
+#side_panel {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 0px;
+  height: 100%;
+  background: rgba(230, 230, 230, 0.9);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+#stickers_btn {
+  position: absolute;
+  top: 45%;
+  bottom: 45%;
+  right: 0px;
+  margin-right: 0px;
+  width: 50px;
+  height: 80px;
+  background: rgba(230, 230, 230, 0.7);
+  border-style: none;
+  border-radius: 50px 0px 0px 50px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+#stickers_btn:active {
+  background: white;
+}
+
+#side_panel img {
+  max-width: 140px;
+  max-height: 180px;
+  margin-top: 10px;
+}
+
+#Painting_tools {
+  position: absolute;
+}
+
+#fakecanvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: none;
+}
+
+.new_sticker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: auto;
+    height: auto;
+    border: 1px solid grey;  
+    cursor: move;
+    position: absolute;
+    top: 50px;
+    left: 300px;
+}
+
+.new_sticker img {
+    display: block;
+    width: 200px;
+    height: auto;
+    /* margin-left: auto;
+    margin-right: auto;
+    position: relative; */
+}
+
+.confirm_sticker_btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  position: absolute;
+  top: 5px;
+  left: 0px;
+  border: none;
+  background: none;
+}
+
+.delete_sticker_btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  position: absolute;
+  top: 5px;
+  right: 0px;
+  border: none;
+  background: none;
+}
+
+.rotate_sticker_btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  border: none;
+  background: none;
+}
+
+.gif {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+  background: none;
+}
+
+#bomb_gif {
+  background-image: url('images/effect1.gif'); 
+  background-size: cover;
+}
+
+#fire_gif {
+  background-image: url('images/effect2.gif'); 
+  background-size: cover;
+}
+
+#water_gif {
+  background-image: url('images/effect3.gif'); 
+  background-size: cover;
+}

@@ -18,6 +18,8 @@ var fronttrans;
 var remotemap;
 var frontstream;
 var surfacestream;
+var windowstream = null;
+var video3;
 
 var audioCtx;
 var analyser;
@@ -167,6 +169,13 @@ function updateAudioFeedback() {
     setTimeout(updateAudioFeedback,50);
 }
 
+function drawVideo() {
+  c2.drawImage( video3, 0, 0, 1280, 720 );
+  c2.drawImage( canvas, 0, 0, 1280, 720 );
+  // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
+  setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
+}
+
 function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
   var l = window.location;
   var wsHost = (hostname != undefined) ? hostname : l.hostname;
@@ -236,8 +245,11 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
 }
 
 window.onload = function() {
+  // stream is the incoming front stream
   var vidstream = document.getElementById("stream");
+  // stream2 is the incoming surface stream
   html5VideoElement2 = document.getElementById("stream2");
+  // "canvas"/context is the primary, visible drawing surface
   canvas = document.getElementById("canvas");
   //fixCanvas(canvas);
   context = canvas.getContext("2d");
@@ -260,24 +272,35 @@ window.onload = function() {
   mycolor = colors[Math.floor(Math.random() * colors.length)];
   context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 
+  // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
   canvas2 = document.getElementById("canvas2");
   c2 = canvas2.getContext("2d");
   canvas2.width=1280;
   canvas2.height=720;
 
+  // canvas3/c3 is for the virtual avatar front stream in VR
   canvas3 = document.getElementById("canvas3");
+  if (canvas3) {
   c3 = canvas3.getContext("webgl");
   canvas3.width=640;
   canvas3.height=360;
+  }
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
 
-  inputelem = document.getElementById("fileElem");
+  // "stream3"/video3 is for the local desktop capture stream
+  video3 = document.getElementById("stream3");
+  startbtn = document.getElementById("start");
 
-  if (inputelem) inputelem.addEventListener("change", function(e) {
-    const img = new Image(); //document.getElementById("buffer");
-    img.src = URL.createObjectURL(e.target.files[0]);
-    img.onload = () => { URL.revokeObjectURL(img.src); context.drawImage(img,0,0); c2.drawImage(img,0,0); }
+  if (startbtn) startbtn.addEventListener("click", function(e) {
+    let captureopts = { video: { width: 1280 }, audio: false, surfaceSwitching: "include", selfBrowserSurface: "exclude" };
+    navigator.mediaDevices.getDisplayMedia(captureopts).then( (stream) => {
+      console.log(stream);
+      windowstream = stream.getVideoTracks()[0];
+      video3.srcObject = stream;
+      video3.play().catch(reportError);
+      drawVideo();
+    } );
   } );
 };

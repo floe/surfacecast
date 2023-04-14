@@ -9,12 +9,11 @@ gi.require_version('GstSdp', '1.0')
 from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
 
 from gst_helpers import *
-from webrtc_peer import WebRTCPeer
+from webrtc_peer import WebRTCDecoder
 from client import BaseClient
 
 args = None
 flags = []
-sink = ""
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, wrb):
@@ -24,21 +23,26 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCPeer(connection,"client",args.stun,True,flags)
+    wrb = WebRTCDecoder(connection,"client",args.stun,True,flags,surf_pipe=args.sp) # e.g. "udpsink host=224.1.1.1 port=3000 auto-multicast=true"
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
 # element message was posted on bus
 def message_cb(bus, message):
+    name = message.src.name
     struct = message.get_structure()
-    res, val = struct.get_uint64("window-handle")
-    if res:
+    # use window-handle message to set title
+    if "fps-display" in name and "have-window-handle" in struct.get_name():
+        toplevel = message.src.parent.parent.name
+        logging.debug("Setting window name for "+toplevel+"...")
+        res, val = struct.get_uint64("window-handle")
         # FIXME: this is obviously a hack...
-        os.system("xprop -id "+str(val)+" -format _NET_WM_NAME 8u -set _NET_WM_NAME "+sink)
+        os.system("xprop -id "+str(val)+" -format _NET_WM_NAME 8u -set _NET_WM_NAME "+toplevel)
+    # debug output for automated tests
+    if "zbar" in name:
+        logging.debug(message.get_structure().to_string())
 
 def on_element_added(thebin, element):
-
-    global sink
 
     name = element.get_name()
     if not name.startswith("output_"):
@@ -48,8 +52,8 @@ def on_element_added(thebin, element):
 
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
-        add_and_link([ element, new_element("videoconvert"), new_element("fpsdisplaysink", {"text-overlay":args.debug}) ])
-        sink = name
+        videopipe = "videoconvert ! fpsdisplaysink sync=false name={name} text-overlay={debug!s}" if name == "front" or args.out == "" else args.out
+        add_and_link([ element, Gst.parse_bin_from_description( videopipe.format(name=name,debug=bool(args.debug)), True ) ])
     elif name == "audio":
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
@@ -59,7 +63,7 @@ def yesman(msg, cert, flags):
        return True
 
 # "main"
-print("\nSurfaceStreams frontend client v0.1.0 - https://github.com/floe/surfacestreams\n")
+print("\nSurfaceStreams frontend client v0.2.2 - https://github.com/floe/surfacestreams\n")
 
 parser = argparse.ArgumentParser()
 
@@ -76,6 +80,8 @@ parser.add_argument("-p","--port",   help="server HTTPS listening port",  defaul
 parser.add_argument("-n","--nick",   help="client nickname", default=""                            )
 parser.add_argument(     "--persp",  help="perspective transform", default=""                      )
 parser.add_argument(     "--size",   help="surface stream output size", default="1280x720"         )
+parser.add_argument(     "--out",    help="video output pipeline", default=""                      )
+parser.add_argument(     "--sp",     help="surface processing pipeline", default=""                )
 
 args = parser.parse_args()
 args.size = [ int(n) for n in args.size.split("x") ]
