@@ -23,7 +23,7 @@ def ws_close_handler(connection, wrb):
 # outgoing Websocket connection
 def ws_conn_handler(session, result):
     connection = session.websocket_connect_finish(result)
-    wrb = WebRTCDecoder(connection,"client",args.stun,True,flags)
+    wrb = WebRTCDecoder(connection,"client",args.stun,True,flags,surf_pipe=args.sp) # e.g. "udpsink host=224.1.1.1 port=3000 auto-multicast=true"
     client = BaseClient("client",wrb)
     connection.connect("closed",ws_close_handler,wrb)
 
@@ -52,8 +52,8 @@ def on_element_added(thebin, element):
 
     if name == "front" or name == "surface":
         logging.info("Starting video output for "+name)
-        videopipe = "videoconvert ! fpsdisplaysink sync=false name={name} text-overlay={args.debug!s}" if args.out == "" else args.out
-        add_and_link([ element, Gst.parse_bin_from_description( videopipe.format(name=name,args=args), True ) ])
+        videopipe = "videoconvert ! fpsdisplaysink sync=false name={name} text-overlay={debug!s}" if name == "front" or args.out == "" else args.out
+        add_and_link([ element, Gst.parse_bin_from_description( videopipe.format(name=name,debug=bool(args.debug)), True ) ])
     elif name == "audio":
         logging.info("Starting audio output")
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
@@ -77,6 +77,7 @@ parser.add_argument("-n","--nick",   help="client nickname", default=""         
 parser.add_argument(     "--persp",  help="perspective transform", default=""                      )
 parser.add_argument(     "--size",   help="surface stream output size", default="1280x720"         )
 parser.add_argument(     "--out",    help="video output pipeline", default=""                      )
+parser.add_argument(     "--sp",     help="surface processing pipeline", default=""                )
 
 args = parser.parse_args()
 args.size = [ int(n) for n in args.size.split("x") ]
