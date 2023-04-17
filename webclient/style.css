@@ -11,6 +11,12 @@
   justify-content: center;
 }
 
+#clearAll_btn {
+  position: absolute;
+  top: 10px;
+  left: 330px;
+}
+
 #bg_btn {
   margin-left: 10px;
 } 
@@ -153,11 +159,11 @@
     
     width: auto;
     height: auto;
-    border: 1px solid grey;  
+    border: 0px solid grey;
     cursor: move;
     position: absolute;
     top: 50px;
-    left: 300px;
+    left: 400px;
 }
 
 .new_sticker img {

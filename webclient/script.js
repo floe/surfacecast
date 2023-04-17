@@ -2,10 +2,20 @@ let bgSubmenuIsOpen = false;
 let effectSubmenuIsOpen = false;
 var background = "";
 
+$('#clearAll_btn').on("click", function() {
+    $("#canvas").empty();
+});
+
+$('#brush_btn').on("click", function() {
+    bgBtnDeactive();
+    effectBtnDeactive();
+    brushBtnActive();
+});
 
 $('#bg_btn').on("click", function() {
     bgBtnActive();
     effectBtnDeactive();
+    brushBtnDeactive();
 });
 
 function changeBg(btn){
@@ -23,6 +33,7 @@ function defaultBg(){$('#fakecanvas').css("background", "none");}
 $('#effect_btn').on("click", function() {
     effectBtnActive();  
     bgBtnDeactive();
+    brushBtnDeactive();
     stickModeOn = false;
 });
 
@@ -114,12 +125,15 @@ function add_sticker(elem) {
     function setStickerScale(scale) {
       sticker_scale = scale;
       sticker_img.style.transform = "scale(" + scale + ")";
+      //var rotation = getRotationDegrees(sticker_img);
+      //sticker_img.style.transform = "scale(" + scale + ") rotate(" + rotation + "deg)";
+
       sticker.style.width = (sticker_img.clientWidth * scale) + 'px';
       sticker.style.height = (sticker_img.clientHeight * scale) + 'px';
     }
 
     sticker.ondblclick = function() {
-      this.style.border = "1px solid grey";
+      //this.style.border = "1px solid grey";
       this.querySelector('.delete_sticker_btn').style.visibility = "visible";
       this.querySelector('.confirm_sticker_btn').style.visibility = "visible";
       this.querySelector('.rotate_sticker_btn').style.visibility = "visible";
@@ -156,7 +170,7 @@ function add_sticker(elem) {
     let currentRotation = 0;
     rotate_btn.onclick = function(){
       currentRotation = (currentRotation + 90) % 360;
-      sticker_img.style.transform = 'rotate(' + currentRotation + 'deg)';
+      sticker.style.transform = 'rotate(' + currentRotation + 'deg)';
     };
 
     sticker.appendChild(sticker_img);
@@ -168,6 +182,15 @@ function add_sticker(elem) {
     drawStickers();
 }
 
+function brushBtnActive() {
+    $('#brush_btn').css({background: "grey" });
+    $('#brush_svg').css({stroke: "white"});
+}
+
+function brushBtnDeactive() {
+     $('#brush_btn').css({background: "none" });
+     $('#brush_svg').css({stroke: "#515151"});
+}
 
 function bgBtnActive() {
     $('#bg_btn').css({background: "grey" });
