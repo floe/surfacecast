@@ -30,4 +30,7 @@ for line in sys.stdin:
     avg2 += diff*diff
 
     var = math.fabs(avg2 - (avg*avg)/count)
-    print(avg/count,math.sqrt(var/count))
+    print(count, avg/count,math.sqrt(var/count))
+
+    if count >= 1000:
+        sys.exit(0)
