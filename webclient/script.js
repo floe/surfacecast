@@ -4,6 +4,9 @@ var background = "";
 
 $('#clearAll_btn').on("click", function() {
     $("#fakecanvas").empty();
+    context.globalCompositeOperation = "destination-out";
+    context.fillStyle = "rgba(0,0,0,255)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 });
 
 $('#brush_btn').on("click", function() {
@@ -349,8 +352,12 @@ function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
 // TODO: animations
 function drawStickers() {
   var stickers = $('#fakecanvas')[0].childNodes;
-  c2.fillRect(0, 0, canvas2.width, canvas2.height);
-  if (background) { myDrawImage(c2,background,0,0); }
+  if (background) {
+    myDrawImage(c2,background,0,0);
+  } else {
+    c2.fillStyle = "rgba(0,255,0,255)";
+    c2.fillRect(0, 0, canvas2.width, canvas2.height);
+  }
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
     var transform1 = sticker.style.transform;
@@ -361,6 +368,7 @@ function drawStickers() {
     if (transform2 && transform2.includes("scale"))  scale = transform2.split("(")[1].split(")")[0];
     myDrawImage(c2,sticker.firstChild,sticker.offsetLeft,sticker.offsetTop,angle,scale);
   }
+  c2.drawImage( canvas,0,0 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
