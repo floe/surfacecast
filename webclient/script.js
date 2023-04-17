@@ -3,7 +3,7 @@ let effectSubmenuIsOpen = false;
 var background = "";
 
 $('#clearAll_btn').on("click", function() {
-    $("#canvas").empty();
+    $("#fakecanvas").empty();
 });
 
 $('#brush_btn').on("click", function() {
@@ -28,7 +28,11 @@ function changeBg(btn){
     background.src = url[3]+"/"+url[4].split("\"")[0];
 }
 
-function defaultBg(){$('#fakecanvas').css("background", "none");}
+function defaultBg(){
+    //$('#fakecanvas').css("background", "none");
+    background=null;
+    bgBtnDeactive();
+}
 
 $('#effect_btn').on("click", function() {
     effectBtnActive();  
@@ -182,14 +186,26 @@ function add_sticker(elem) {
     drawStickers();
 }
 
+// courtesy of https://gist.github.com/derek-dchu/8c828fc40b17646cbb78
+function swapElement(a, b) {
+  // create a temporary marker div
+  var aNext = $('<div>').insertAfter(a);
+  a.insertAfter(b);
+  b.insertBefore(aNext);
+  // remove marker div
+  aNext.remove();
+}
+
 function brushBtnActive() {
     $('#brush_btn').css({background: "grey" });
     $('#brush_svg').css({stroke: "white"});
+    swapElement($('#fakecanvas'),$('#canvas'));
 }
 
 function brushBtnDeactive() {
      $('#brush_btn').css({background: "none" });
      $('#brush_svg').css({stroke: "#515151"});
+     swapElement($('#fakecanvas'),$('#canvas'));
 }
 
 function bgBtnActive() {
@@ -334,14 +350,15 @@ function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
 function drawStickers() {
   var stickers = $('#fakecanvas')[0].childNodes;
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
-  if (background) { console.log(background); myDrawImage(c2,background,0,0); }
+  if (background) { myDrawImage(c2,background,0,0); }
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
-    var transform = sticker.firstChild.style.transform;
+    var transform1 = sticker.style.transform;
+    var transform2 = sticker.firstChild.style.transform;
     var angle = 0;
     var scale = 1;
-    if (transform.includes("rotate")) angle = transform.split("(")[1].split("d")[0];
-    if (transform.includes("scale"))  scale = transform.split("(")[1].split(")")[0];
+    if (transform1 && transform1.includes("rotate")) angle = transform1.split("(")[1].split("d")[0];
+    if (transform2 && transform2.includes("scale"))  scale = transform2.split("(")[1].split(")")[0];
     myDrawImage(c2,sticker.firstChild,sticker.offsetLeft,sticker.offsetTop,angle,scale);
   }
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
