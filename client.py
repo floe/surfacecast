@@ -150,6 +150,10 @@ class Client(BaseClient):
         self.wrb.cleanup()
         self.wrb = None
 
+        # unlock the new connection mutex
+        if self.mutex != None and self.mutex.locked():
+            self.mutex.release()
+
         logging.info("Client "+self.name+" unlinked.")
 
     # create mixer & converter
@@ -252,7 +256,7 @@ class Client(BaseClient):
         self.link_streams("audio")
 
         # unlock the new connection mutex
-        if self.mutex != None:
+        if self.mutex != None and self.mutex.locked():
             self.mutex.release()
 
 # new top-level element added to pipeline
