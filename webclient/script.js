@@ -1,5 +1,6 @@
 let bgSubmenuIsOpen = false;
 let effectSubmenuIsOpen = false;
+let brushMenuIsOpen = false;
 var background = "";
 
 $('#clearAll_btn').on("click", function() {
@@ -10,9 +11,13 @@ $('#clearAll_btn').on("click", function() {
 });
 
 $('#brush_btn').on("click", function() {
+  if (brushMenuIsOpen) {
+    brushBtnDeactive();
+  } else {
     bgBtnDeactive();
     effectBtnDeactive();
     brushBtnActive();
+  }
 });
 
 $('#bg_btn').on("click", function() {
@@ -203,12 +208,14 @@ function brushBtnActive() {
     $('#brush_btn').css({background: "grey" });
     $('#brush_svg').css({stroke: "white"});
     swapElement($('#fakecanvas'),$('#canvas'));
+    brushMenuIsOpen = true;
 }
 
 function brushBtnDeactive() {
      $('#brush_btn').css({background: "none" });
      $('#brush_svg').css({stroke: "#515151"});
      swapElement($('#fakecanvas'),$('#canvas'));
+     brushMenuIsOpen = false;
 }
 
 function bgBtnActive() {
