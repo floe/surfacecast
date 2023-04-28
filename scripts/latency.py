@@ -5,6 +5,10 @@ count = 0
 avg = 0
 avg2 = 0
 
+offset = 10000
+if len(sys.argv) > 1:
+    offset = sys.argv[1]
+
 #[DEBUG] barcode, timestamp=(guint64)6358626351, stream-time=(guint64)6358626351, running-time=(guint64)6358626351, type=(string)QR-Code, symbol=(string)"\{\"TIMESTAMP\":10604463965\,\"BUFFERCOUNT\":160\,\"FRAMERATE\":\"15/1\"\,\"NAME\":\"DEBUGQROVERLAY0\"\}", quality=(int)1, duration=(guint64)66666666;
 
 for line in sys.stdin:
@@ -22,7 +26,7 @@ for line in sys.stdin:
 
     diff = float(t_remote[1].strip("\\")) - float(t_local[1])
     # convert to ms, with 10 sec offset
-    diff = math.fabs(10000 - diff/1000000)
+    diff = math.fabs(int(offset) - diff/1000000)
     #print(diff)
 
     count += 1

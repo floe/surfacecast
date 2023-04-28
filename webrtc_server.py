@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys,gi,json,argparse,datetime,threading
+import sys,gi,json,argparse,datetime,threading,time
 gi.require_version('GLib', '2.0')
 gi.require_version('Gst',  '1.0')
 gi.require_version('Soup', '2.4')
@@ -57,10 +57,12 @@ def ws_close_handler(connection, client):
 # incoming Websocket connection
 def ws_conn_handler(server, connection, path, client, user_data):
 
+    time.sleep(1)
+
     source = get_client_address(client)
     logging.info("New WebSocket connection from: "+source)
 
-    mutex.acquire()
+    #mutex.acquire()
 
     wrb = WebRTCDecoder(connection,source,args.stun)
     new_client = Client(source,wrb,args.size[0],args.size[1],mutex)
