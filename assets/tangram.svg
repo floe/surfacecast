@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="tangram.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:object-paths="true"
+     inkscape:snap-midpoints="true"
+     inkscape:zoom="0.69965671"
+     inkscape:cx="1224.1718"
+     inkscape:cy="631.73838"
+     inkscape:window-width="2560"
+     inkscape:window-height="1440"
+     inkscape:window-x="0"
+     inkscape:window-y="-37"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.19999981;stroke-dasharray:none"
+       id="rect846"
+       width="149.89999"
+       height="149.89999"
+       x="29.883945"
+       y="82.873863"
+       rx="0.10000006"
+       ry="0.10000006" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:5.19999981;stroke-dasharray:none"
+       d="M 29.883946,232.77386 179.78393,82.873862"
+       id="path961" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:5.19999981;stroke-dasharray:none"
+       d="m 179.78393,232.77386 -74.94999,-74.95"
+       id="path963" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:5.19999981;stroke-dasharray:none"
+       d="m 29.883946,157.82386 74.949994,-74.949998 37.475,37.474998"
+       id="path965" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:5.19999981;stroke-dasharray:none"
+       d="m 104.83394,157.82386 -37.474998,-37.475 v 74.95"
+       id="path967" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="M 319.924,76.846599 357.399,39.371601 394.874,76.846599 357.399,114.3216 Z"
+       id="path859"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram3.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 368.27596,25.588909 37.475,37.474998 37.47499,-37.474998 z"
+       id="path974"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/path974.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 304.99522,165.70345 37.47499,-37.475 -37.47499,-37.474991 z"
+       id="path974-3"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram4.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 272.24263,102.00638 347.19262,27.056381 H 272.24263 Z"
+       id="path1350"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram2.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 256.94248,216.85377 37.47499,-37.475 v -74.95 l -37.47499,37.475 z"
+       id="path1465"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram5.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 278.52737,223.30025 74.95,-74.95 74.94999,74.95 z"
+       id="path1598"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram7.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 444.72079,209.25837 -74.94999,-74.95 74.94999,-74.949987 z"
+       id="path1598-6"
+       inkscape:export-filename="/home/floe/src/surfacestreams/assets/tangram6.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </g>
+</svg>
