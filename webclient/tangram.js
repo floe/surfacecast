@@ -116,7 +116,7 @@ function add_sticker(elem) {
       if (isDragging && isConfirm == false) {
         sticker.style.left = (e.touches[0].clientX + offset[0]) + 'px';
         sticker.style.top  = (e.touches[0].clientY + offset[1]) + 'px';
-        console.log("offset:"+offset);
+        //console.log("offset:"+offset);
       }
       
       if (isResizing) {
@@ -375,7 +375,8 @@ function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
 
 // TODO: animations
 function drawStickers() {
-  var stickers = $('#fakecanvas')[0].childNodes;
+  var fc = $('#fakecanvas')[0];
+  var stickers = fc.childNodes;
   if (background) {
     myDrawImage(c2,background,0,0);
   } else {
@@ -390,9 +391,14 @@ function drawStickers() {
     var scale = 1;
     if (transform1 && transform1.includes("rotate")) angle = transform1.split("(")[1].split("d")[0];
     if (transform2 && transform2.includes("scale"))  scale = transform2.split("(")[1].split(")")[0];
-    myDrawImage(c2,sticker.firstChild,sticker.offsetLeft,sticker.offsetTop,angle,scale);
-    console.log("canvas:"+sticker.style.left+" "+sticker.style.top);
-    console.log("canvas:"+sticker.offsetLeft+" "+sticker.offsetTop);
+    var scalex = canvas2.width  / canvas2.offsetWidth;
+    var scaley = canvas2.height / canvas2.offsetHeight;
+    var x = sticker.offsetLeft * (1280 / canvas2.offsetWidth );
+    var y = sticker.offsetTop  * ( 720 / canvas2.offsetHeight);
+    myDrawImage(c2,sticker.firstChild,x,y,angle,scale*scalex);
+    //console.log("fc:"+fc.offsetWidth+" "+fc.offsetHeight);
+    //console.log("sticker:"+sticker.offsetLeft+" "+sticker.offsetTop);
+    //console.log("sx sy:"+scalex+" "+scaley);
   }
   c2.drawImage( canvas,0,0 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
