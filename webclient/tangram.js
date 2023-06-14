@@ -143,7 +143,7 @@ function add_sticker(elem) {
       var touch2 = touches[1];
       var dx = touch1.clientX - touch2.clientX;
       var dy = touch1.clientY - touch2.clientY;
-      return Math.atan(dy/dx);
+      return Math.atan2(dy,dx);
     }
 
     function setStickerScale(scale) {
