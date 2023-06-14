@@ -303,4 +303,5 @@ window.onload = function() {
       drawVideo();
     } );
   } );
+  setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
 };

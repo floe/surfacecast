@@ -104,6 +104,7 @@ function add_sticker(elem) {
         startAngle    = getAngleBetweenTouches(e.touches);
         startScale = sticker_scale;
       }
+      sticker.parentNode.appendChild(sticker);
     });  
     
     sticker.addEventListener("touchend", function() {
@@ -209,7 +210,7 @@ function add_sticker(elem) {
     if(elem.className == "rotatable"){sticker.appendChild(rotate_btn);}*/
   
     $('#fakecanvas').append(sticker);
-    drawStickers();
+    //drawStickers();
 }
 
 // courtesy of https://gist.github.com/derek-dchu/8c828fc40b17646cbb78
@@ -404,3 +405,11 @@ function drawStickers() {
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
+
+add_sticker($("#t1"));
+add_sticker($("#t2"));
+add_sticker($("#t3"));
+add_sticker($("#t4"));
+add_sticker($("#t5"));
+add_sticker($("#t6"));
+add_sticker($("#t7"));
