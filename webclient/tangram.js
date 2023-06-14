@@ -102,6 +102,9 @@ function add_sticker(elem) {
         isResizing = true;
         startDistance = getDistanceBetweenTouches(e.touches);
         startAngle    = getAngleBetweenTouches(e.touches);
+        curAngle = 0;
+        if (sticker.style.transform) curAngle = Number(sticker.style.transform.split("(")[1].split("d")[0]);
+        console.log(curAngle);
         startScale = sticker_scale;
       }
       sticker.parentNode.appendChild(sticker);
@@ -125,8 +128,9 @@ function add_sticker(elem) {
         var newScale = startScale * (currentDistance / startDistance);
         setStickerScale(newScale);*/
         var currentAngle = getAngleBetweenTouches(e.touches);
-        var newAngle = startAngle - currentAngle;
-        setStickerRotation(newAngle);
+        var deltaAngle = startAngle - currentAngle;
+        console.log(currentAngle,deltaAngle,curAngle);
+        setStickerRotation(curAngle+deltaAngle);
       }
     });
   
@@ -143,7 +147,7 @@ function add_sticker(elem) {
       var touch2 = touches[1];
       var dx = touch1.clientX - touch2.clientX;
       var dy = touch1.clientY - touch2.clientY;
-      return Math.atan2(dy,dx);
+      return -360*Math.atan2(dy,dx)/(2*Math.PI);
     }
 
     function setStickerScale(scale) {
@@ -157,7 +161,7 @@ function add_sticker(elem) {
     }
 
     function setStickerRotation(rotation) {
-      var tmp = "rotate(" + -360*rotation/(2*Math.PI) + "deg)";
+      var tmp = "rotate(" + rotation + "deg)";
       sticker.style.transform = tmp;
       //var rotation = getRotationDegrees(sticker_img);
       //sticker_img.style.transform = "scale(" + scale + ") rotate(" + rotation + "deg)";
