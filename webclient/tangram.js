@@ -417,3 +417,5 @@ add_sticker($("#t4"));
 add_sticker($("#t5"));
 add_sticker($("#t6"));
 add_sticker($("#t7"));
+
+$("#stream").on("click", function(){document.documentElement.requestFullscreen();});
