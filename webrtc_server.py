@@ -73,10 +73,10 @@ print("\nSurfaceStreams backend mixing server v0.2.2 - https://github.com/floe/s
 print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-outfile = datetime.datetime.now().strftime("surfacestreams-%Y%m%d-%H%M%S.mp4")
+outfile = datetime.datetime.now().strftime("surfacestreams-%Y%m%d-%H%M%S.mkv")
 
 parser.add_argument("-d","--debug", help="more debug output (-dd=max)",  action="count",default=1 )
-parser.add_argument("-s","--sink",  help="save all streams to MP4 file", action="store_true"      )
+parser.add_argument("-s","--sink",  help="save all streams to MKV file", action="store_true"      )
 parser.add_argument("-p","--port",  help="server HTTPS listening port",  default=8080             )
 parser.add_argument("-o","--out",   help="MP4 output filename", default=outfile                   )
 parser.add_argument("-u","--stun",  help="STUN server", default="stun://stun.l.google.com:19302"  )

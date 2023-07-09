@@ -19,7 +19,7 @@ AENCODER="queue max-size-time=100000000 leaky=downstream ! opusenc bitrate-type=
 RTPVIDEO="h264parse config-interval=-1 ! rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
 #RTPVIDEO="rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
 RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
-FILESINK="mp4mux name=mux fragment-duration=1000 latency=100000000 ! filesink sync=true location="
+FILESINK="matroskamux name=mux offset-to-zero=true ! filesink sync=true location="
 
 bindesc="webrtcbin name=webrtcbin bundle-policy=max-bundle stun-server=%s "+\
   "videoconvert name=front   ! "+VENCODER+RTPVIDEO+"payload=96 ! webrtcbin. "+\

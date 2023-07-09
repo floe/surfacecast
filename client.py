@@ -270,7 +270,7 @@ def on_element_added(thebin, element):
     direction = elname[0]
     source = elname[1]+"_"+elname[2]
     stype = elname[3]
-    #logging.debug("New element: "+direction+" "+source+" "+stype)
+    logging.debug("New terminal element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
     if direction == "output":
