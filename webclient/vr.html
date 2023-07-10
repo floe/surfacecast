@@ -28,7 +28,9 @@
           if (!this.raycaster) { return; }  // Not intersecting.
           let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
           if (!intersection) { return; }
-          let btn = (this.raycaster.components["laser-controls"].attrValue["hand"] == "right") ? 1 : 2;
+          let laser = this.raycaster.components["laser-controls"];
+          if (!laser) { return; }
+          let btn = (laser.attrValue["hand"] == "right") ? 1 : 2;
           // FIXME: hardcoded canvas size
           const evt = { offsetX: Math.round(intersection.uv.x*1280), offsetY: 720-Math.round(intersection.uv.y*720), buttons: btn, type: "fakemouse" };
           if (mousedown == -1) onCanvasDown(evt);
@@ -50,7 +52,7 @@
         <canvas id="canvas3"></canvas>
       </a-assets>
       <a-entity camera="active: true" look-controls wasd-controls position="0 1.6 0">
-        <a-entity avatar position="0 0 0.1" rotation="0 180 0">
+        <a-entity avatar position="0 0 0.3" rotation="0 180 0" scale="2 2 2">
           <a-entity geometry="primitive: box; width: 0.2; height: 0.2; depth: 0.2" material="color: blue" position="0 0 0"></a-entity>
           <a-entity geometry="primitive: cylinder; height:0.001; radius: 0.02" material="color: white" position=" 0.05 0.05 0.1" rotation="90 0 0"></a-entity>
           <a-entity geometry="primitive: cylinder; height:0.001; radius: 0.02" material="color: white" position="-0.05 0.05 0.1" rotation="90 0 0"></a-entity>
