@@ -246,11 +246,11 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
 
 window.onload = function() {
   // stream is the incoming front stream
-  var vidstream = document.getElementById("stream");
+  var vidstream = document.getElementById("frontoutput");
   // stream2 is the incoming surface stream
-  html5VideoElement2 = document.getElementById("stream2");
+  html5VideoElement2 = document.getElementById("surfaceoutput");
   // "canvas"/context is the primary, visible drawing surface
-  canvas = document.getElementById("canvas");
+  canvas = document.getElementById("surfacecanvas");
   //fixCanvas(canvas);
   context = canvas.getContext("2d");
   canvas.width=1280;
@@ -273,13 +273,13 @@ window.onload = function() {
   context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 
   // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
-  canvas2 = document.getElementById("canvas2");
+  canvas2 = document.getElementById("surfacesource");
   c2 = canvas2.getContext("2d");
   canvas2.width=1280;
   canvas2.height=720;
 
   // canvas3/c3 is for the virtual avatar front stream in VR
-  canvas3 = document.getElementById("canvas3");
+  canvas3 = document.getElementById("frontsource");
   if (canvas3) {
   c3 = canvas3.getContext("webgl");
   canvas3.width=640;
@@ -290,7 +290,7 @@ window.onload = function() {
   c2.fillRect(0, 0, canvas2.width, canvas2.height);
 
   // "stream3"/video3 is for the local desktop capture stream
-  video3 = document.getElementById("stream3");
+  video3 = document.getElementById("desktopsource");
   startbtn = document.getElementById("start");
 
   if (startbtn) startbtn.addEventListener("click", function(e) {
