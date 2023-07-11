@@ -1,11 +1,11 @@
-var html5VideoElement;
-var html5VideoElement2;
+var frontoutput;
+var surfaceoutput;
 var websocketConnection;
 var webrtcPeerConnection;
 var webrtcConfiguration;
 var reportError;
 var datastream;
-var canvas,canvas2,canvas3;
+var canvas,surfacesource,frontsource;
 var context,c2,c3;
 var canvasstream;
 var mousedown;
@@ -19,7 +19,7 @@ var remotemap;
 var frontstream;
 var surfacestream;
 var windowstream = null;
-var video3;
+var desktopsource;
 
 var audioCtx;
 var analyser;
@@ -98,8 +98,8 @@ function onAddRemoteStream(event) {
 
   if (remotemap[event.transceiver.mid] == "front") {
     frontstream.addTrack(event.track);
-    html5VideoElement.srcObject = frontstream;
-    html5VideoElement.play().catch(reportError);
+    frontoutput.srcObject = frontstream;
+    frontoutput.play().catch(reportError);
   }
 
   if (remotemap[event.transceiver.mid] == "audio") {
@@ -108,8 +108,8 @@ function onAddRemoteStream(event) {
 
   if (remotemap[event.transceiver.mid] == "surface") {
     surfacestream.addTrack(event.track);
-    html5VideoElement2.srcObject = surfacestream;
-    html5VideoElement2.play().catch(reportError);
+    surfaceoutput.srcObject = surfacestream;
+    surfaceoutput.play().catch(reportError);
   }
 }
 
@@ -170,22 +170,16 @@ function updateAudioFeedback() {
 }
 
 function drawVideo() {
-  c2.drawImage( video3, 0, 0, 1280, 720 );
+  c2.drawImage( desktopsource, 0, 0, 1280, 720 );
   c2.drawImage( canvas, 0, 0, 1280, 720 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
 }
 
-function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
+function playStream(configuration, reportErrorCB) {
   var l = window.location;
-  var wsHost = (hostname != undefined) ? hostname : l.hostname;
-  var wsPort = (port != undefined) ? port : l.port;
-  var wsPath = (path != undefined) ? path : "ws";
-  if (wsPort)
-    wsPort = ":" + wsPort;
-  var wsUrl = "wss://" + wsHost + wsPort + "/" + wsPath;
+  var wsUrl = "wss://" + l.hostname + ":" + l.port + "/ws";
 
-  html5VideoElement = videoElement;
   webrtcConfiguration = configuration;
   reportError = (reportErrorCB != undefined) ? reportErrorCB : function(text) {};
   frontstream = new MediaStream();
@@ -220,7 +214,7 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
         fronttrack = vidtracks[0];
         console.log("using camera track for front");
       } else {
-        canvasstream = canvas3.captureStream(15);
+        canvasstream = frontsource.captureStream(15);
         fronttrack = canvasstream.getVideoTracks()[0];
         console.log("using fake front stream");
         //fronttrack.contentHint = "detail";
@@ -228,13 +222,13 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       fronttrans = fronttrack.id;
       webrtcPeerConnection.addTrack(fronttrack);
 
-      canvasstream = canvas2.captureStream(15);
+      canvasstream = surfacesource.captureStream(15);
       canvastrack = canvasstream.getVideoTracks()[0];
       canvastrack.contentHint = "detail";
       surfacetrans = canvastrack.id;
       webrtcPeerConnection.addTrack(canvastrack, stream);
       // make sure that the canvas stream starts by triggering a delayed paint operation
-      setTimeout(() => { c2.fillRect(0, 0, canvas2.width, canvas2.height); }, 1000);
+      setTimeout(() => { c2.fillRect(0, 0, surfacesource.width, surfacesource.height); }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
@@ -246,9 +240,9 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
 
 window.onload = function() {
   // stream is the incoming front stream
-  var vidstream = document.getElementById("frontoutput");
+  frontoutput = document.getElementById("frontoutput");
   // stream2 is the incoming surface stream
-  html5VideoElement2 = document.getElementById("surfaceoutput");
+  surfaceoutput = document.getElementById("surfaceoutput");
   // "canvas"/context is the primary, visible drawing surface
   canvas = document.getElementById("surfacecanvas");
   //fixCanvas(canvas);
@@ -267,30 +261,30 @@ window.onload = function() {
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
   var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
-  playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
+  playStream(config, function (errmsg) { console.error(errmsg); });
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
   context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 
   // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
-  canvas2 = document.getElementById("surfacesource");
-  c2 = canvas2.getContext("2d");
-  canvas2.width=1280;
-  canvas2.height=720;
+  surfacesource = document.getElementById("surfacesource");
+  c2 = surfacesource.getContext("2d");
+  surfacesource.width=1280;
+  surfacesource.height=720;
 
   // canvas3/c3 is for the virtual avatar front stream in VR
-  canvas3 = document.getElementById("frontsource");
-  if (canvas3) {
-  c3 = canvas3.getContext("webgl");
-  canvas3.width=640;
-  canvas3.height=360;
+  frontsource = document.getElementById("frontsource");
+  if (frontsource) {
+  c3 = frontsource.getContext("webgl");
+  frontsource.width=640;
+  frontsource.height=360;
   }
 
   c2.fillStyle = "rgba(0,255,0,255)";
-  c2.fillRect(0, 0, canvas2.width, canvas2.height);
+  c2.fillRect(0, 0, surfacesource.width, surfacesource.height);
 
   // "stream3"/video3 is for the local desktop capture stream
-  video3 = document.getElementById("desktopsource");
+  desktopsource = document.getElementById("desktopsource");
   startbtn = document.getElementById("start");
 
   if (startbtn) startbtn.addEventListener("click", function(e) {
@@ -298,8 +292,8 @@ window.onload = function() {
     navigator.mediaDevices.getDisplayMedia(captureopts).then( (stream) => {
       console.log(stream);
       windowstream = stream.getVideoTracks()[0];
-      video3.srcObject = stream;
-      video3.play().catch(reportError);
+      desktopsource.srcObject = stream;
+      desktopsource.play().catch(reportError);
       drawVideo();
     } );
   } );
