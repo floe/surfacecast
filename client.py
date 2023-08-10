@@ -67,7 +67,7 @@ class BaseClient:
         return pad
 
     # convenience function to link request pads (and keep track of pads/queues)
-    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={"leaky":"downstream","max-size-time":100000000}):
+    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={"leaky":"downstream","max-size-time":50000000}):
 
         pad1 = self.get_pad(el1,tpl1)
         pad2 = self.get_pad(el2,tpl2)
@@ -245,8 +245,8 @@ class Client(BaseClient):
         logging.info("  setting up mixers for new client "+self.name)
 
         # create surface/audio mixers
-        self.create_mixer("surface", new_element("compositor",{"latency":100000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={self.sw},height={self.sh}")}))
-        self.create_mixer(  "audio", new_element("audiomixer",{"latency":100000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        self.create_mixer("surface", new_element("compositor",{"latency":50000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={self.sw},height={self.sh}")}))
+        self.create_mixer(  "audio", new_element("audiomixer",{"latency":50000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
         # add missing frontmixer links
         self.link_to_front()
