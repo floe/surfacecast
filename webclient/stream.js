@@ -124,7 +124,7 @@ function onIceCandidate(event) {
 
 function getLocalStreams() {
   // courtesy of https://stackoverflow.com/a/33770858
-  var vidconst = { width: { ideal: 640 }, height: { ideal: 360 }, facingMode: "user" };
+  var vidconst = { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" };
   return navigator.mediaDevices.enumerateDevices().then(devices => {
     const cams = devices.filter(device => device.kind == "videoinput");
     const mics = devices.filter(device => device.kind == "audioinput");
@@ -276,8 +276,8 @@ window.onload = function() {
   frontsource = document.getElementById("frontsource");
   if (frontsource) {
   c3 = frontsource.getContext("webgl");
-  frontsource.width=640;
-  frontsource.height=360;
+  frontsource.width=1280;
+  frontsource.height=720;
   }
 
   c2.fillStyle = "rgba(0,255,0,255)";
