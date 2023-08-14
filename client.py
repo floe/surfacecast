@@ -13,27 +13,6 @@ from webrtc_peer import WebRTCPeer
 # client object pool
 clients = {}
 
-# position offsets and src/dest dimensions for 1-4 front streams
-# FIXME: how to handle > 4 clients?
-all_offsets = [
-    [
-    ],[
-        (  0,   0, 1280, 720, 1280, 720)  # single fullscreen
-    ],[
-        (  0,   0,  640, 720,  640, 720), # pillarbox left
-        (640,   0,  640, 720,  640, 720)  # pillarbox right
-    ],[
-        (  0,   0,  640, 720,  640, 720), # pillarbox left
-        (640,   0, 1280, 720,  640, 360), # top right
-        (640, 360, 1280, 720,  640, 360)  # bottom right
-    ],[
-        (  0,   0, 1280, 720,  640, 360), # top left
-        (640,   0, 1280, 720,  640, 360), # top right
-        (  0, 360, 1280, 720,  640, 360), # bottom left
-        (640, 360, 1280, 720,  640, 360)  # bottom right
-    ]
-]
-
 # last DTS for compositor pads
 last_pts = {}
 
@@ -168,6 +147,9 @@ class Client(BaseClient):
 
         logging.info("Client "+self.name+" unlinked.")
 
+        # rearrange the remaining frontstreams
+        #arrange_frontstreams()
+
     # create mixer & converter
     def create_mixer(self,mtype,mixer,caps):
 
@@ -200,26 +182,8 @@ class Client(BaseClient):
         sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
         sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
-        # set xpos/ypos properties on pad according to sequence number
-        fm = get_by_name("frontmixer")
-        count = 0
-        offsets = all_offsets[len(fm.sinkpads)-1]
-        #print(offsets)
-        for pad in fm.sinkpads:
-            padnum = int(pad.get_name().split("_")[1])
-            if padnum == 0: # skip testsource pad
-                continue
-            padnum = count % len(offsets)
-            pad.set_property("xpos",offsets[padnum][0])
-            pad.set_property("ypos",offsets[padnum][1])
-            pad.set_property("width",offsets[padnum][4])
-            pad.set_property("height",offsets[padnum][5])
-            cc = Gst.Structure.new_empty("cc")
-            cc.set_value("GstVideoConverter.src-x",int((1280-offsets[padnum][2])/2))
-            cc.set_value("GstVideoConverter.src-width",offsets[padnum][2])
-            pad.set_property("converter-config",cc)
-            #print(pad.get_property("converter-config").to_string())
-            count += 1
+        # make it look nice
+        arrange_frontstreams()
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix):
