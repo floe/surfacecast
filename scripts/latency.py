@@ -30,6 +30,11 @@ for line in sys.stdin:
     #print(diff)
 
     count += 1
+
+    # toss the initial outliers
+    if count < 10:
+        continue
+
     avg  += diff
     avg2 += diff*diff
 
