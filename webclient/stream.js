@@ -3,7 +3,7 @@ var surfaceoutput;
 var websocketConnection;
 var webrtcPeerConnection;
 var webrtcConfiguration;
-var reportError;
+var reportError = function (errmsg) { console.error(errmsg); }
 var datastream;
 var canvas,surfacesource,frontsource;
 var context,c2,c3;
@@ -176,12 +176,10 @@ function drawVideo() {
   setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
 }
 
-function playStream(configuration, reportErrorCB) {
+function playStream() {
   var l = window.location;
   var wsUrl = "wss://" + l.hostname + ":" + l.port + "/ws";
 
-  webrtcConfiguration = configuration;
-  reportError = (reportErrorCB != undefined) ? reportErrorCB : function(text) {};
   frontstream = new MediaStream();
   surfacestream = new MediaStream();
 
@@ -197,7 +195,7 @@ function playStream(configuration, reportErrorCB) {
       datastream = webrtcPeerConnection.createDataChannel("events");
       datastream.onopen = function(event) { datastream.send("Hi from "+navigator.userAgent); }
 
-      audiotrack = stream.getAudioTracks()[0];
+      var audiotrack = stream.getAudioTracks()[0];
       audiotrans = audiotrack.id;
       webrtcPeerConnection.addTrack(audiotrack);
 
@@ -210,6 +208,7 @@ function playStream(configuration, reportErrorCB) {
       setTimeout(updateAudioFeedback,50);
 
       var vidtracks = stream.getVideoTracks();
+      var fronttrack = null;
       if (vidtracks.length > 0) {
         fronttrack = vidtracks[0];
         console.log("using camera track for front");
@@ -260,8 +259,8 @@ window.onload = function() {
   canvas.ontouchmove = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
-  var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
-  playStream(config, function (errmsg) { console.error(errmsg); });
+  webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
+  playStream();
   colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
   context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
