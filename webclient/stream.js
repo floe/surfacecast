@@ -154,21 +154,6 @@ function onServerMessage(event) {
   }
 }
 
-function updateAudioFeedback() {
-
-    var target = document.getElementById("mouth");
-    if (target === null) return;
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(dataArray);
-
-    scale = (dataArray[1]/255.0)+ (dataArray[2]/255.0);
-
-    target.object3D.scale.set(scale,scale,scale);
-    setTimeout(updateAudioFeedback,50);
-}
-
 function drawVideo() {
   c2.drawImage( desktopsource, 0, 0, 1280, 720 );
   c2.drawImage( canvas, 0, 0, 1280, 720 );
@@ -198,14 +183,6 @@ function playStream() {
       var audiotrack = stream.getAudioTracks()[0];
       audiotrans = audiotrack.id;
       webrtcPeerConnection.addTrack(audiotrack);
-
-      // from https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
-      audioCtx = new AudioContext();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source = audioCtx.createMediaStreamSource(stream);
-      source.connect(analyser);
-      setTimeout(updateAudioFeedback,50);
 
       var vidtracks = stream.getVideoTracks();
       var fronttrack = null;
@@ -270,14 +247,6 @@ window.onload = function() {
   c2 = surfacesource.getContext("2d");
   surfacesource.width=1280;
   surfacesource.height=720;
-
-  // canvas3/c3 is for the virtual avatar front stream in VR
-  frontsource = document.getElementById("frontsource");
-  if (frontsource) {
-  c3 = frontsource.getContext("webgl");
-  frontsource.width=1280;
-  frontsource.height=720;
-  }
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, surfacesource.width, surfacesource.height);
