@@ -81,6 +81,7 @@ parser.add_argument("-p","--port",  help="server HTTPS listening port",  default
 parser.add_argument("-o","--out",   help="MP4 output filename", default=outfile                   )
 parser.add_argument("-u","--stun",  help="STUN server", default="stun://stun.l.google.com:19302"  )
 parser.add_argument(     "--size",  help="surface stream output size", default="1280x720"         )
+parser.add_argument(     "--fps",   help="frames per second", default=15                          )
 
 args = parser.parse_args()
 args.size = [ int(n) for n in args.size.split("x") ]
@@ -92,8 +93,8 @@ frontsrc   = "filesrc location=assets/front.png ! pngdec ! videoconvert ! imagef
 surfacesrc = "videotestsrc is-live=true pattern=solid-color foreground-color=0" #ball motion=sweep background-color=0
 audiosrc   = "audiotestsrc is-live=true wave=silence"
 
-add_test_sources(frontsrc,surfacesrc,audiosrc,fake=True,bgcol=0xFFFF00FF,wave="sine",sw=args.size[0],sh=args.size[1])
-create_frontmixer_queue()
+add_test_sources(frontsrc,surfacesrc,audiosrc,fake=True,bgcol=0xFFFF00FF,wave="sine",sw=args.size[0],sh=args.size[1],fps=args.fps)
+create_frontmixer_queue(args.fps)
 
 server = Soup.Server()
 server.add_handler("/",http_handler,None)

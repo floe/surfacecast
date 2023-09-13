@@ -54,12 +54,12 @@ def get_request_pad(el,tpl):
     return el.request_pad(el.get_pad_template(tpl), None, None)
 
 # create single mixer for front stream
-def create_frontmixer_queue():
+def create_frontmixer_queue(fps=15):
 
     logging.info("Creating frontmixer subqueue...")
 
     frontmixer  = new_element("compositor",{"latency":50000000},myname="frontmixer")
-    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")})
+    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=I420,width=1280,height=720,framerate={fps}/1")})
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
@@ -166,7 +166,7 @@ def connect_bus(msgtype, callback, *args):
     bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks",sw=1280,sh=720):
+def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks",sw=1280,sh=720,fps=15):
 
     if fake:
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay text="+wave if frontdev == "" else frontdev
@@ -183,12 +183,12 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00F
     logging.debug("  Audio Source: "+audiosrc)
 
     add_and_link([ Gst.parse_bin_from_description( frontsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=I420,width=1280,height=720,framerate={fps}/1")}),
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
     add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={sw},height={sh},framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={sw},height={sh},framerate={fps}/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 

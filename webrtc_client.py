@@ -78,6 +78,7 @@ parser.add_argument(     "--persp",  help="perspective transform", default=""   
 parser.add_argument(     "--size",   help="surface stream output size", default="1280x720"         )
 parser.add_argument(     "--out",    help="video output pipeline", default=""                      )
 parser.add_argument(     "--sp",     help="surface processing pipeline", default=""                )
+parser.add_argument(     "--fps",    help="frames per second", default=15                          )
 
 args = parser.parse_args()
 args.size = [ int(n) for n in args.size.split("x") ]
@@ -98,7 +99,7 @@ connect_bus("message::element",message_cb)
 if not args.fake and (args.front == "" or args.surface == ""):
     logging.warning("Need to either specify --fake for test sources, or -f/-s for source devices/pipelines.")
 
-add_test_sources(args.front,args.surface,args.audio,args.fake,sw=args.size[0],sh=args.size[1])
+add_test_sources(args.front,args.surface,args.audio,args.fake,sw=args.size[0],sh=args.size[1],fps=args.fps)
 
 session = Soup.Session()
 session.set_property("ssl-strict", False)
