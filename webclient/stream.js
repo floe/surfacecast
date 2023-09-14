@@ -6,7 +6,7 @@ var webrtcConfiguration;
 var reportError = function (errmsg) { console.error(errmsg); }
 var datastream;
 var canvas,surfacesource,frontsource;
-var context,c2;
+var canvasctx,sourcectx;
 var canvasstream;
 
 var audiotrans;
@@ -150,41 +150,40 @@ function playStream() {
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
-      //websocketConnection.onopen = function(event) { websocketConnection.send("Hoi!"); };
       console.log("Capture setup complete.");
     } );
   }
 }
 
+function initcanvas(canvas,w,h,fillstyle) {
+  var context = canvas.getContext("2d");
+  canvas.width  = w;
+  canvas.height = h;
+  context.fillStyle = fillstyle;
+  context.fillRect(0,0,w,h);
+  return context;
+}
+
 window.onload = function() {
+
   // output element for incoming front stream
   frontoutput = document.getElementById("frontoutput");
   // output element for incoming surface stream
   surfaceoutput = document.getElementById("surfaceoutput");
 
-  // "canvas"/context is the primary, visible drawing surface
+  // canvas/canvasctx is the primary, visible drawing surface
   canvas = document.getElementById("surfacecanvas");
-  // FIXME: hardcoded dimensions
-  context = canvas.getContext("2d");
-  canvas.width=1280;
-  canvas.height=720;
-  context.fillStyle = "rgba(0,255,0,0)";
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  canvasctx = initcanvas(canvas,1280,720,"rgba(0,255,0,0)"); // FIXME: hardcoded dimensions
+
+  // surfacesource/sourcectx is the surface stream source (invisible drawing surface with green background)
+  surfacesource = document.getElementById("surfacesource");
+  sourcectx = initcanvas(surfacesource,1280,720,"rgba(0,255,0,255)"); // FIXME: hardcoded dimensions
+
+  // some interactive handler needed to give stream higher priority?
+  canvas.onmousemove = function(ev) { sourcectx.strokeStyle = "red"; sourcectx.fillStyle = "red"; sourcectx.fillRect(10, 10, 20, 20); }
 
   webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream();
-
-  // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
-  surfacesource = document.getElementById("surfacesource");
-  c2 = surfacesource.getContext("2d");
-  surfacesource.width=1280;
-  surfacesource.height=720;
-
-  c2.fillStyle = "rgba(0,255,0,255)";
-  c2.fillRect(0, 0, surfacesource.width, surfacesource.height);
-
-  canvas.onmousemove = function(ev) {c2.strokeStyle = "red"; c2.fillStyle = "red"; c2.fillRect(10, 10, 20, 20);}
-
 
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
 };

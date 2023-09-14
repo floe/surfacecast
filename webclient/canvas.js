@@ -34,25 +34,23 @@ function onCanvasMove(evt) {
   const centerX = evt.offsetX;
   const centerY = evt.offsetY;
 
-  paint(context, centerX, centerY, "rgba(0,  0,0,255)", "destination-out", mousedown);
-  paint(c2, centerX, centerY, "rgba(0,255,0,255)", "source-over", mousedown);
+  paint(canvasctx, centerX, centerY, "rgba(0,  0,0,255)", "destination-out", mousedown);
+  paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over", mousedown);
 
   x = centerX;
   y = centerY;
 }
 
 function canvas_init() {
-  canvas.onmousedown = onCanvasDown;
+  canvas.onmousedown  = onCanvasDown;
   canvas.ontouchstart = onCanvasDown;
-  canvas.onmouseup   = onCanvasUp;
-  canvas.ontouchend = onCanvasUp;
-  canvas.onmousemove = onCanvasMove;
-  canvas.ontouchmove = onCanvasMove;
+  canvas.onmouseup    = onCanvasUp;
+  canvas.ontouchend   = onCanvasUp;
+  canvas.onmousemove  = onCanvasMove;
+  canvas.ontouchmove  = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
 
   var colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
-
-  context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 }
