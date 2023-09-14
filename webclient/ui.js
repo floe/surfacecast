@@ -69,14 +69,14 @@ $('#bg_btn').on("click", function() {
 function brushBtnActive() {
   $('#brush_btn').css({background: "grey" });
   $('#brush_svg').css({stroke: "white"});
-  swapElement($('#fakecanvas'),$('#canvas'));
+  swapElement($('#fakecanvas'),$('#surfacecanvas'));
   brushMenuIsOpen = true;
 }
 
 function brushBtnDeactive() {
    $('#brush_btn').css({background: "none" });
    $('#brush_svg').css({stroke: "#515151"});
-   swapElement($('#fakecanvas'),$('#canvas'));
+   swapElement($('#fakecanvas'),$('#surfacecanvas'));
    brushMenuIsOpen = false;
 }
 
