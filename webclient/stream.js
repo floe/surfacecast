@@ -18,12 +18,7 @@ var fronttrans;
 var remotemap;
 var frontstream;
 var surfacestream;
-var windowstream = null;
-var desktopsource;
 
-var audioCtx;
-var analyser;
-var source;
 
 function paint(ctx, centerX, centerY, clearcolor, clearmode) {
   const radius = (mousedown == 1) ? 5 : 20;
@@ -154,13 +149,6 @@ function onServerMessage(event) {
   }
 }
 
-function drawVideo() {
-  c2.drawImage( desktopsource, 0, 0, 1280, 720 );
-  c2.drawImage( canvas, 0, 0, 1280, 720 );
-  // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
-  setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
-}
-
 function playStream() {
   var l = window.location;
   var wsUrl = "wss://" + l.hostname + ":" + l.port + "/ws";
@@ -215,13 +203,14 @@ function playStream() {
 }
 
 window.onload = function() {
-  // stream is the incoming front stream
+  // output element for incoming front stream
   frontoutput = document.getElementById("frontoutput");
-  // stream2 is the incoming surface stream
+  // output element for incoming surface stream
   surfaceoutput = document.getElementById("surfaceoutput");
+
   // "canvas"/context is the primary, visible drawing surface
   canvas = document.getElementById("surfacecanvas");
-  //fixCanvas(canvas);
+  // FIXME: hardcoded dimensions
   context = canvas.getContext("2d");
   canvas.width=1280;
   canvas.height=720;
@@ -251,19 +240,5 @@ window.onload = function() {
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, surfacesource.width, surfacesource.height);
 
-  // "stream3"/video3 is for the local desktop capture stream
-  desktopsource = document.getElementById("desktopsource");
-  startbtn = document.getElementById("start");
-
-  if (startbtn) startbtn.addEventListener("click", function(e) {
-    let captureopts = { video: { width: 1280 }, audio: false, surfaceSwitching: "include", selfBrowserSurface: "exclude" };
-    navigator.mediaDevices.getDisplayMedia(captureopts).then( (stream) => {
-      console.log(stream);
-      windowstream = stream.getVideoTracks()[0];
-      desktopsource.srcObject = stream;
-      desktopsource.play().catch(reportError);
-      drawVideo();
-    } );
-  } );
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
 };
