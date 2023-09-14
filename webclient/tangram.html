@@ -9,9 +9,9 @@
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="canvas2" ></canvas> <!-- surface stream source canvas (green background) -->
-<video  style="position:absolute;top:0px;left:0px;width:100%" id="stream2" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="canvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
+<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
+<video  style="position:absolute;top:0px;left:0px;width:100%" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
+<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
 <div id="fakecanvas"></div>
 
 <div id="Painting_tools">
@@ -59,7 +59,7 @@
   </div>
 </div>
 
-<video style="position:absolute;top:70%;width:360px" id="stream" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
+<video style="position:absolute;top:70%;width:360px" id="frontoutput" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
 
 <!-- partial -->
   <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script><script  src="./tangram.js"></script>

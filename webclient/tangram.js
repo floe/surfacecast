@@ -5,9 +5,9 @@ var background = "";
 
 $('#clearAll_btn').on("click", function() {
     $("#fakecanvas").empty();
-    context.globalCompositeOperation = "destination-out";
-    context.fillStyle = "rgba(0,0,0,255)";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    canvasctx.globalCompositeOperation = "destination-out";
+    canvasctx.fillStyle = "rgba(0,0,0,255)";
+    canvasctx.fillRect(0, 0, canvas.width, canvas.height);
 });
 
 $('#brush_btn').on("click", function() {
@@ -383,10 +383,10 @@ function drawStickers() {
   var fc = $('#fakecanvas')[0];
   var stickers = fc.childNodes;
   if (background) {
-    myDrawImage(c2,background,0,0);
+    myDrawImage(sourcectx,background,0,0);
   } else {
-    c2.fillStyle = "rgba(0,255,0,255)";
-    c2.fillRect(0, 0, canvas2.width, canvas2.height);
+    sourcectx.fillStyle = "rgba(0,255,0,255)";
+    sourcectx.fillRect(0, 0, surfacesource.width, surfacesource.height);
   }
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
@@ -396,16 +396,16 @@ function drawStickers() {
     var scale = 1;
     if (transform1 && transform1.includes("rotate")) angle = transform1.split("(")[1].split("d")[0];
     if (transform2 && transform2.includes("scale"))  scale = transform2.split("(")[1].split(")")[0];
-    var scalex = canvas2.width  / canvas2.offsetWidth;
-    var scaley = canvas2.height / canvas2.offsetHeight;
-    var x = sticker.offsetLeft * (1280 / canvas2.offsetWidth );
-    var y = sticker.offsetTop  * ( 720 / canvas2.offsetHeight);
-    myDrawImage(c2,sticker.firstChild,x,y,angle,scale*scalex);
+    var scalex = surfacesource.width  / surfacesource.offsetWidth;
+    var scaley = surfacesource.height / surfacesource.offsetHeight;
+    var x = sticker.offsetLeft * (1280 / surfacesource.offsetWidth );
+    var y = sticker.offsetTop  * ( 720 / surfacesource.offsetHeight);
+    myDrawImage(sourcectx,sticker.firstChild,x,y,angle,scale*scalex);
     //console.log("fc:"+fc.offsetWidth+" "+fc.offsetHeight);
     //console.log("sticker:"+sticker.offsetLeft+" "+sticker.offsetTop);
     //console.log("sx sy:"+scalex+" "+scaley);
   }
-  c2.drawImage( canvas,0,0 );
+  sourcectx.drawImage( canvas,0,0 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
