@@ -155,7 +155,7 @@ function playStream() {
   }
 }
 
-function initcanvas(canvas,w,h,fillstyle) {
+function get_context(canvas,w,h,fillstyle) {
   var context = canvas.getContext("2d");
   canvas.width  = w;
   canvas.height = h;
@@ -173,11 +173,11 @@ window.onload = function() {
 
   // canvas/canvasctx is the primary, visible drawing surface
   canvas = document.getElementById("surfacecanvas");
-  canvasctx = initcanvas(canvas,1280,720,"rgba(0,255,0,0)"); // FIXME: hardcoded dimensions
+  canvasctx = get_context(canvas,1280,720,"rgba(0,255,0,0)"); // FIXME: hardcoded dimensions
 
   // surfacesource/sourcectx is the surface stream source (invisible drawing surface with green background)
   surfacesource = document.getElementById("surfacesource");
-  sourcectx = initcanvas(surfacesource,1280,720,"rgba(0,255,0,255)"); // FIXME: hardcoded dimensions
+  sourcectx = get_context(surfacesource,1280,720,"rgba(0,255,0,255)"); // FIXME: hardcoded dimensions
 
   // some interactive handler needed to give stream higher priority?
   canvas.onmousemove = function(ev) { sourcectx.strokeStyle = "red"; sourcectx.fillStyle = "red"; sourcectx.fillRect(10, 10, 20, 20); }
@@ -185,5 +185,6 @@ window.onload = function() {
   webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream();
 
-  setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
+  if (typeof canvas_init  === "function") canvas_init();
+  if (typeof drawStickers === "function") setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
 };

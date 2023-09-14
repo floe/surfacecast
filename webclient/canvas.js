@@ -35,7 +35,7 @@ function onCanvasMove(evt) {
   const centerY = evt.offsetY;
 
   paint(canvasctx, centerX, centerY, "rgba(0,  0,0,255)", "destination-out", mousedown);
-  paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over", mousedown);
+  paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over",     mousedown);
 
   x = centerX;
   y = centerY;
