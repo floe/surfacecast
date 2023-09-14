@@ -6,11 +6,8 @@ var webrtcConfiguration;
 var reportError = function (errmsg) { console.error(errmsg); }
 var datastream;
 var canvas,surfacesource,frontsource;
-var context,c2,c3;
+var context,c2;
 var canvasstream;
-var mousedown;
-var mycolor;
-var x,y;
 
 var audiotrans;
 var surfacetrans;
@@ -18,47 +15,6 @@ var fronttrans;
 var remotemap;
 var frontstream;
 var surfacestream;
-
-
-function paint(ctx, centerX, centerY, clearcolor, clearmode) {
-  const radius = (mousedown == 1) ? 5 : 20;
-  ctx.beginPath();
-  ctx.lineWidth = radius;
-  ctx.strokeStyle = (mousedown == 1) ? mycolor : clearcolor;
-  ctx.fillStyle = ctx.strokeStyle
-  ctx.globalCompositeOperation = (mousedown == 1) ? "source-over" : clearmode;
-  ctx.moveTo(x,y);
-  ctx.lineTo(centerX,centerY);
-  ctx.stroke();
-  ctx.arc(centerX, centerY, radius/2, 0, 2 * Math.PI, false);
-  ctx.fill();
-  ctx.closePath();
-}
-
-
-function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;                                            }
-
-function onCanvasMove(evt) {
-
-  if (mousedown == 0) return;
-
-  if (evt.type == "touchmove") {
-    evt.preventDefault();
-    evt.offsetX = evt.changedTouches[0].pageX;
-    evt.offsetY = evt.changedTouches[0].pageY;
-  }
-
-  const centerX = evt.offsetX;
-  const centerY = evt.offsetY;
-
-  paint(context, centerX, centerY, "rgba(0,  0,0,255)", "destination-out");
-  paint(c2,      centerX, centerY, "rgba(0,255,0,255)", "source-over"    );
-
-  x = centerX;
-  y = centerY;
-}
-
 
 function onLocalDescription(desc) {
   var mapping = { };
@@ -191,8 +147,6 @@ function playStream() {
       canvastrack.contentHint = "detail";
       surfacetrans = canvastrack.id;
       webrtcPeerConnection.addTrack(canvastrack, stream);
-      // make sure that the canvas stream starts by triggering a delayed paint operation
-      setTimeout(() => { c2.fillRect(0, 0, surfacesource.width, surfacesource.height); }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
@@ -217,19 +171,8 @@ window.onload = function() {
   context.fillStyle = "rgba(0,255,0,0)";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  canvas.onmousedown = onCanvasDown;
-  canvas.ontouchstart = onCanvasDown;
-  canvas.onmouseup   = onCanvasUp;
-  canvas.ontouchend = onCanvasUp;
-  canvas.onmousemove = onCanvasMove;
-  canvas.ontouchmove = onCanvasMove;
-
-  canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
   webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
   playStream();
-  colors = ["red", "cyan", "yellow", "blue", "magenta" ];
-  mycolor = colors[Math.floor(Math.random() * colors.length)];
-  context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
 
   // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
   surfacesource = document.getElementById("surfacesource");
@@ -239,6 +182,9 @@ window.onload = function() {
 
   c2.fillStyle = "rgba(0,255,0,255)";
   c2.fillRect(0, 0, surfacesource.width, surfacesource.height);
+
+  canvas.onmousemove = function(ev) {c2.strokeStyle = "red"; c2.fillStyle = "red"; c2.fillRect(10, 10, 20, 20);}
+
 
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
 };
