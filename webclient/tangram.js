@@ -25,11 +25,25 @@ function defaultBg(){
 
 let offset = [0, 0];
 let isDragging = false;
-var touchTimer;
 let isResizing = false;
 
+function getDistanceBetweenTouches(touches) {
+  var touch1 = touches[0];
+  var touch2 = touches[1];
+  var dx = touch1.clientX - touch2.clientX;
+  var dy = touch1.clientY - touch2.clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+function getAngleBetweenTouches(touches) {
+  var touch1 = touches[0];
+  var touch2 = touches[1];
+  var dx = touch1.clientX - touch2.clientX;
+  var dy = touch1.clientY - touch2.clientY;
+  return -360*Math.atan2(dy,dx)/(2*Math.PI);
+}
+
 function add_sticker(elem) {
-    let isConfirm = false;
   
     var sticker = document.createElement('div');
     sticker.className = 'new_sticker';
@@ -59,7 +73,7 @@ function add_sticker(elem) {
 
     sticker.addEventListener("touchmove", function(e) {
       e.preventDefault();
-      if (isDragging && isConfirm == false) {
+      if (isDragging) {
         sticker.style.left = (e.touches[0].clientX + offset[0]) + 'px';
         sticker.style.top  = (e.touches[0].clientY + offset[1]) + 'px';
         //console.log("offset:"+offset);
@@ -76,27 +90,9 @@ function add_sticker(elem) {
       }
     });
   
-    function getDistanceBetweenTouches(touches) {
-      var touch1 = touches[0];
-      var touch2 = touches[1];
-      var dx = touch1.clientX - touch2.clientX;
-      var dy = touch1.clientY - touch2.clientY;
-      return Math.sqrt(dx*dx + dy*dy);
-    }
-
-    function getAngleBetweenTouches(touches) {
-      var touch1 = touches[0];
-      var touch2 = touches[1];
-      var dx = touch1.clientX - touch2.clientX;
-      var dy = touch1.clientY - touch2.clientY;
-      return -360*Math.atan2(dy,dx)/(2*Math.PI);
-    }
-
     function setStickerScale(scale) {
       sticker_scale = scale;
       sticker_img.style.transform = "scale(" + scale + ")";
-      //var rotation = getRotationDegrees(sticker_img);
-      //sticker_img.style.transform = "scale(" + scale + ") rotate(" + rotation + "deg)";
 
       sticker.style.width = (sticker_img.clientWidth * scale) + 'px';
       sticker.style.height = (sticker_img.clientHeight * scale) + 'px';
@@ -105,8 +101,6 @@ function add_sticker(elem) {
     function setStickerRotation(rotation) {
       var tmp = "rotate(" + rotation + "deg)";
       sticker.style.transform = tmp;
-      //var rotation = getRotationDegrees(sticker_img);
-      //sticker_img.style.transform = "scale(" + scale + ") rotate(" + rotation + "deg)";
     }
 
     var sticker_img = document.createElement('img');
@@ -114,7 +108,6 @@ function add_sticker(elem) {
     var sticker_scale = 1;
     sticker.appendChild(sticker_img);
     $('#fakecanvas').append(sticker);
-    //drawStickers();
 }
 
 // courtesy of https://gist.github.com/Luftare/fd238b7aac27c4e82c13b4a9526c878f
