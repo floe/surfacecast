@@ -153,7 +153,6 @@
 }
 
 .new_sticker {
-    display: flex;
     justify-content: center;
     align-items: center;
     
@@ -164,15 +163,9 @@
     position: absolute;
     top: 50px;
     left: 400px;
-}
-
-.new_sticker img {
     display: block;
-    width: auto;
-    height: auto;
-    /* margin-left: auto;
+    margin-left: auto;
     margin-right: auto;
-    position: relative; */
 }
 
 .confirm_sticker_btn {

@@ -23,10 +23,6 @@ function defaultBg(){
     bgBtnDeactive();
 }
 
-let offset = [0, 0];
-let isDragging = false;
-let isResizing = false;
-
 function getDistanceBetweenTouches(touches) {
   var touch1 = touches[0];
   var touch2 = touches[1];
@@ -43,70 +39,90 @@ function getAngleBetweenTouches(touches) {
   return -360*Math.atan2(dy,dx)/(2*Math.PI);
 }
 
+function touchify(evt) {
+  if (evt.touches === undefined) {
+    evt.touches = [ { clientX: evt.clientX, clientY: evt.clientY } ];
+  }
+  console.log(evt);
+}
+
+function move_start(evt) {
+  touchify(evt);
+  var sticker = evt.target;
+  evt.preventDefault();
+
+  sticker.isDragging = true;
+  sticker.offset = [
+    sticker.offsetLeft - evt.touches[0].clientX,
+    sticker.offsetTop - evt.touches[0].clientY
+  ];
+
+  if (evt.touches.length === 2) {
+    sticker.isResizing = true;
+    sticker.startDistance = getDistanceBetweenTouches(e.touches);
+    sticker.startAngle = getAngleBetweenTouches(e.touches);
+    sticker.curAngle = 0;
+    if (sticker.style.transform) sticker.curAngle = Number(sticker.style.transform.split("(")[1].split("d")[0]);
+  }
+  sticker.parentNode.appendChild(sticker);
+}
+
+function move_end(evt) {
+  var sticker = evt.target;
+  sticker.isDragging = false;
+  sticker.isResizing = false;
+}
+
+function do_move(evt) {
+  touchify(evt);
+  var sticker = evt.target;
+  if (!sticker.isDragging) return;
+  evt.preventDefault();
+
+  if (sticker.isDragging) {
+    sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
+    sticker.style.top = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
+    console.log("offset:"+sticker.offset);
+  }
+
+  if (sticker.isResizing) {
+    /*var currentDistance = getDistanceBetweenTouches(e.touches);
+    var newScale = startScale * (currentDistance / startDistance);
+    setStickerScale(newScale);*/
+    var currentAngle = getAngleBetweenTouches(e.touches);
+    var deltaAngle = sticker.startAngle - currentAngle;
+    console.log(currentAngle, deltaAngle, curAngle);
+    setStickerRotation(sticker, curAngle + deltaAngle);
+  }
+}
+
+function setStickerScale(sticker,scale) {
+  var sticker_img = sticker.firstChild;
+  sticker_img.style.transform = "scale(" + scale + ")";
+  sticker.style.width = (sticker_img.clientWidth * scale) + 'px';
+  sticker.style.height = (sticker_img.clientHeight * scale) + 'px';
+}
+
+function setStickerRotation(sticker,rotation) {
+  var tmp = "rotate(" + rotation + "deg)";
+  sticker.style.transform = tmp;
+}
+
 function add_sticker(elem) {
   
-    var sticker = document.createElement('div');
+    var sticker = document.createElement("img");
     sticker.className = 'new_sticker';
-    sticker.addEventListener("touchstart", function(e) {
-      isDragging = true;
-      offset = [
-        sticker.offsetLeft - e.touches[0].clientX,
-        sticker.offsetTop - e.touches[0].clientY
-      ];
-      
-      if (e.touches.length === 2) {
-        isResizing = true;
-        startDistance = getDistanceBetweenTouches(e.touches);
-        startAngle    = getAngleBetweenTouches(e.touches);
-        curAngle = 0;
-        if (sticker.style.transform) curAngle = Number(sticker.style.transform.split("(")[1].split("d")[0]);
-        console.log(curAngle);
-        startScale = sticker_scale;
-      }
-      sticker.parentNode.appendChild(sticker);
-    });  
-    
-    sticker.addEventListener("touchend", function() {
-      isDragging = false;
-      isResizing = false;
-    });
 
-    sticker.addEventListener("touchmove", function(e) {
-      e.preventDefault();
-      if (isDragging) {
-        sticker.style.left = (e.touches[0].clientX + offset[0]) + 'px';
-        sticker.style.top  = (e.touches[0].clientY + offset[1]) + 'px';
-        //console.log("offset:"+offset);
-      }
-      
-      if (isResizing) {
-        /*var currentDistance = getDistanceBetweenTouches(e.touches);
-        var newScale = startScale * (currentDistance / startDistance);
-        setStickerScale(newScale);*/
-        var currentAngle = getAngleBetweenTouches(e.touches);
-        var deltaAngle = startAngle - currentAngle;
-        console.log(currentAngle,deltaAngle,curAngle);
-        setStickerRotation(curAngle+deltaAngle);
-      }
-    });
-  
-    function setStickerScale(scale) {
-      sticker_scale = scale;
-      sticker_img.style.transform = "scale(" + scale + ")";
+    sticker.addEventListener("touchstart", move_start);  
+    sticker.addEventListener("mousedown",  move_start);  
+    sticker.addEventListener("touchend",   move_end);
+    sticker.addEventListener("mouseup",    move_end);
+    sticker.addEventListener("touchmove",  do_move);
+    sticker.addEventListener("mousemove",  do_move);
 
-      sticker.style.width = (sticker_img.clientWidth * scale) + 'px';
-      sticker.style.height = (sticker_img.clientHeight * scale) + 'px';
-    }
-
-    function setStickerRotation(rotation) {
-      var tmp = "rotate(" + rotation + "deg)";
-      sticker.style.transform = tmp;
-    }
-
-    var sticker_img = document.createElement('img');
-    sticker_img.src = $(elem).prop('src');
-    var sticker_scale = 1;
-    sticker.appendChild(sticker_img);
+    //var sticker_img = document.createElement('img');
+    sticker.src = elem[0].src;
+    //sticker.appendChild(sticker_img);
     $('#fakecanvas').append(sticker);
 }
 
@@ -133,7 +149,7 @@ function drawStickers() {
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
     var transform1 = sticker.style.transform;
-    var transform2 = sticker.firstChild.style.transform;
+    var transform2 = sticker.style.transform; // FIXME: should be sticker.firstChild (i.e. the image)
     var angle = 0;
     var scale = 1;
     if (transform1 && transform1.includes("rotate")) angle = transform1.split("(")[1].split("d")[0];
@@ -142,7 +158,7 @@ function drawStickers() {
     var scaley = surfacesource.height / surfacesource.offsetHeight;
     var x = sticker.offsetLeft * (1280 / surfacesource.offsetWidth );
     var y = sticker.offsetTop  * ( 720 / surfacesource.offsetHeight);
-    myDrawImage(sourcectx,sticker.firstChild,x,y,angle,scale*scalex);
+    myDrawImage(sourcectx,sticker,x,y,angle,scale*scalex);
     //console.log("fc:"+fc.offsetWidth+" "+fc.offsetHeight);
     //console.log("sticker:"+sticker.offsetLeft+" "+sticker.offsetTop);
     //console.log("sx sy:"+scalex+" "+scaley);
