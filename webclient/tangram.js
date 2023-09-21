@@ -59,8 +59,8 @@ function move_start(evt) {
 
   if (evt.touches.length >= 2) {
     sticker.isResizing = true;
-    sticker.startDistance = getDistanceBetweenTouches(e.touches);
-    sticker.startAngle = getAngleBetweenTouches(e.touches);
+    sticker.startDistance = getDistanceBetweenTouches(evt.touches);
+    sticker.startAngle = getAngleBetweenTouches(evt.touches);
   }
   sticker.parentNode.appendChild(sticker);
 }
@@ -92,14 +92,14 @@ function do_move(evt) {
     /*var currentDistance = getDistanceBetweenTouches(e.touches);
     var newScale = startScale * (currentDistance / startDistance);
     setStickerScale(newScale);*/
-    var currentAngle = getAngleBetweenTouches(e.touches);
+    var currentAngle = getAngleBetweenTouches(evt.touches);
     var deltaAngle = sticker.startAngle - currentAngle;
-    setStickerRotation(sticker, curAngle + deltaAngle);
+    sticker.startAngle = currentAngle;
+    setStickerRotation(sticker, sticker.curAngle + deltaAngle);
   }
 }
 
 function setStickerScale(sticker,scale) {
-  //sticker.style.transform = "scale(" + scale + ")";
   sticker.curScale = scale;
   setStickerTransform(sticker);
   //sticker.style.width = (sticker.clientWidth * scale) + 'px';
