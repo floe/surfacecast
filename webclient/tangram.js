@@ -51,14 +51,13 @@ function move_start(evt) {
   var sticker = evt.target;
   evt.preventDefault();
 
-  sticker.isDragging = true;
+  sticker.isActive = true;
   sticker.offset = [
     sticker.offsetLeft - evt.touches[0].clientX,
     sticker.offsetTop - evt.touches[0].clientY
   ];
 
   if (evt.touches.length >= 2) {
-    sticker.isResizing = true;
     sticker.startDistance = getDistanceBetweenTouches(evt.touches);
     sticker.startAngle = getAngleBetweenTouches(evt.touches);
   }
@@ -67,8 +66,7 @@ function move_start(evt) {
 
 function move_end(evt) {
   var sticker = evt.target;
-  sticker.isDragging = false;
-  sticker.isResizing = false;
+  sticker.isActive = false;
 }
 
 function wheel(evt) {
@@ -80,15 +78,13 @@ function wheel(evt) {
 function do_move(evt) {
   touchify(evt);
   var sticker = evt.target;
-  if (!sticker.isDragging) return;
+  if (!sticker.isActive) return;
   evt.preventDefault();
 
-  if (sticker.isDragging) {
     sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
     sticker.style.top = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
-  }
 
-  if (sticker.isResizing) {
+  if (evt.touches.length >= 2) {
     /*var currentDistance = getDistanceBetweenTouches(e.touches);
     var newScale = startScale * (currentDistance / startDistance);
     setStickerScale(newScale);*/
@@ -179,4 +175,4 @@ add_sticker($("#t5"));
 add_sticker($("#t6"));
 add_sticker($("#t7"));
 
-$("#stream").on("click", function(){document.documentElement.requestFullscreen();});
+$("#frontoutput").on("click", function(){document.documentElement.requestFullscreen();});
