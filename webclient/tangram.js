@@ -57,12 +57,10 @@ function move_start(evt) {
     sticker.offsetTop - evt.touches[0].clientY
   ];
 
-  if (evt.touches.length === 2) {
+  if (evt.touches.length >= 2) {
     sticker.isResizing = true;
     sticker.startDistance = getDistanceBetweenTouches(e.touches);
     sticker.startAngle = getAngleBetweenTouches(e.touches);
-    sticker.curAngle = 0;
-    if (sticker.style.transform) sticker.curAngle = Number(sticker.style.transform.split("(")[1].split("d")[0]);
   }
   sticker.parentNode.appendChild(sticker);
 }
@@ -71,6 +69,12 @@ function move_end(evt) {
   var sticker = evt.target;
   sticker.isDragging = false;
   sticker.isResizing = false;
+}
+
+function wheel(evt) {
+  var delta = evt.deltaY < 0 ? -5 : 5;
+  var sticker = evt.target;
+  setStickerRotation(sticker,sticker.curAngle+delta);
 }
 
 function do_move(evt) {
@@ -91,7 +95,6 @@ function do_move(evt) {
     setStickerScale(newScale);*/
     var currentAngle = getAngleBetweenTouches(e.touches);
     var deltaAngle = sticker.startAngle - currentAngle;
-    console.log(currentAngle, deltaAngle, curAngle);
     setStickerRotation(sticker, curAngle + deltaAngle);
   }
 }
@@ -106,6 +109,7 @@ function setStickerScale(sticker,scale) {
 function setStickerRotation(sticker,rotation) {
   var tmp = "rotate(" + rotation + "deg)";
   sticker.style.transform = tmp;
+  sticker.curAngle = rotation;
 }
 
 function add_sticker(elem) {
@@ -113,12 +117,16 @@ function add_sticker(elem) {
     var sticker = document.createElement("img");
     sticker.className = "sticker";
 
+    sticker.curAngle = 0;
+    sticker.curScale = 1;
+
     sticker.addEventListener("touchstart", move_start);  
     sticker.addEventListener("mousedown",  move_start);  
     sticker.addEventListener("touchend",   move_end);
     sticker.addEventListener("mouseup",    move_end);
     sticker.addEventListener("touchmove",  do_move);
     sticker.addEventListener("mousemove",  do_move);
+    sticker.addEventListener("wheel",      wheel);
 
     sticker.src = elem[0].src;
     $('#fakecanvas').append(sticker);
