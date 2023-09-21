@@ -61,6 +61,8 @@ function move_start(evt) {
     sticker.startDistance = getDistanceBetweenTouches(evt.touches);
     sticker.startAngle = getAngleBetweenTouches(evt.touches);
   }
+
+  // move sticker to the top
   sticker.parentNode.appendChild(sticker);
 }
 
@@ -87,9 +89,11 @@ function do_move(evt) {
   sticker.style.top  = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
 
   if (evt.touches.length >= 2) {
-    /*var currentDistance = getDistanceBetweenTouches(e.touches);
-    var newScale = startScale * (currentDistance / startDistance);
-    setStickerScale(newScale);*/
+    var currentDistance = getDistanceBetweenTouches(evt.touches);
+    var newScale = currentDistance / sticker.startDistance;
+    sticker.startDistance = currentDistance;
+    setStickerScale(sticker, sticker.curScale * newScale);
+
     var currentAngle = getAngleBetweenTouches(evt.touches);
     var deltaAngle = sticker.startAngle - currentAngle;
     sticker.startAngle = currentAngle;
