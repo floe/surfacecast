@@ -86,7 +86,6 @@ function do_move(evt) {
   if (sticker.isDragging) {
     sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
     sticker.style.top = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
-    console.log("offset:"+sticker.offset);
   }
 
   if (sticker.isResizing) {
@@ -100,16 +99,20 @@ function do_move(evt) {
 }
 
 function setStickerScale(sticker,scale) {
-  var sticker_img = sticker.firstChild;
-  sticker_img.style.transform = "scale(" + scale + ")";
-  sticker.style.width = (sticker_img.clientWidth * scale) + 'px';
-  sticker.style.height = (sticker_img.clientHeight * scale) + 'px';
+  //sticker.style.transform = "scale(" + scale + ")";
+  sticker.curScale = scale;
+  setStickerTransform(sticker);
+  //sticker.style.width = (sticker.clientWidth * scale) + 'px';
+  //sticker.style.height = (sticker.clientHeight * scale) + 'px';
 }
 
 function setStickerRotation(sticker,rotation) {
-  var tmp = "rotate(" + rotation + "deg)";
-  sticker.style.transform = tmp;
   sticker.curAngle = rotation;
+  setStickerTransform(sticker);
+}
+
+function setStickerTransform(sticker) {
+  sticker.style.transform = "rotate(" + sticker.curAngle + "deg) scale(" + sticker.curScale + ")";
 }
 
 function add_sticker(elem) {
@@ -154,17 +157,11 @@ function drawStickers() {
   }
   for (const sticker of stickers) {
     //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
-    var transform1 = sticker.style.transform;
-    var transform2 = sticker.style.transform; // FIXME: should be sticker.firstChild (i.e. the image)
-    var angle = 0;
-    var scale = 1;
-    if (transform1 && transform1.includes("rotate")) angle = transform1.split("(")[1].split("d")[0];
-    if (transform2 && transform2.includes("scale"))  scale = transform2.split("(")[1].split(")")[0];
     var scalex = surfacesource.width  / surfacesource.offsetWidth;
     var scaley = surfacesource.height / surfacesource.offsetHeight;
     var x = sticker.offsetLeft * (1280 / surfacesource.offsetWidth );
     var y = sticker.offsetTop  * ( 720 / surfacesource.offsetHeight);
-    myDrawImage(sourcectx,sticker,x,y,angle,scale*scalex);
+    myDrawImage(sourcectx,sticker,x,y,sticker.curAngle,sticker.curScale*scalex);
     //console.log("fc:"+fc.offsetWidth+" "+fc.offsetHeight);
     //console.log("sticker:"+sticker.offsetLeft+" "+sticker.offsetTop);
     //console.log("sx sy:"+scalex+" "+scaley);
