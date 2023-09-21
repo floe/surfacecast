@@ -152,7 +152,7 @@
   background: none;
 }
 
-.new_sticker {
+.sticker {
     justify-content: center;
     align-items: center;
     
@@ -166,39 +166,6 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-.confirm_sticker_btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  position: absolute;
-  top: 5px;
-  left: 0px;
-  border: none;
-  background: none;
-}
-
-.delete_sticker_btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  position: absolute;
-  top: 5px;
-  right: 0px;
-  border: none;
-  background: none;
-}
-
-.rotate_sticker_btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  border: none;
-  background: none;
 }
 
 .gif {

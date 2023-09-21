@@ -111,7 +111,7 @@ function setStickerRotation(sticker,rotation) {
 function add_sticker(elem) {
   
     var sticker = document.createElement("img");
-    sticker.className = 'new_sticker';
+    sticker.className = "sticker";
 
     sticker.addEventListener("touchstart", move_start);  
     sticker.addEventListener("mousedown",  move_start);  
@@ -120,9 +120,7 @@ function add_sticker(elem) {
     sticker.addEventListener("touchmove",  do_move);
     sticker.addEventListener("mousemove",  do_move);
 
-    //var sticker_img = document.createElement('img');
     sticker.src = elem[0].src;
-    //sticker.appendChild(sticker_img);
     $('#fakecanvas').append(sticker);
 }
 
