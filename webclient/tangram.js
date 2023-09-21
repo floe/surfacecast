@@ -43,7 +43,7 @@ function touchify(evt) {
   if (evt.touches === undefined) {
     evt.touches = [ { clientX: evt.clientX, clientY: evt.clientY } ];
   }
-  console.log(evt);
+  //console.log(evt);
 }
 
 function move_start(evt) {
@@ -70,9 +70,11 @@ function move_end(evt) {
 }
 
 function wheel(evt) {
+  evt.preventDefault();
   var delta = evt.deltaY < 0 ? -5 : 5;
   var sticker = evt.target;
-  setStickerRotation(sticker,sticker.curAngle+delta);
+  if (evt.shiftKey) setStickerScale(sticker,sticker.curScale+(0.01*delta));
+  else setStickerRotation(sticker,sticker.curAngle+delta);
 }
 
 function do_move(evt) {
@@ -81,8 +83,8 @@ function do_move(evt) {
   if (!sticker.isActive) return;
   evt.preventDefault();
 
-    sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
-    sticker.style.top = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
+  sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
+  sticker.style.top  = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
 
   if (evt.touches.length >= 2) {
     /*var currentDistance = getDistanceBetweenTouches(e.touches);
