@@ -1,5 +1,7 @@
 var background = "";
 
+function gebi(id) {return document.getElementById(id); }
+
 $('#clearAll_btn').on("click", function() {
     $("#fakecanvas").empty();
     canvasctx.globalCompositeOperation = "destination-out";
@@ -21,6 +23,18 @@ function defaultBg(){
     //$('#fakecanvas').css("background", "none");
     background=null;
     bgBtnDeactive();
+}
+
+// courtesy of https://stackoverflow.com/a/75045656/
+function imagePreviewFunc(that, previewerId) {
+  var files = that.files;
+  for (var i = 0; i < files.length; i++) {
+    var image = document.createElement("img");
+    image.src = URL.createObjectURL(files[i]);
+    image.classList.add("rotate","scale");
+    image.onclick = add_sticker;
+    document.getElementById(previewerId).append(image);
+  }
 }
 
 function getDistanceBetweenTouches(touches) {
@@ -121,6 +135,9 @@ function setStickerTransform(sticker) {
 
 function add_sticker(elem) {
   
+    // if called via event, replace event with its own target
+    if (elem.classList === undefined) elem = elem.target;
+
     var sticker = document.createElement("img");
     sticker.className = "sticker";
 
@@ -135,8 +152,8 @@ function add_sticker(elem) {
     sticker.addEventListener("mousemove",  do_move);
     sticker.addEventListener("wheel",      wheel);
 
-    sticker.src = elem[0].src;
-    for (const cl of elem[0].classList) sticker.classList.add(cl);
+    sticker.src = elem.src;
+    for (const cl of elem.classList) sticker.classList.add(cl);
     $('#fakecanvas').append(sticker);
 }
 
@@ -176,12 +193,12 @@ function drawStickers() {
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
 
-add_sticker($("#t1"));
-add_sticker($("#t2"));
-add_sticker($("#t3"));
-add_sticker($("#t4"));
-add_sticker($("#t5"));
-add_sticker($("#t6"));
-add_sticker($("#t7"));
+add_sticker(gebi("#t1"));
+add_sticker(gebi("#t2"));
+add_sticker(gebi("#t3"));
+add_sticker(gebi("#t4"));
+add_sticker(gebi("#t5"));
+add_sticker(gebi("#t6"));
+add_sticker(gebi("#t7"));
 
 $("#frontoutput").on("click", function(){document.documentElement.requestFullscreen();});
