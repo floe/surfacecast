@@ -102,6 +102,7 @@ function do_move(evt) {
 }
 
 function setStickerScale(sticker,scale) {
+  if (!sticker.classList.contains("scale")) return;
   sticker.curScale = scale;
   setStickerTransform(sticker);
   //sticker.style.width = (sticker.clientWidth * scale) + 'px';
@@ -109,6 +110,7 @@ function setStickerScale(sticker,scale) {
 }
 
 function setStickerRotation(sticker,rotation) {
+  if (!sticker.classList.contains("rotate")) return;
   sticker.curAngle = rotation;
   setStickerTransform(sticker);
 }
@@ -134,6 +136,7 @@ function add_sticker(elem) {
     sticker.addEventListener("wheel",      wheel);
 
     sticker.src = elem[0].src;
+    for (const cl of elem[0].classList) sticker.classList.add(cl);
     $('#fakecanvas').append(sticker);
 }
 
