@@ -119,8 +119,6 @@ function setStickerScale(sticker,scale) {
   if (!sticker.classList.contains("scale")) return;
   sticker.curScale = scale;
   setStickerTransform(sticker);
-  //sticker.style.width = (sticker.clientWidth * scale) + 'px';
-  //sticker.style.height = (sticker.clientHeight * scale) + 'px';
 }
 
 function setStickerRotation(sticker,rotation) {
@@ -201,4 +199,5 @@ add_sticker(gebi("#t5"));
 add_sticker(gebi("#t6"));
 add_sticker(gebi("#t7"));
 
+// TODO: move this to ui.js?
 $("#frontoutput").on("click", function(){document.documentElement.requestFullscreen();});
