@@ -190,14 +190,3 @@ function drawStickers() {
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
 }
-
-add_sticker(gebi("#t1"));
-add_sticker(gebi("#t2"));
-add_sticker(gebi("#t3"));
-add_sticker(gebi("#t4"));
-add_sticker(gebi("#t5"));
-add_sticker(gebi("#t6"));
-add_sticker(gebi("#t7"));
-
-// TODO: move this to ui.js?
-$("#frontoutput").on("click", function(){document.documentElement.requestFullscreen();});

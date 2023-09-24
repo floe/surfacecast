@@ -187,4 +187,6 @@ window.onload = function() {
 
   if (typeof canvas_init  === "function") canvas_init();
   if (typeof drawStickers === "function") setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
+
+  document.getElementById("frontoutput").onclick = function(){document.documentElement.requestFullscreen();};
 };
