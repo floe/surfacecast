@@ -1,9 +1,8 @@
 var background = "";
-
-function gebi(id) {return document.getElementById(id); }
+var fakecanvas = null;
 
 $('#clearAll_btn').on("click", function() {
-    $("#fakecanvas").empty();
+    fakecanvas.empty();
     canvasctx.globalCompositeOperation = "destination-out";
     canvasctx.fillStyle = "rgba(0,0,0,255)";
     canvasctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -152,7 +151,7 @@ function add_sticker(elem) {
 
     sticker.src = elem.src;
     for (const cl of elem.classList) sticker.classList.add(cl);
-    $('#fakecanvas').append(sticker);
+    fakecanvas.append(sticker);
 }
 
 // courtesy of https://gist.github.com/Luftare/fd238b7aac27c4e82c13b4a9526c878f
@@ -167,8 +166,7 @@ function myDrawImage(ctx, img, x, y, angle = 0, scale = 1) {
 
 // TODO: animations
 function drawStickers() {
-  var fc = $('#fakecanvas')[0];
-  var stickers = fc.childNodes;
+  var stickers = fakecanvas.childNodes;
   if (background) {
     myDrawImage(sourcectx,background,0,0);
   } else {
@@ -189,4 +187,9 @@ function drawStickers() {
   sourcectx.drawImage( canvas,0,0 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
   setTimeout( () => { requestAnimationFrame(drawStickers); }, 1000/15 );
+}
+
+function stickers_init() {
+  fakecanvas = document.getElementById("fakecanvas");
+  drawStickers();
 }

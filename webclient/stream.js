@@ -164,7 +164,7 @@ function get_context(canvas,w,h,fillstyle) {
   return context;
 }
 
-window.onload = function() {
+window.addEventListener("load", function(ev) {
 
   // output element for incoming front stream
   frontoutput = document.getElementById("frontoutput");
@@ -186,7 +186,7 @@ window.onload = function() {
   playStream();
 
   if (typeof canvas_init  === "function") canvas_init();
-  if (typeof drawStickers === "function") setTimeout( () => { requestAnimationFrame(drawStickers); }, 2000 );
+  if (typeof stickers_init === "function") stickers_init();
 
   document.getElementById("frontoutput").onclick = function(){document.documentElement.requestFullscreen();};
-};
+});
