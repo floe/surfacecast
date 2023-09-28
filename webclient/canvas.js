@@ -1,6 +1,7 @@
 var mousedown;
 var mycolor;
 var x,y;
+var scale = 1;
 
 function paint(ctx, centerX, centerY, clearcolor, clearmode, erase) {
     const radius = (erase == 1) ? 5 : 20;
@@ -18,8 +19,8 @@ function paint(ctx, centerX, centerY, clearcolor, clearmode, erase) {
   }
   
   
-function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;                                            }
+function onCanvasDown(evt) { x = evt.offsetX/scale; y = evt.offsetY/scale; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
+function onCanvasUp  (evt) { onCanvasMove(evt);                            mousedown = 0;                                            }
   
 function onCanvasMove(evt) {
 
@@ -31,8 +32,8 @@ function onCanvasMove(evt) {
     evt.offsetY = evt.changedTouches[0].pageY;
   }
 
-  const centerX = evt.offsetX;
-  const centerY = evt.offsetY;
+  const centerX = evt.offsetX / scale;
+  const centerY = evt.offsetY / scale;
 
   paint(canvasctx, centerX, centerY, "rgba(0,  0,0,255)", "destination-out", mousedown);
   paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over",     mousedown);
@@ -50,6 +51,7 @@ function canvas_init() {
   canvas.ontouchmove  = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
+  scale = canvas.offsetWidth / canvas.width;
 
   var colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
