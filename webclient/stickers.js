@@ -148,6 +148,10 @@ function add_sticker(elem) {
     sticker.src = elem.src;
     for (const cl of elem.classList) sticker.classList.add(cl);
     fakecanvas.append(sticker);
+
+    // set intial scale for all stickers based on canvas width
+    sticker.curScale = fakecanvas.offsetWidth / 1280.0;
+    setStickerTransform(sticker);
 }
 
 // courtesy of https://gist.github.com/Luftare/fd238b7aac27c4e82c13b4a9526c878f
