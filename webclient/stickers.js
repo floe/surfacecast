@@ -1,25 +1,21 @@
 var background = "";
 var fakecanvas = null;
 
-$('#clearAll_btn').on("click", function() {
+document.getElementById("clearAll_btn").onclick = function() {
     fakecanvas.empty();
     canvasctx.globalCompositeOperation = "destination-out";
     canvasctx.fillStyle = "rgba(0,0,0,255)";
     canvasctx.fillRect(0, 0, canvas.width, canvas.height);
-});
+};
 
 function changeBg(btn){
-    let id = "#" + btn.id;
-    let url = $(id).css("background-image");
-    //$('#fakecanvas').css("background-image", url);
-    //$('#fakecanvas').css("background-size", "cover");
+    let url = btn.style.background-image;
     url = url.split("/");
     background = document.createElement("img");
     background.src = url[3]+"/"+url[4].split("\"")[0];
 }
 
 function defaultBg(){
-    //$('#fakecanvas').css("background", "none");
     background=null;
     bgBtnDeactive();
 }
