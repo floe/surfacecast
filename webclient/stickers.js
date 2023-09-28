@@ -123,7 +123,7 @@ function setStickerRotation(sticker,rotation) {
 }
 
 function setStickerTransform(sticker) {
-  sticker.style.transform = "rotate(" + sticker.curAngle + "deg) scale(" + sticker.curScale + ")";
+  sticker.style.transform = "scale(" + sticker.curScale + ") translate(50%, 50%) rotate(" + sticker.curAngle + "deg) translate(-50%, -50%)"; // scale(" + sticker.curScale + ")";
 }
 
 function add_sticker(elem) {
@@ -173,16 +173,12 @@ function drawStickers() {
     sourcectx.fillStyle = "rgba(0,255,0,255)";
     sourcectx.fillRect(0, 0, surfacesource.width, surfacesource.height);
   }
+  var scalex = surfacesource.width  / surfacesource.offsetWidth;
+  var scaley = surfacesource.height / surfacesource.offsetHeight;
   for (const sticker of stickers) {
-    //console.log(sticker.firstChild,sticker.firstChild.style.transform,sticker.offsetLeft,sticker.offsetTop);
-    var scalex = surfacesource.width  / surfacesource.offsetWidth;
-    var scaley = surfacesource.height / surfacesource.offsetHeight;
-    var x = sticker.offsetLeft * (1280 / surfacesource.offsetWidth );
-    var y = sticker.offsetTop  * ( 720 / surfacesource.offsetHeight);
+    var x = sticker.offsetLeft * scalex;
+    var y = sticker.offsetTop  * scaley;
     myDrawImage(sourcectx,sticker,x,y,sticker.curAngle,sticker.curScale*scalex);
-    //console.log("fc:"+fc.offsetWidth+" "+fc.offsetHeight);
-    //console.log("sticker:"+sticker.offsetLeft+" "+sticker.offsetTop);
-    //console.log("sx sy:"+scalex+" "+scaley);
   }
   sourcectx.drawImage( canvas,0,0 );
   // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
