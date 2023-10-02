@@ -1,4 +1,4 @@
-# SurfaceStreams
+# SurfaceCast
 
 A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
@@ -7,7 +7,7 @@ A framework to mix and distribute live video feeds from interactive surfaces via
 ![shared table surfaces with real and projected objects](assets/teaser1.jpg)
 2nd image credit: ©️ Stadt Regensburg, ©️ Stefan Effenhauser (see also the [VIGITIA](https://vigitia.de/) project)
 
-SurfaceStreams consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
+SurfaceCast consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
 The mixing server then composes a new surface stream for each client, consisting of the layered surface streams of the _other_ clients, and streams that back to each client (along with a single combined front stream of all individual front streams arranged side-by-side).
 
@@ -100,7 +100,7 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * Firefox 94 - 96
   * Safari 15 - 16
   * Firefox 78 ESR, 102 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
-  * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacestreams/issues/8))
+  * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacecast/issues/8))
 
 ## Known issues
 
@@ -115,4 +115,4 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
         * "Outsource" the perspective transform to the server using the `--persp` parameter.
         * Don't plug the cameras into the USB3 ports (blue), but into USB2 instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?t=275492))
         * Avoid using the analogue audio output, use HDMI instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?f=28&t=306408))
-        * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. [39c6020](https://github.com/floe/surfacestreams/commit/39c60206fb0797f97e825718ff5deba41b53008d))
+        * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. [39c6020](https://github.com/floe/surfacecast/commit/39c60206fb0797f97e825718ff5deba41b53008d))
