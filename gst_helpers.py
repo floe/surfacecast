@@ -119,7 +119,7 @@ def arrange_frontstreams():
         pad.set_property("converter-config",cc)
 
 # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
-def dump_debug(name="surfacestreams"):
+def dump_debug(name="surfacecast"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
         logging.info("Cannot dump graph, GST_DEBUG_DUMP_DOT_DIR is unset.")
         return

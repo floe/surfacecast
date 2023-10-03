@@ -59,7 +59,7 @@ def on_element_added(thebin, element):
         add_and_link([ element, new_element("audioconvert"), new_element("autoaudiosink") ])
 
 # "main"
-print("\nSurfaceStreams frontend client v0.2.2 - https://github.com/floe/surfacestreams\n")
+print("\nSurfaceCast frontend client v0.2.2 - https://github.com/floe/surfacecast\n")
 
 parser = argparse.ArgumentParser()
 

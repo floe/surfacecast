@@ -78,7 +78,7 @@ Can be used to "outsource" the perspective transformation of the surface feed to
 
 ```
   -s, --sink            save all streams to MP4 file (default: False)
-  -o OUT, --out OUT     MP4 output filename (default: surfacestreams-20220327-125732.mp4)
+  -o OUT, --out OUT     MP4 output filename (default: surfacecast-20220327-125732.mp4)
 ```
 If `-s/--sink` is given, write the combined front, surface, and audio streams to a MP4 file. Optional target filename can be set via `-o/--out`. Note that the file contains OPUS audio inside an MP4 container, which is not supported by all players. If necessary, use `scripts/playback.sh` to recode to MP3 and play all streams simultaneously in VLC.
 

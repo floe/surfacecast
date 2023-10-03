@@ -69,11 +69,11 @@ def ws_conn_handler(server, connection, path, client, user_data):
     connection.connect("closed",ws_close_handler,new_client)
 
 # "main"
-print("\nSurfaceStreams backend mixing server v0.2.2 - https://github.com/floe/surfacestreams\n")
+print("\nSurfaceCast backend mixing server v0.2.2 - https://github.com/floe/surfacecast\n")
 print("Note: any GStreamer-WARNINGs about pipeline loops can be safely ignored.\n")
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-outfile = datetime.datetime.now().strftime("surfacestreams-%Y%m%d-%H%M%S.mkv")
+outfile = datetime.datetime.now().strftime("surfacecast-%Y%m%d-%H%M%S.mkv")
 
 parser.add_argument("-d","--debug", help="more debug output (-dd=max)",  action="count",default=1 )
 parser.add_argument("-s","--sink",  help="save all streams to MKV file", action="store_true"      )
