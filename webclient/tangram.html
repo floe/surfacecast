@@ -2,19 +2,18 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8"/>
-  <meta name='viewport' content='width=device-width, height=device-height, initial-scale:1, user-scalable=no' />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale:1, user-scalable=no" />
   <title>Tangram</title>
   <link rel="stylesheet" href="ui.css"/>
-
 </head>
 <body>
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
-<video  style="position:absolute;top:0px;left:0px;width:100%" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
-<div    style="position:absolute;top:0px;left:0px;width:100%" id="fakecanvas"></div>
+<canvas class="fullscreen" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
+<video  class="fullscreen" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
+<canvas class="fullscreen" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
+<div    class="fullscreen" id="fakecanvas"></div> <!-- visible sticker container -->
 
-<div id="stickers_sidebar">
-  <div id="side_panel">
+<div id="sidebar">
+  <div id="sidebar-panel">
     <img id="t1" src="images/tangram1.png" class="rotate">
     <img id="t2" src="images/tangram2.png" class="rotate">
     <img id="t3" src="images/tangram3.png" class="rotate">
@@ -25,7 +24,7 @@
   </div>
 </div>
 
-<video style="position:absolute;top:70%;width:360px" id="frontoutput" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
+<video class="overlay" id="frontoutput" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
 
   <script src="adapter.js"></script>
   <script src="stickers.js"></script>

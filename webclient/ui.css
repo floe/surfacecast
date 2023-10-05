@@ -5,16 +5,55 @@
   width: 100%
 }
 
-#sidebar-toggle:checked ~ label {
+.overlay {
+  position: absolute;
+  top:   70%;
+  width: 360px
+}
+
+#sidebar-toggle:checked ~ #sidebar-button {
   transform: rotate(180deg);
   right: 400px;
-  transition: 0.2s;
 }
 
 #sidebar-toggle:checked ~ #sidebar-panel {
   width: 450px;
 }
 
+.toggle:checked ~ label {
+  background: white;
+}
+
+.toggle:checked ~ .submenu {
+  display: block;
+}
+
+.button {
+  width:100px;
+  height:100px;
+  background: none;
+  border-style: none;
+  margin: 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.button:active {
+  background:white;
+}
+
+.submenu {
+  position: relative;
+  display: none;
+  width: fit-content;
+  margin: 10px;
+  transition: 0.2s;
+  border-radius: 50px;
+  background: lightgray;
+}
 
 .mainBtn {
   width:94px;
@@ -159,7 +198,7 @@
   margin-top: 10px;
 }
 
-#Painting_tools {
+#toolbar {
   position: absolute;
 }
 
