@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name='viewport' content='width=device-width, height=device-height, initial-scale:1, user-scalable=no' />
-  <title>Tangram</title>
+  <title>SurfaceCast</title>
   <link rel="stylesheet" href="ui.css"/>
 
 </head>
 <body>
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
-<video  style="position:absolute;top:0px;left:0px;width:100%" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
-<canvas style="position:absolute;top:0px;left:0px;width:100%" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
-<div id="fakecanvas"></div>
+<canvas class="fullscreen" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
+<video  class="fullscreen" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
+<canvas class="fullscreen" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
+<div    class="fullscreen" id="fakecanvas"></div> <!-- visible sticker container -->
 
 <div id="Painting_tools">
   <div id="Main_btns">
@@ -69,15 +69,15 @@
   
 </div>
 
-<div id="stickers_sidebar">
-  <button id="stickers_btn">
-    <svg width="40" height="70" viewBox="0 0 43 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+<div id="sidebar">
+  <input type="checkbox" id="sidebar-toggle" style="height: 0" />
+  <label id="sidebar-button" for="sidebar-toggle">
+    <svg fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M29.2886 25L16 38.2886L29.2886 51.5771" stroke="#515151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </button>
-  
-  <div id="side_panel">
-    <input type="file" accept="image/*" multiple="true" onchange="imagePreviewFunc(this, 'side_panel');" />
+  </label>
+  <div id="sidebar-panel">
+    <input type="file" accept="image/*" multiple="true" onchange="imagePreviewFunc(this, 'sidebar-panel');" />
   </div>
 </div>
 
@@ -85,9 +85,9 @@
 
   <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script>
   <script src="ui.js"></script>
+  <script src="adapter.js"></script>
   <script src="effects.js"></script>
   <script src="stickers.js"></script>
-  <script src="tangram.js"></script>
   <script src="canvas.js"></script>
   <script src="stream.js"></script>
 

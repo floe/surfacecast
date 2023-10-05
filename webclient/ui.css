@@ -1,3 +1,21 @@
+.fullscreen {
+  position: absolute;
+  top:   0px;
+  left:  0px;
+  width: 100%
+}
+
+#sidebar-toggle:checked ~ label {
+  transform: rotate(180deg);
+  right: 400px;
+  transition: 0.2s;
+}
+
+#sidebar-toggle:checked ~ #sidebar-panel {
+  width: 450px;
+}
+
+
 .mainBtn {
   width:94px;
   height:94px;
@@ -102,7 +120,7 @@
   margin-left: 17px;
 }
 
-#side_panel {
+#sidebar-panel {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -112,9 +130,10 @@
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
   z-index: 1;
   overflow-x: hidden;
+  transition: 0.2s;
 }
 
-#stickers_btn {
+#sidebar-button {
   position: absolute;
   top: 45%;
   bottom: 45%;
@@ -127,13 +146,14 @@
   border-radius: 50px 0px 0px 50px;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
   z-index: 2;
+  transition: 0.2s;
 }
 
-#stickers_btn:active {
+#sidebar-button:active {
   background: white;
 }
 
-#side_panel img {
+#sidebar-panel img {
   max-width: 140px;
   max-height: 180px;
   margin-top: 10px;

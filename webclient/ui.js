@@ -1,8 +1,6 @@
 let bgSubmenuIsOpen = false;
 let effectSubmenuIsOpen = false;
 let brushMenuIsOpen = false;
-let sidebarIsOpen = false;
-let stickModeOn = false;
 
 // courtesy of https://gist.github.com/derek-dchu/8c828fc40b17646cbb78
 function swapElement(a, b) {
@@ -20,35 +18,6 @@ $('#effect_btn').on("click", function() {
   brushBtnDeactive();
   stickModeOn = false;
 });
-
-$('#stickers_btn').on("click", function() {
-if(sidebarIsOpen==false)  {
-  openSidebar();
-} else {
-  closeSidebar();
-}
-});
-
-function openSidebar() {
-  $('#side_panel').css({ width: "450px" });
-  $('#side_panel').css({ padding: "0px 0px 0px 42px" });
-  $('#stickers_btn').css({ right: "442px" });
-  $('#stickers_btn').css({ transform: "rotate(180deg)" });
-  $('#stickers_btn').css({ background: "white" });
-  sidebarIsOpen = true;
-  stickModeOn = true;
-  bgBtnDeactive();
-  effectBtnDeactive();
-}
-
-function closeSidebar() {
-  $('#side_panel').css({ width: "0px" });
-  $('#side_panel').css({ padding: "0px" });
-  $('#stickers_btn').css({ right: "0px" });
-  $('#stickers_btn').css({ transform: "rotate(360deg)" });
-  $('#stickers_btn').css({ background: "rgba(230, 230, 230, 0.7)" });
-  sidebarIsOpen = false;
-}
 
 $('#brush_btn').on("click", function() {
   if (brushMenuIsOpen) {
