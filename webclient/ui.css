@@ -57,6 +57,8 @@
   transition: 0.2s;
   border-radius: 50px;
   background: lightgray;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .mainBtn {

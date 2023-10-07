@@ -1,8 +1,8 @@
 var background = "";
 var fakecanvas = null;
 
-document.getElementById("clearAll_btn").onclick = function() {
-    fakecanvas.empty();
+document.getElementById("paint-clear").onclick = function() {
+    fakecanvas.replaceChildren();
     canvasctx.globalCompositeOperation = "destination-out";
     canvasctx.fillStyle = "rgba(0,0,0,255)";
     canvasctx.fillRect(0, 0, canvas.width, canvas.height);
