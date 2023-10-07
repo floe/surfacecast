@@ -28,6 +28,10 @@
   display: block;
 }
 
+.menu label {
+  padding: 10px;
+}
+
 .button {
   width:100px;
   height:100px;
@@ -78,7 +82,8 @@
   margin-left: 10px;
 } 
   
-#Main_btns {
+#toolbar {
+  position: absolute;
   display: flex;
   flex-direction: row;
   margin: 10px;
@@ -196,10 +201,6 @@
   max-width: 140px;
   max-height: 180px;
   margin-top: 10px;
-}
-
-#toolbar {
-  position: absolute;
 }
 
 .sticker {
