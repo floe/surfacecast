@@ -21,8 +21,17 @@ function paint(ctx, centerX, centerY, clearcolor, clearmode) {
   }
   
   
-function onCanvasDown(evt) { x = evt.offsetX/scale; y = evt.offsetY/scale; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                            mousedown = 0;                                            }
+function onCanvasDown(evt) {
+  scale = canvas.offsetWidth / canvas.width;
+  x = evt.offsetX/scale;
+  y = evt.offsetY/scale;
+  mousedown = (evt.buttons == undefined) ? 1 : evt.buttons;
+}
+
+function onCanvasUp(evt) {
+  onCanvasMove(evt);
+  mousedown = 0;
+}
   
 function onCanvasMove(evt) {
 
@@ -53,7 +62,6 @@ function canvas_init() {
   canvas.ontouchmove  = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
-  scale = canvas.offsetWidth / canvas.width; // FIXME needs recalc at screen size change
 
   var colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];
