@@ -28,7 +28,7 @@
   display: block;
 }
 
-.menu label {
+.menu > label {
   padding: 10px;
 }
 

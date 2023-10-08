@@ -1,23 +1,18 @@
-var background = "";
+var background = null;
 var fakecanvas = null;
 
-document.getElementById("paint-clear").onclick = function() {
+function clear_all() {
     fakecanvas.replaceChildren();
+    background = null;
     canvasctx.globalCompositeOperation = "destination-out";
     canvasctx.fillStyle = "rgba(0,0,0,255)";
     canvasctx.fillRect(0, 0, canvas.width, canvas.height);
 };
 
-function changeBg(btn){
-    let url = btn.style.background-image;
-    url = url.split("/");
-    background = document.createElement("img");
-    background.src = url[3]+"/"+url[4].split("\"")[0];
-}
-
-function defaultBg(){
-    background=null;
-    bgBtnDeactive();
+function backgroundFunc(that) {
+  var files = that.files;
+  background = document.createElement("img");
+  background.src = URL.createObjectURL(files[0]);
 }
 
 // courtesy of https://stackoverflow.com/a/75045656/
