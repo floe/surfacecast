@@ -53,10 +53,10 @@
     </svg>
     </button> -->
     <div class="submenu">
-      <button class="button" id="paint-pen" title="Pen">
+      <button class="button" id="paint-pen" onclick="paintmode=1;" title="Pen">
         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#515151" viewBox="0 0 256 256"><path d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM136,75.31,152.69,92,68,176.69,51.31,160ZM48,208V179.31L76.69,208Zm48-3.31L79.32,188,164,103.31,180.69,120Zm96-96L147.32,64l24-24L216,84.69Z"></path></svg>
       </button>
-      <button class="button" id="paint-erase" title="Eraser">
+      <button class="button" id="paint-erase" onclick="paintmode=2;" title="Eraser">
         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#515151" viewBox="0 0 256 256"><path d="M225,80.4,183.6,39a24,24,0,0,0-33.94,0L31,157.66a24,24,0,0,0,0,33.94l30.06,30.06A8,8,0,0,0,66.74,224H216a8,8,0,0,0,0-16h-84.7L225,114.34A24,24,0,0,0,225,80.4ZM108.68,208H70.05L42.33,180.28a8,8,0,0,1,0-11.31L96,115.31,148.69,168Zm105-105L160,156.69,107.31,104,161,50.34a8,8,0,0,1,11.32,0l41.38,41.38a8,8,0,0,1,0,11.31Z"></path></svg>
       </button>
       <button class="button" id="paint-clear" onclick="clear_all();" title="Clear all">
@@ -90,7 +90,6 @@
 <video class="overlay" id="frontoutput" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
 
   <script src="adapter.js"></script>
-  <!-- script src="effects.js"></script -->
   <script src="stickers.js"></script>
   <script src="canvas.js"></script>
   <script src="stream.js"></script>

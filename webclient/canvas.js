@@ -1,9 +1,11 @@
-var mousedown;
+var paintmode = 1;
+var mousedown = 0;
 var mycolor;
 var x,y;
 var scale = 1;
 
-function paint(ctx, centerX, centerY, clearcolor, clearmode, erase) {
+function paint(ctx, centerX, centerY, clearcolor, clearmode) {
+    var erase = (paintmode == 2 || mousedown > 1) ? 2 : 1;
     const radius = (erase == 1) ? 5 : 20;
     ctx.beginPath();
     ctx.lineWidth = radius;
@@ -35,8 +37,8 @@ function onCanvasMove(evt) {
   const centerX = evt.offsetX / scale;
   const centerY = evt.offsetY / scale;
 
-  paint(canvasctx, centerX, centerY, "rgba(0,  0,0,255)", "destination-out", mousedown);
-  paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over",     mousedown);
+  paint(canvasctx, centerX, centerY, "rgba(0,  0,0,255)", "destination-out");
+  paint(sourcectx, centerX, centerY, "rgba(0,255,0,255)", "source-over"    );
 
   x = centerX;
   y = centerY;
@@ -51,7 +53,7 @@ function canvas_init() {
   canvas.ontouchmove  = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
-  scale = canvas.offsetWidth / canvas.width;
+  scale = canvas.offsetWidth / canvas.width; // FIXME needs recalc at screen size change
 
   var colors = ["red", "cyan", "yellow", "blue", "magenta" ];
   mycolor = colors[Math.floor(Math.random() * colors.length)];

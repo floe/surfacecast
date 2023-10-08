@@ -55,6 +55,12 @@ function move_start(evt) {
   var sticker = evt.target;
   evt.preventDefault();
 
+  // erase sticker on right click or if eraser is active
+  if (evt.buttons > 1 || paintmode == 2 ) {
+    sticker.remove();
+    return;
+  }
+
   sticker.isActive = true;
   sticker.offset = [
     sticker.offsetLeft - evt.touches[0].clientX,
