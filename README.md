@@ -1,5 +1,7 @@
 # SurfaceCast
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8419471.svg)](https://doi.org/10.5281/zenodo.8419471)
+
 A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
 ![shared table surfaces with real and projected objects](assets/teaser0.jpg)
