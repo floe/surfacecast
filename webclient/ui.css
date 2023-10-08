@@ -28,6 +28,10 @@
   display: block;
 }
 
+.radio:checked ~ label {
+  background: white;
+}
+
 .menu > label {
   padding: 10px;
 }
