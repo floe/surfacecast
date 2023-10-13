@@ -6,7 +6,7 @@ SurfaceCast is a super-flexible streaming toolkit that lets you create shared in
 
 ![two shared table surfaces and one iPad screenshot, with real and projected objects plus virtual annotations](assets/teaser0.jpg)
 
-Some examples for the usage scenarios that you can build with SurfaceCast include a hybrid physical-virtual whiteboard (a), remote piano teaching (b), distributed physical board games or puzzles (c), or "dining at a distance" (d).
+Some examples for the usage scenarios that you can build with SurfaceCast include a hybrid physical-virtual whiteboard (a), remote piano teaching (b), "dining at a distance" (c), or distributed physical board games and puzzles (d).
 
 ![four usage scenarios of SurfaceCast](assets/teaser2.jpg)
 
