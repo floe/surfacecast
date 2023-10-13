@@ -1,6 +1,8 @@
 # SurfaceCast
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8419471.svg)](https://doi.org/10.5281/zenodo.8419471)
+
+[![DOI](https://img.shields.io/badge/Zenodo-10.5281/zenodo.8419471-blue?logo=DOI)](https://doi.org/10.5281/zenodo.8419471)
+[![DOI](https://img.shields.io/badge/ACM-10.1145/3626475-blue?logo=DOI)](https://doi.org/10.1145/3626475)
 
 SurfaceCast is a super-flexible streaming toolkit that lets you create shared interactive surfaces from a huge variety of devices, merging up to four separate locations into one shared mixed-reality space.
 
@@ -104,6 +106,12 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * Safari 15 - 16
   * Firefox 78 ESR, 102 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
   * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacecast/issues/8))
+ 
+## Citations
+
+If you use SurfaceCast in an academic context, please cite our main publication: [![DOI](https://img.shields.io/badge/ACM-10.1145/3626475-blue?logo=DOI)](https://doi.org/10.1145/3626475)
+
+F. Echtler, V. Maierhöfer, N. B. Hansen, and R. Wimmer. **SurfaceCast: Cross-Device Ubiquitous Surface Sharing.** In _Proceedings of the ACM on Human-Computer Interaction_, ISS '23 (to appear).
 
 ## Known issues
 
