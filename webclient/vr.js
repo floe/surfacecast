@@ -2,6 +2,10 @@ var audioCtx;
 var analyser;
 var source;
 
+function vr_init() {
+  vr_fakefront_init();
+}
+
 function vr_fakefront_init() {
   // canvas3/c3 is for the virtual avatar front stream in VR
   frontsource = document.getElementById("frontsource");

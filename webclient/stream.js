@@ -182,11 +182,12 @@ window.addEventListener("load", function(ev) {
   // some interactive handler needed to give stream higher priority?
   canvas.onmousemove = function(ev) { sourcectx.strokeStyle = "red"; sourcectx.fillStyle = "red"; sourcectx.fillRect(10, 10, 20, 20); }
 
-  webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
-  playStream();
-
-  if (typeof canvas_init  === "function") canvas_init();
+  if (typeof vr_init       === "function") vr_init();
+  if (typeof canvas_init   === "function") canvas_init();
   if (typeof stickers_init === "function") stickers_init();
 
   document.getElementById("frontoutput").onclick = function(){document.documentElement.requestFullscreen();};
+  webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
+
+  playStream();
 });
