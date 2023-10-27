@@ -23,6 +23,7 @@ function paint(ctx, centerX, centerY, clearcolor, clearmode) {
   
 function onCanvasDown(evt) {
   scale = canvas.offsetWidth / canvas.width;
+  if (scale === 0) scale = 1;
   x = evt.offsetX/scale;
   y = evt.offsetY/scale;
   mousedown = (evt.buttons == undefined) ? 1 : evt.buttons;
