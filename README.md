@@ -12,6 +12,10 @@ Some examples for the usage scenarios that you can build with SurfaceCast includ
 
 ![four usage scenarios of SurfaceCast](assets/teaser2.jpg)
 
+You can use SurfaceCast with just about anything: a tablet, a plain old desktop PC, a VR or AR headset, a projector-camera setup, or a dedicated tabletop like the SUR40.
+
+## Architecture
+
 SurfaceCast consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
 The mixing server then composes a new surface stream for each client, consisting of the layered surface streams of the _other_ clients, and streams that back to each client (along with a single combined front stream of all individual front streams arranged side-by-side).
