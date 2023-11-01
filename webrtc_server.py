@@ -22,7 +22,7 @@ def get_client_address(client):
     return addr.get_address().to_string()+"_"+str(addr.get_port())
 
 # incoming HTTP(S) request
-def http_handler(server,msg,path,query,client,user_data):
+def http_handler(server,msg,path,query,client):
     logging.info("HTTP(S) request for: "+path)
     if path == "/":
         path = "/index.html"
@@ -45,10 +45,10 @@ def http_handler(server,msg,path,query,client,user_data):
             GLib.timeout_add(100,quit_mainloop)
             data=b"Server exiting/restarting..."
 
-    msg.response_headers.append("Content-Type",content_type)
-    msg.response_headers.append("Cache-Control","no-store")
+    msg.get_response_headers().append("Content-Type",content_type)
+    msg.get_response_headers().append("Cache-Control","no-store")
     #msg.response_headers.append("Access-Control-Allow-Origin","*")
-    msg.response_body.append(data)
+    msg.get_response_body().append(data)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, client):
