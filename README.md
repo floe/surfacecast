@@ -1,13 +1,22 @@
-# SurfaceStreams
+# SurfaceCast
 
-A framework to mix and distribute live video feeds from interactive surfaces via WebRTC.
 
-![shared table surfaces with real and projected objects](assets/teaser0.jpg)
+[![DOI](https://img.shields.io/badge/Zenodo-10.5281/zenodo.8419471-blue?logo=DOI)](https://doi.org/10.5281/zenodo.8419471)
+[![DOI](https://img.shields.io/badge/ACM-10.1145/3626475-blue?logo=DOI)](https://doi.org/10.1145/3626475)
 
-![shared table surfaces with real and projected objects](assets/teaser1.jpg)
-2nd image credit: ©️ Stadt Regensburg, ©️ Stefan Effenhauser (see also the [VIGITIA](https://vigitia.de/) project)
+SurfaceCast is a super-flexible streaming toolkit that lets you create shared interactive surfaces from a huge variety of devices, merging up to four separate locations into one shared mixed-reality space.
 
-SurfaceStreams consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
+![two shared table surfaces and one iPad screenshot, with real and projected objects plus virtual annotations](assets/teaser0.jpg)
+
+Some examples for the usage scenarios that you can build with SurfaceCast include a hybrid physical-virtual whiteboard (a), remote piano teaching (b), "dining at a distance" (c), or distributed physical board games and puzzles (d).
+
+![four usage scenarios of SurfaceCast](assets/teaser2.jpg)
+
+You can use SurfaceCast with just about anything: a tablet, a plain old desktop PC, a VR or AR headset, a projector-camera setup, or a dedicated tabletop like the SUR40.
+
+## Architecture
+
+SurfaceCast consists of a mixing server, and one or more clients. Each clients sends one audiostream and two video streams: a plain old webcam feed of the user called the _front stream_, and a second feed of a rectified interactive surface called the _surface stream_. The surface stream is expected to have any background removed and chroma-keyed with 100% bright green.
 
 The mixing server then composes a new surface stream for each client, consisting of the layered surface streams of the _other_ clients, and streams that back to each client (along with a single combined front stream of all individual front streams arranged side-by-side).
 
@@ -24,7 +33,7 @@ Here's an example walkthrough of how to connect an interactive surface with a br
    * you should then see your own webcam stream and a black canvas after a few seconds
    * try doodling on the black canvas (left mouse button draws, right button erases)
  * start the interactive surface:
-   * setup and calibrate [SurfaceCast](https://github.com/floe/surfacecast) to stream the surface on virtual camera `/dev/video20` (see Usage - Example 2)
+   * setup and calibrate [SurfaceStreams](https://github.com/floe/surfacestreams) to stream the surface on virtual camera `/dev/video20` (see Usage - Example 2)
    * run the Python client: `./webrtc_client.py -t ${SERVER_HOST} -s /dev/video20 -f /dev/video0` (or whatever device your plain webcam is)
    * put the `surface` window as fullscreen on the surface display, and the `front` window on the front display
  * connect additional browser and/or surface clients (up to 4 in total)
@@ -78,7 +87,7 @@ Can be used to "outsource" the perspective transformation of the surface feed to
 
 ```
   -s, --sink            save all streams to MP4 file (default: False)
-  -o OUT, --out OUT     MP4 output filename (default: surfacestreams-20220327-125732.mp4)
+  -o OUT, --out OUT     MP4 output filename (default: surfacecast-20220327-125732.mp4)
 ```
 If `-s/--sink` is given, write the combined front, surface, and audio streams to a MP4 file. Optional target filename can be set via `-o/--out`. Note that the file contains OPUS audio inside an MP4 container, which is not supported by all players. If necessary, use `scripts/playback.sh` to recode to MP3 and play all streams simultaneously in VLC.
 
@@ -92,7 +101,6 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
 
 * Mixing server & standalone client
   * Ubuntu 22.04 LTS (Python 3.10, GStreamer 1.20)
-  * Ubuntu 20.04 LTS (Python 3.8, GStreamer 1.16)
   * Debian 11 "Bullseye" (Python 3.9, GStreamer 1.18)
   * Install dependencies: `sudo apt install gstreamer1.0-libav gir1.2-soup-2.4 gir1.2-gstreamer-1.0 gir1.2-gst-plugins-bad-1.0 gir1.2-gst-plugins-base-1.0 gir1.2-nice-0.1 libnice10 gstreamer1.0-nice gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly`
 
@@ -101,7 +109,13 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
   * Firefox 94 - 96
   * Safari 15 - 16
   * Firefox 78 ESR, 102 ESR (Note: remember to enable OpenH264 plugin in `about:plugins`)
-  * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacestreams/issues/8))
+  * Chromium (Note: remember to install `chromium-codecs-ffmpeg-extra`, see [issue #8](https://github.com/floe/surfacecast/issues/8))
+ 
+## Citations
+
+If you use SurfaceCast in an academic context, please cite our main publication: [![DOI](https://img.shields.io/badge/ACM-10.1145/3626475-blue?logo=DOI)](https://doi.org/10.1145/3626475)
+
+F. Echtler, V. Maierhöfer, N. B. Hansen, and R. Wimmer. **SurfaceCast: Cross-Device Ubiquitous Surface Sharing.** In _Proceedings of the ACM on Human-Computer Interaction_, ISS '23 (to appear).
 
 ## Known issues
 
@@ -111,9 +125,9 @@ If you want to use a different STUN server than the default (stun://stun.l.googl
     * Some race conditions when setting up the mixers still seem to be present, but hard to pin down. This happens particularly when a client connects within a few seconds of the previous client, before negotiation has completed. Usually shows up as a black surface stream, restart the client in this case.
   * Python Client
     * Using webcams as live sources (e.g. for the front stream) is somewhat hit-and-miss and depends on the pixel formats the webcam can deliver. Reliable results so far only with 24-bit RGB or 16-bit YUYV/YUV2. The front/face cam needs to support 640x360 natively, the surface cam needs to support 1280x720 natively. Good results with Logitech C270 (front/face) and C920 (surface). Note: environment variable `GST_V4L2_USE_LIBV4L2=1` can sometimes be used to fix format mismatch issues.
-    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceCast perspective transform. Some additional notes: 
+    * A Raspberry Pi 4 is just barely fast enough to handle the incoming and outgoing streams _plus_ the SurfaceStreams perspective transform. Some additional notes: 
         * Overclocking to at least 1800 core/600 GPU is recommended (and don't forget to add active cooling, otherwise it will just go into thermal throttling right away, and you're back to square one).
         * "Outsource" the perspective transform to the server using the `--persp` parameter.
         * Don't plug the cameras into the USB3 ports (blue), but into USB2 instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?t=275492))
         * Avoid using the analogue audio output, use HDMI instead (cf. [forum post](https://forums.raspberrypi.com/viewtopic.php?f=28&t=306408))
-        * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. [39c6020](https://github.com/floe/surfacestreams/commit/39c60206fb0797f97e825718ff5deba41b53008d))
+        * Don't use the hardware H.264 decoder, causes some resource contention/race condition in the V4L2 subsystem when used in parallel with two cameras (cf. [39c6020](https://github.com/floe/surfacecast/commit/39c60206fb0797f97e825718ff5deba41b53008d))

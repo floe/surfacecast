@@ -54,12 +54,12 @@ def get_request_pad(el,tpl):
     return el.request_pad(el.get_pad_template(tpl), None, None)
 
 # create single mixer for front stream
-def create_frontmixer_queue():
+def create_frontmixer_queue(fps=15):
 
     logging.info("Creating frontmixer subqueue...")
 
-    frontmixer  = new_element("compositor",{"latency":100000000},myname="frontmixer")
-    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=1280,height=720,framerate=15/1")})
+    frontmixer  = new_element("compositor",{"latency":50000000},myname="frontmixer")
+    capsfilter  = new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=I420,width=1280,height=720,framerate={fps}/1")})
     frontstream = new_element("tee",{"allow-not-linked":True},myname="frontstream")
 
     add_and_link([ frontmixer, capsfilter, frontstream ])
@@ -69,8 +69,57 @@ def create_frontmixer_queue():
     pad2 = get_request_pad(frontmixer,"sink_%u")
     pad1.link(pad2)
 
+# position offsets and src/dest dimensions for 1-4 front streams
+# FIXME: how to handle > 4 clients?
+all_offsets = [
+    [
+    ],[
+        (  0,   0, 1280, 720, 1280, 720)  # single fullscreen
+    ],[
+        (  0,   0,  640, 720,  640, 720), # pillarbox left
+        (640,   0,  640, 720,  640, 720)  # pillarbox right
+    ],[
+        (  0,   0,  640, 720,  640, 720), # pillarbox left
+        (640,   0, 1280, 720,  640, 360), # top right
+        (640, 360, 1280, 720,  640, 360)  # bottom right
+    ],[
+        (  0,   0, 1280, 720,  640, 360), # top left
+        (640,   0, 1280, 720,  640, 360), # top right
+        (  0, 360, 1280, 720,  640, 360), # bottom left
+        (640, 360, 1280, 720,  640, 360)  # bottom right
+    ]
+]
+
+# use all_offsets to arrange the incoming frontstreams
+def arrange_frontstreams():
+
+    fm = get_by_name("frontmixer")
+    count = 0
+    offsets = all_offsets[len(fm.sinkpads)-1]
+
+    # set xpos/ypos/offset properties on pad according to sequence number
+    for pad in fm.sinkpads:
+
+        padnum = int(pad.get_name().split("_")[1])
+        if padnum == 0: # skip testsource pad
+            continue
+        padnum = count % len(offsets)
+        count += 1
+
+        # set the target rectangle
+        pad.set_property("xpos",offsets[padnum][0])
+        pad.set_property("ypos",offsets[padnum][1])
+        pad.set_property("width",offsets[padnum][4])
+        pad.set_property("height",offsets[padnum][5])
+
+        # set the source width and offset
+        cc = Gst.Structure.new_empty("cc") # FIXME hardcoded source image width
+        cc.set_value("GstVideoConverter.src-x",int((1280-offsets[padnum][2])/2))
+        cc.set_value("GstVideoConverter.src-width",offsets[padnum][2])
+        pad.set_property("converter-config",cc)
+
 # write out debug dot file (needs envvar GST_DEBUG_DUMP_DOT_DIR set)
-def dump_debug(name="surfacestreams"):
+def dump_debug(name="surfacecast"):
     if os.getenv("GST_DEBUG_DUMP_DOT_DIR") == None:
         logging.info("Cannot dump graph, GST_DEBUG_DUMP_DOT_DIR is unset.")
         return
@@ -117,7 +166,7 @@ def connect_bus(msgtype, callback, *args):
     bus.connect(msgtype, callback, *args)
 
 # test sources as stream placeholders
-def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks",sw=1280,sh=720):
+def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00FF00,wave="ticks",sw=1280,sh=720,fps=15):
 
     if fake:
         frontsrc = "videotestsrc is-live=true pattern=smpte ! timeoverlay text="+wave if frontdev == "" else frontdev
@@ -134,12 +183,12 @@ def add_test_sources(frontdev="",surfdev="",audiodev="",fake=False,bgcol=0xFF00F
     logging.debug("  Audio Source: "+audiosrc)
 
     add_and_link([ Gst.parse_bin_from_description( frontsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string("video/x-raw,format=I420,width=640,height=360,framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=I420,width=1280,height=720,framerate={fps}/1")}),
         new_element("tee",{"allow-not-linked":True},"fronttestsource")
     ])
 
     add_and_link([ Gst.parse_bin_from_description( surfsrc, True ),
-        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={sw},height={sh},framerate=15/1")}),
+        new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={sw},height={sh},framerate={fps}/1")}),
         new_element("tee",{"allow-not-linked":True},"surfacetestsource")
     ])
 

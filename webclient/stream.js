@@ -1,16 +1,13 @@
-var html5VideoElement;
-var html5VideoElement2;
+var frontoutput;
+var surfaceoutput;
 var websocketConnection;
 var webrtcPeerConnection;
 var webrtcConfiguration;
-var reportError;
+var reportError = function (errmsg) { console.error(errmsg); }
 var datastream;
-var canvas,canvas2,canvas3;
-var context,c2,c3;
+var canvas,surfacesource,frontsource;
+var canvasctx,sourcectx;
 var canvasstream;
-var mousedown;
-var mycolor;
-var x,y;
 
 var audiotrans;
 var surfacetrans;
@@ -18,52 +15,6 @@ var fronttrans;
 var remotemap;
 var frontstream;
 var surfacestream;
-var windowstream = null;
-var video3;
-
-var audioCtx;
-var analyser;
-var source;
-
-function paint(ctx, centerX, centerY, clearcolor, clearmode) {
-  const radius = (mousedown == 1) ? 5 : 20;
-  ctx.beginPath();
-  ctx.lineWidth = radius;
-  ctx.strokeStyle = (mousedown == 1) ? mycolor : clearcolor;
-  ctx.fillStyle = ctx.strokeStyle
-  ctx.globalCompositeOperation = (mousedown == 1) ? "source-over" : clearmode;
-  ctx.moveTo(x,y);
-  ctx.lineTo(centerX,centerY);
-  ctx.stroke();
-  ctx.arc(centerX, centerY, radius/2, 0, 2 * Math.PI, false);
-  ctx.fill();
-  ctx.closePath();
-}
-
-
-function onCanvasDown(evt) { x = evt.offsetX; y = evt.offsetY; mousedown = (evt.buttons == undefined) ? 1 : evt.buttons; }
-function onCanvasUp  (evt) { onCanvasMove(evt);                mousedown = 0;                                            }
-
-function onCanvasMove(evt) {
-
-  if (mousedown == 0) return;
-
-  if (evt.type == "touchmove") {
-    evt.preventDefault();
-    evt.offsetX = evt.changedTouches[0].pageX;
-    evt.offsetY = evt.changedTouches[0].pageY;
-  }
-
-  const centerX = evt.offsetX;
-  const centerY = evt.offsetY;
-
-  paint(context, centerX, centerY, "rgba(0,  0,0,255)", "destination-out");
-  paint(c2,      centerX, centerY, "rgba(0,255,0,255)", "source-over"    );
-
-  x = centerX;
-  y = centerY;
-}
-
 
 function onLocalDescription(desc) {
   var mapping = { };
@@ -98,8 +49,8 @@ function onAddRemoteStream(event) {
 
   if (remotemap[event.transceiver.mid] == "front") {
     frontstream.addTrack(event.track);
-    html5VideoElement.srcObject = frontstream;
-    html5VideoElement.play().catch(reportError);
+    frontoutput.srcObject = frontstream;
+    frontoutput.play().catch(reportError);
   }
 
   if (remotemap[event.transceiver.mid] == "audio") {
@@ -108,8 +59,8 @@ function onAddRemoteStream(event) {
 
   if (remotemap[event.transceiver.mid] == "surface") {
     surfacestream.addTrack(event.track);
-    html5VideoElement2.srcObject = surfacestream;
-    html5VideoElement2.play().catch(reportError);
+    surfaceoutput.srcObject = surfacestream;
+    surfaceoutput.play().catch(reportError);
   }
 }
 
@@ -124,7 +75,7 @@ function onIceCandidate(event) {
 
 function getLocalStreams() {
   // courtesy of https://stackoverflow.com/a/33770858
-  var vidconst = { width: { ideal: 640 }, height: { ideal: 360 }, facingMode: "user" };
+  var vidconst = { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" };
   return navigator.mediaDevices.enumerateDevices().then(devices => {
     const cams = devices.filter(device => device.kind == "videoinput");
     const mics = devices.filter(device => device.kind == "audioinput");
@@ -154,40 +105,10 @@ function onServerMessage(event) {
   }
 }
 
-function updateAudioFeedback() {
-
-    var target = document.getElementById("mouth");
-    if (target === null) return;
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(dataArray);
-
-    scale = (dataArray[1]/255.0)+ (dataArray[2]/255.0);
-
-    target.object3D.scale.set(scale,scale,scale);
-    setTimeout(updateAudioFeedback,50);
-}
-
-function drawVideo() {
-  c2.drawImage( video3, 0, 0, 1280, 720 );
-  c2.drawImage( canvas, 0, 0, 1280, 720 );
-  // 15 FPS rate-limiting, cf. https://stackoverflow.com/q/19764018
-  setTimeout( () => { requestAnimationFrame(drawVideo); }, 1000/15 );
-}
-
-function playStream(videoElement, hostname, port, path, configuration, reportErrorCB) {
+function playStream() {
   var l = window.location;
-  var wsHost = (hostname != undefined) ? hostname : l.hostname;
-  var wsPort = (port != undefined) ? port : l.port;
-  var wsPath = (path != undefined) ? path : "ws";
-  if (wsPort)
-    wsPort = ":" + wsPort;
-  var wsUrl = "wss://" + wsHost + wsPort + "/" + wsPath;
+  var wsUrl = "wss://" + l.hostname + ":" + l.port + "/ws";
 
-  html5VideoElement = videoElement;
-  webrtcConfiguration = configuration;
-  reportError = (reportErrorCB != undefined) ? reportErrorCB : function(text) {};
   frontstream = new MediaStream();
   surfacestream = new MediaStream();
 
@@ -203,24 +124,17 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       datastream = webrtcPeerConnection.createDataChannel("events");
       datastream.onopen = function(event) { datastream.send("Hi from "+navigator.userAgent); }
 
-      audiotrack = stream.getAudioTracks()[0];
+      var audiotrack = stream.getAudioTracks()[0];
       audiotrans = audiotrack.id;
       webrtcPeerConnection.addTrack(audiotrack);
 
-      // from https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
-      audioCtx = new AudioContext();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source = audioCtx.createMediaStreamSource(stream);
-      source.connect(analyser);
-      setTimeout(updateAudioFeedback,50);
-
       var vidtracks = stream.getVideoTracks();
+      var fronttrack = null;
       if (vidtracks.length > 0) {
         fronttrack = vidtracks[0];
         console.log("using camera track for front");
       } else {
-        canvasstream = canvas3.captureStream(15);
+        canvasstream = frontsource.captureStream(15);
         fronttrack = canvasstream.getVideoTracks()[0];
         console.log("using fake front stream");
         //fronttrack.contentHint = "detail";
@@ -228,79 +142,52 @@ function playStream(videoElement, hostname, port, path, configuration, reportErr
       fronttrans = fronttrack.id;
       webrtcPeerConnection.addTrack(fronttrack);
 
-      canvasstream = canvas2.captureStream(15);
+      canvasstream = surfacesource.captureStream(15);
       canvastrack = canvasstream.getVideoTracks()[0];
       canvastrack.contentHint = "detail";
       surfacetrans = canvastrack.id;
       webrtcPeerConnection.addTrack(canvastrack, stream);
-      // make sure that the canvas stream starts by triggering a delayed paint operation
-      setTimeout(() => { c2.fillRect(0, 0, canvas2.width, canvas2.height); }, 1000);
 
       websocketConnection = new WebSocket(wsUrl);
       websocketConnection.addEventListener("message", onServerMessage);
-      //websocketConnection.onopen = function(event) { websocketConnection.send("Hoi!"); };
       console.log("Capture setup complete.");
     } );
   }
 }
 
-window.onload = function() {
-  // stream is the incoming front stream
-  var vidstream = document.getElementById("stream");
-  // stream2 is the incoming surface stream
-  html5VideoElement2 = document.getElementById("stream2");
-  // "canvas"/context is the primary, visible drawing surface
-  canvas = document.getElementById("canvas");
-  //fixCanvas(canvas);
-  context = canvas.getContext("2d");
-  canvas.width=1280;
-  canvas.height=720;
-  context.fillStyle = "rgba(0,255,0,0)";
-  context.fillRect(0, 0, canvas.width, canvas.height);
+function get_context(canvas,w,h,fillstyle) {
+  var context = canvas.getContext("2d");
+  canvas.width  = w;
+  canvas.height = h;
+  context.fillStyle = fillstyle;
+  context.fillRect(0,0,w,h);
+  return context;
+}
 
-  canvas.onmousedown = onCanvasDown;
-  canvas.ontouchstart = onCanvasDown;
-  canvas.onmouseup   = onCanvasUp;
-  canvas.ontouchend = onCanvasUp;
-  canvas.onmousemove = onCanvasMove;
-  canvas.ontouchmove = onCanvasMove;
+window.addEventListener("load", function(ev) {
 
-  canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
-  var config = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
-  playStream(vidstream, null, null, null, config, function (errmsg) { console.error(errmsg); });
-  colors = ["red", "cyan", "yellow", "blue", "magenta" ];
-  mycolor = colors[Math.floor(Math.random() * colors.length)];
-  context.strokeStyle = mycolor; context.fillStyle = mycolor; context.fillRect(10, 10, 20, 20);
+  // output element for incoming front stream
+  frontoutput = document.getElementById("frontoutput");
+  // output element for incoming surface stream
+  surfaceoutput = document.getElementById("surfaceoutput");
 
-  // canvas2/c2 is the surface stream source (invisible drawing surface with green background)
-  canvas2 = document.getElementById("canvas2");
-  c2 = canvas2.getContext("2d");
-  canvas2.width=1280;
-  canvas2.height=720;
+  // canvas/canvasctx is the primary, visible drawing surface
+  canvas = document.getElementById("surfacecanvas");
+  canvasctx = get_context(canvas,1280,720,"rgba(0,255,0,0)"); // FIXME: hardcoded dimensions
 
-  // canvas3/c3 is for the virtual avatar front stream in VR
-  canvas3 = document.getElementById("canvas3");
-  if (canvas3) {
-  c3 = canvas3.getContext("webgl");
-  canvas3.width=640;
-  canvas3.height=360;
-  }
+  // surfacesource/sourcectx is the surface stream source (invisible drawing surface with green background)
+  surfacesource = document.getElementById("surfacesource");
+  sourcectx = get_context(surfacesource,1280,720,"rgba(0,255,0,255)"); // FIXME: hardcoded dimensions
 
-  c2.fillStyle = "rgba(0,255,0,255)";
-  c2.fillRect(0, 0, canvas2.width, canvas2.height);
+  // some interactive handler needed to give stream higher priority?
+  canvas.onmousemove = function(ev) { sourcectx.strokeStyle = "red"; sourcectx.fillStyle = "red"; sourcectx.fillRect(10, 10, 20, 20); }
 
-  // "stream3"/video3 is for the local desktop capture stream
-  video3 = document.getElementById("stream3");
-  startbtn = document.getElementById("start");
+  if (typeof vr_init       === "function") vr_init();
+  if (typeof canvas_init   === "function") canvas_init();
+  if (typeof stickers_init === "function") stickers_init();
 
-  if (startbtn) startbtn.addEventListener("click", function(e) {
-    let captureopts = { video: { width: 1280 }, audio: false, surfaceSwitching: "include", selfBrowserSurface: "exclude" };
-    navigator.mediaDevices.getDisplayMedia(captureopts).then( (stream) => {
-      console.log(stream);
-      windowstream = stream.getVideoTracks()[0];
-      video3.srcObject = stream;
-      video3.play().catch(reportError);
-      drawVideo();
-    } );
-  } );
-};
+  document.getElementById("frontoutput").onclick = function(){document.documentElement.requestFullscreen();};
+  webrtcConfiguration = { 'iceServers': [{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.ekiga.net"}] };
+
+  playStream();
+});

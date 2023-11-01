@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale:1, user-scalable=no" />
+  <title>Tangram</title>
+  <link rel="stylesheet" href="ui.css"/>
+</head>
+<body>
+<canvas class="fullscreen" id="surfacesource" ></canvas> <!-- surface stream source canvas (green background) -->
+<video  class="fullscreen" id="surfaceoutput" autoplay playsinline>Your browser does not support video</video> <!-- surface stream display -->
+<canvas class="fullscreen" id="surfacecanvas"  ></canvas> <!-- visible painting canvas (transparent BG) -->
+<div    class="fullscreen" id="fakecanvas"></div> <!-- visible sticker container -->
+
+<div id="sidebar">
+  <div id="sidebar-panel">
+    <img id="t1" src="images/tangram1.png" class="rotate">
+    <img id="t2" src="images/tangram2.png" class="rotate">
+    <img id="t3" src="images/tangram3.png" class="rotate">
+    <img id="t4" src="images/tangram4.png" class="rotate">
+    <img id="t5" src="images/tangram5.png" class="rotate">
+    <img id="t6" src="images/tangram6.png" class="rotate">
+    <img id="t7" src="images/tangram7.png" class="rotate">
+  </div>
+</div>
+
+<video class="overlay" id="frontoutput" autoplay playsinline>Your browser does not support video</video> <!-- front stream display -->
+
+  <script src="adapter.js"></script>
+  <script src="stickers.js"></script>
+  <script src="canvas.js"></script>
+  <script src="stream.js"></script>
+  <script src="tangram.js"></script>
+
+</body>
+</html>

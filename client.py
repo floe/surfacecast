@@ -13,15 +13,6 @@ from webrtc_peer import WebRTCPeer
 # client object pool
 clients = {}
 
-# position offsets for 4 front streams
-# FIXME: how to handle > 4 clients?
-offsets = [
-    (640,360), # bottom right
-    (  0,  0), # top left
-    (640,  0), # top right
-    (  0,360)  # bottom left
-]
-
 # last DTS for compositor pads
 last_pts = {}
 
@@ -67,7 +58,7 @@ class BaseClient:
         return pad
 
     # convenience function to link request pads (and keep track of pads/queues)
-    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={"leaky":"downstream","max-size-time":100000000}):
+    def link_request_pads(self, el1, tpl1, el2, tpl2, do_queue=True, qp={"leaky":"downstream","max-size-time":50000000}):
 
         pad1 = self.get_pad(el1,tpl1)
         pad2 = self.get_pad(el2,tpl2)
@@ -150,7 +141,14 @@ class Client(BaseClient):
         self.wrb.cleanup()
         self.wrb = None
 
+        # unlock the new connection mutex
+        if self.mutex != None and self.mutex.locked():
+            self.mutex.release()
+
         logging.info("Client "+self.name+" unlinked.")
+
+        # rearrange the remaining frontstreams
+        #arrange_frontstreams()
 
     # create mixer & converter
     def create_mixer(self,mtype,mixer,caps):
@@ -184,17 +182,8 @@ class Client(BaseClient):
         sinkpad = self.link_request_pads(self.outputs["front"],"src_%u",get_by_name("frontmixer"),"sink_%u")
         sinkpad.add_probe(Gst.PadProbeType.BUFFER, probe_callback, None)
 
-        # set xpos/ypos properties on pad according to sequence number
-        fm = get_by_name("frontmixer")
-        count = 0
-        for pad in fm.sinkpads:
-            padnum = int(pad.get_name().split("_")[1])
-            if padnum == 0: # skip testsource pad
-                continue
-            padnum = count % len(offsets)
-            pad.set_property("xpos",offsets[padnum][0])
-            pad.set_property("ypos",offsets[padnum][1])
-            count += 1
+        # make it look nice
+        arrange_frontstreams()
 
     # helper function to link source tees to destination mixers
     def link_streams_oneway(self,dest,prefix):
@@ -241,8 +230,8 @@ class Client(BaseClient):
         logging.info("  setting up mixers for new client "+self.name)
 
         # create surface/audio mixers
-        self.create_mixer("surface", new_element("compositor",{"latency":100000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={self.sw},height={self.sh}")}))
-        self.create_mixer(  "audio", new_element("audiomixer",{"latency":100000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"audio/x-raw,format=S16LE,rate=48000,channels=1")}))
+        self.create_mixer("surface", new_element("compositor",{"latency":50000000,"background":"black"}), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"video/x-raw,format=AYUV,width={self.sw},height={self.sh}")}))
+        self.create_mixer(  "audio", new_element("audiomixer",{"latency":50000000}                     ), new_element("capsfilter",{"caps":Gst.Caps.from_string(f"audio/x-raw,format=S16LE,rate=48000,channels=1")}))
 
         # add missing frontmixer links
         self.link_to_front()
@@ -252,7 +241,7 @@ class Client(BaseClient):
         self.link_streams("audio")
 
         # unlock the new connection mutex
-        if self.mutex != None:
+        if self.mutex != None and self.mutex.locked():
             self.mutex.release()
 
 # new top-level element added to pipeline
@@ -266,7 +255,7 @@ def on_element_added(thebin, element):
     direction = elname[0]
     source = elname[1]+"_"+elname[2]
     stype = elname[3]
-    #logging.debug("New element: "+direction+" "+source+" "+stype)
+    logging.debug("New terminal element: "+direction+" "+source+" "+stype)
 
     client = clients[source]
     if direction == "output":

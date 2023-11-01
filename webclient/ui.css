@@ -1,0 +1,133 @@
+.fullscreen {
+  position: absolute;
+  top:   0px;
+  left:  0px;
+  width: 100%
+}
+
+.overlay {
+  position: absolute;
+  top:   70%;
+  width: 360px
+}
+
+#sidebar-toggle:checked ~ #sidebar-button {
+  transform: rotate(180deg);
+  right: 400px;
+}
+
+#sidebar-toggle:checked ~ #sidebar-panel {
+  width: 450px;
+}
+
+.toggle:checked ~ label {
+  background: white;
+}
+
+.toggle:checked ~ .submenu {
+  display: block;
+}
+
+.radio:checked ~ label {
+  background: white;
+}
+
+.menu > label {
+  padding: 10px;
+}
+
+.button {
+  width:100px;
+  height:100px;
+  background: darkgray;
+  border-style: none;
+  margin: 10px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.button:active {
+  background:white;
+}
+
+.submenu {
+  position: relative;
+  display: none;
+  width: fit-content;
+  margin: 10px;
+  transition: 0.2s;
+  border-radius: 50px;
+  background: lightgray;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#toolbar {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+  width: fit-content;
+  height: fit-content;
+  background: rgba(230, 230, 230, 0.7);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 50px;
+}
+
+#sidebar-panel {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 0px;
+  height: 100%;
+  background: rgba(230, 230, 230, 0.9);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+  overflow-x: hidden;
+  transition: 0.2s;
+}
+
+#sidebar-button {
+  position: absolute;
+  top: 45%;
+  bottom: 45%;
+  right: 0px;
+  margin-right: 0px;
+  width: 50px;
+  height: 80px;
+  background: rgba(230, 230, 230, 0.7);
+  border-style: none;
+  border-radius: 50px 0px 0px 50px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+  transition: 0.2s;
+}
+
+#sidebar-button:active {
+  background: white;
+}
+
+#sidebar-panel img {
+  max-width: 140px;
+  max-height: 180px;
+  margin-top: 10px;
+}
+
+.sticker {
+    justify-content: center;
+    align-items: center;
+    transform-origin: top left;
+    width: auto;
+    height: auto;
+    border: 0px solid grey;
+    cursor: move;
+    position: absolute;
+    top: 50px;
+    left: 400px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
