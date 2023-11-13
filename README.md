@@ -12,7 +12,7 @@ Some examples for the usage scenarios that you can build with SurfaceCast includ
 
 ![four usage scenarios of SurfaceCast](assets/teaser2.jpg)
 
-You can use SurfaceCast with just about anything: a tablet, a plain old desktop PC, a VR or AR headset, a projector-camera setup, or a dedicated tabletop like the SUR40.
+You can use SurfaceCast with just about anything: a tablet, a plain old PC/laptop, a VR or AR headset, a projector-camera setup, or a dedicated tabletop like the SUR40.
 
 ## Architecture
 
