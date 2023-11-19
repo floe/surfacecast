@@ -10,9 +10,6 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
-# client object pool
-clients = {}
-
 # last DTS for compositor pads
 last_pts = {}
 

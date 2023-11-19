@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gi,logging,os,signal
+import gi,logging,os,signal,re
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 from gi.repository import Gst, GLib
@@ -13,6 +13,8 @@ pipeline = None
 mainloop = None
 bus = None
 
+# client object pool
+clients = {}
 
 # conveniently create a new GStreamer element and set parameters
 def new_element(element_name,parameters={},myname=None):
@@ -43,6 +45,13 @@ def bus_call(bus, message, loop):
         loop.quit()
     elif t == Gst.MessageType.ERROR:
         err, debug = message.parse_error()
+        # FIXME this is apparently unrecoverable? need to kill the client
+        if "SCTP association went into error state" in debug:
+           pattern = re.search(r"GstBin:bin_(.*)/GstWebRTCBin",debug)
+           cid = pattern[1]
+           logging.error("SCTP timeout for client %s, disconnecting...",cid)
+           clients[cid].remove()
+           return True
         logging.error("Pipeline error: %s: %s", err, debug)
     elif t == Gst.MessageType.WARNING:
         err, debug = message.parse_warning()
