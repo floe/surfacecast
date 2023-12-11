@@ -135,6 +135,16 @@ def dump_debug(name="surfacecast"):
     logging.info("Writing graph snapshot to "+name+".dot")
     Gst.debug_bin_to_dot_file(pipeline,Gst.DebugGraphDetails.ALL,name)
 
+# convert a gststructure to formatted text (FIXME: incomplete)
+def dump_structure(struct,level=0):
+    result = "structure "+struct.get_name()+":\n"
+    for i in range(struct.n_fields()):
+        name = struct.nth_field_name(i)
+        result += "  "+name+": "
+        field = struct.get_value(name)
+        print(str(field))
+    return result
+
 def get_by_name(name):
     return pipeline.get_by_name(name)
 

@@ -122,7 +122,7 @@ class WebRTCPeer(StreamSink):
 
         self.connection.connect("message",self.on_ws_message)
         self.wrb = self.bin.get_by_name("webrtcbin")
-        self.get_stats()
+        # self.get_stats() # FIXME uncomment to get vast amounts of streaming statistics
 
         # connect signals (note: negotiation-needed will initially be empty on client side)
         self.wrb.connect("on-negotiation-needed", self.on_negotiation_needed)
@@ -199,7 +199,7 @@ class WebRTCPeer(StreamSink):
     def stats_ready(self,promise):
         GLib.timeout_add(1000,self.get_stats)
         reply = promise.get_reply()
-        logging.debug("Streaming stats: "+reply.to_string().replace("\\",""))
+        logging.debug("Streaming stats: "+dump_structure(reply)) #.replace("\\",""))
 
     # WebRTCBin has created a format negotiation offer
     def on_negotiation_created(self, promise, kind):
