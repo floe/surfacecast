@@ -143,7 +143,7 @@ class WebRTCPeer(StreamSink):
         while trans := self.wrb.emit("get-transceiver",index):
             logging.debug("Adjust FEC/NACK for transceiver "+str(index))
             trans.set_property("fec-type",GstWebRTC.WebRTCFECType.ULP_RED)
-            trans.set_property("fec-percentage",50)
+            trans.set_property("fec-percentage",20)
             if index != 1: # FIXME Chrome can't do audio NACK?
                 trans.set_property("do-nack",True)
             index += 1
