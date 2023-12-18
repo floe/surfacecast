@@ -13,7 +13,6 @@ VENCODER="queue max-size-time=50000000 leaky=downstream ! x264enc bitrate=1500 s
 # TODO: VP8 has better compatibility (esp. wrt to Firefox), but the encoder performance and error recovery suck, switch back to H.264 for now
 #VENCODER="queue ! vp8enc threads=2 deadline=2000 target-bitrate=1500000 ! queue ! "
 HWENCODER='video/x-raw,format=I420 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1500000,video_bitrate_mode=1" ! video/x-h264,profile=constrained-baseline,level=(string)3.1 ! queue ! h264parse ! '
-# TODO: any other sensible audiocodec that can also be put into MP4 containers?
 AENCODER="queue max-size-time=50000000 leaky=downstream ! opusenc bitrate-type=vbr inband-fec=true ! queue ! opusparse ! "
 
 RTPVIDEO="h264parse config-interval=-1 ! rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
@@ -60,7 +59,7 @@ def get_mids_from_sdp(sdptext):
 
         if line.startswith("m="):
             try:
-                plnum = int(line.split(" ")[-1])
+                plnum = int(line.split(" ")[3])
             except:
                 plnum = 0
 
@@ -138,6 +137,16 @@ class WebRTCPeer(StreamSink):
         for flag in flags:
             message = json.dumps({"type":"msg","data":flag})
             self.connection.send_text(message)
+
+        # improve error correction for all transceivers (FEC/NACK)
+        index = 0
+        while trans := self.wrb.emit("get-transceiver",index):
+            logging.debug("Adjust FEC/NACK for transceiver "+str(index))
+            trans.set_property("fec-type",GstWebRTC.WebRTCFECType.ULP_RED)
+            trans.set_property("fec-percentage",50)
+            if index != 1: # FIXME Chrome can't do audio NACK?
+                trans.set_property("do-nack",True)
+            index += 1
 
     # remove leftover object references
     def cleanup(self):
@@ -225,7 +234,7 @@ class WebRTCPeer(StreamSink):
         mapping = get_mids_from_sdp(text)
 
         # check whether all 3 media blocks already have MID & SSRC, otherwise retry
-        if not len(mapping) == 6:
+        if not len(mapping) >= 6:
             logging.debug("Not all MIDs/SSRCs present, retrying negotiation...")
             time.sleep(1)
             self.on_negotiation_needed(self.wrb)
@@ -236,7 +245,8 @@ class WebRTCPeer(StreamSink):
 
         # ... and send to peer.
         message = json.dumps({"type":"sdp","data":{"type":kind,"sdp":text},"mapping":mapping})
-        logging.debug("Outgoing SDP: " + message)
+        logging.debug("Outgoing SDP "+kind+": " + text)
+        logging.debug("Outgoing stream mapping: "+ str(mapping))
         self.connection.send_text(message)
 
     # new pad appears on WebRTCBin element
@@ -261,7 +271,7 @@ class WebRTCPeer(StreamSink):
                 return
 
             logging.info("Received SDP " + stype + ", parsing...")
-            logging.debug("Incoming SDP: " + json.dumps(msg))
+            logging.debug("Incoming SDP: " + sdp)
 
             res, sdpmsg = GstSdp.sdp_message_new_from_text(sdp)
             # as client, we need to parse an OFFER, as server, we need to parse an ANSWER
