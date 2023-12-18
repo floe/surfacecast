@@ -15,9 +15,9 @@ VENCODER="queue max-size-time=50000000 leaky=downstream ! x264enc bitrate=1500 s
 HWENCODER='video/x-raw,format=I420 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1500000,video_bitrate_mode=1" ! video/x-h264,profile=constrained-baseline,level=(string)3.1 ! queue ! h264parse ! '
 AENCODER="queue max-size-time=50000000 leaky=downstream ! opusenc bitrate-type=vbr inband-fec=true ! queue ! opusparse ! "
 
-RTPVIDEO="h264parse config-interval=-1 ! rtph264pay config-interval=1 ! application/x-rtp,media=video,encoding-name=H264,"
+RTPVIDEO="h264parse config-interval=-1 ! rtph264pay config-interval=1 mtu=1200 ! application/x-rtp,media=video,encoding-name=H264,"
 #RTPVIDEO="rtpvp8pay ! application/x-rtp,media=video,encoding-name=VP8,"
-RTPAUDIO="rtpopuspay ! application/x-rtp,media=audio,encoding-name=OPUS,"
+RTPAUDIO="rtpopuspay mtu=1200 ! application/x-rtp,media=audio,encoding-name=OPUS,"
 FILESINK="matroskamux name=mux offset-to-zero=true ! filesink sync=true location="
 
 bindesc="webrtcbin name=webrtcbin bundle-policy=max-bundle stun-server=%s "+\
