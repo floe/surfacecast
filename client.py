@@ -10,16 +10,13 @@ from gi.repository import GLib, Gst, GstWebRTC, GstSdp
 from gst_helpers import *
 from webrtc_peer import WebRTCPeer
 
-# client object pool
-clients = {}
-
 # last DTS for compositor pads
 last_pts = {}
 
 # pad probe for fixing timestamps (UUUUGLY hack, use after link_request_pads:)
 def probe_callback(pad,info,pdata):
     buf = info.get_buffer()
-    if buf.pts == Gst.CLOCK_TIME_NONE:
+    if buf.pts == Gst.CLOCK_TIME_NONE and pad in last_pts:
         logging.warn("Fixing decoded buffer with null timestamp")
         buf.pts = last_pts[pad]
     else:
