@@ -10,7 +10,7 @@ function vr_fakefront_init() {
   // canvas3/c3 is for the virtual avatar front stream in VR
   frontsource = document.getElementById("frontsource");
   if (frontsource) {
-    c3 = frontsource.getContext("webgl");
+    //c3 = frontsource.getContext("webgl");
     frontsource.width=1280;
     frontsource.height=720;
   }
@@ -40,4 +40,3 @@ function updateAudioFeedback() {
   target.object3D.scale.set(scale, scale, scale);
   setTimeout(updateAudioFeedback, 50);
 }
-  
