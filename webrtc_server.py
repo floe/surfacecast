@@ -2,11 +2,12 @@
 
 import sys,gi,json,argparse,datetime,threading,time
 gi.require_version('GLib', '2.0')
+gi.require_version('Gio',  '2.0')
 gi.require_version('Gst',  '1.0')
-gi.require_version('Soup', '2.4')
+gi.require_version('Soup', '3.0')
 gi.require_version('GstWebRTC', '1.0')
 gi.require_version('GstSdp', '1.0')
-from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp
+from gi.repository import GLib, Gst, Soup, GstWebRTC, GstSdp, Gio
 
 from gst_helpers import *
 from webrtc_peer import *
@@ -21,7 +22,7 @@ def get_client_address(client):
     return addr.get_address().to_string()+"_"+str(addr.get_port())
 
 # incoming HTTP(S) request
-def http_handler(server,msg,path,query,client,user_data):
+def http_handler(server,msg,path,query,client):
     logging.info("HTTP(S) request for: "+path)
     if path == "/":
         path = "/index.html"
@@ -44,10 +45,10 @@ def http_handler(server,msg,path,query,client,user_data):
             GLib.timeout_add(100,quit_mainloop)
             data=b"Server exiting/restarting..."
 
-    msg.response_headers.append("Content-Type",content_type)
-    msg.response_headers.append("Cache-Control","no-store")
+    msg.get_response_headers().append("Content-Type",content_type)
+    msg.get_response_headers().append("Cache-Control","no-store")
     #msg.response_headers.append("Access-Control-Allow-Origin","*")
-    msg.response_body.append(data)
+    msg.get_response_body().append(data)
 
 # Websocket connection was closed by remote
 def ws_close_handler(connection, client):
@@ -55,7 +56,7 @@ def ws_close_handler(connection, client):
     client.remove()
 
 # incoming Websocket connection
-def ws_conn_handler(server, connection, path, client, user_data):
+def ws_conn_handler(server, client, path, connection, user_data):
 
     time.sleep(1)
 
@@ -99,7 +100,7 @@ create_frontmixer_queue(args.fps)
 server = Soup.Server()
 server.add_handler("/",http_handler,None)
 server.add_websocket_handler("/ws",None,None,ws_conn_handler,None)
-server.set_ssl_cert_file("assets/tls-cert.pem","assets/tls-key.pem")
+server.set_tls_certificate(Gio.TlsCertificate.new_from_files("assets/tls-cert.pem","assets/tls-key.pem"))
 server.listen_all(int(args.port),Soup.ServerListenOptions.HTTPS)
 
 if args.sink:
