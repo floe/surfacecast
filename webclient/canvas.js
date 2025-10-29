@@ -38,12 +38,6 @@ function onCanvasMove(evt) {
 
   if (mousedown == 0) return;
 
-  if (evt.type == "touchmove") {
-    evt.preventDefault();
-    evt.offsetX = evt.changedTouches[0].pageX;
-    evt.offsetY = evt.changedTouches[0].pageY;
-  }
-
   const centerX = evt.offsetX / scale;
   const centerY = evt.offsetY / scale;
 
@@ -55,12 +49,9 @@ function onCanvasMove(evt) {
 }
 
 function canvas_init() {
-  canvas.onmousedown  = onCanvasDown;
-  canvas.ontouchstart = onCanvasDown;
-  canvas.onmouseup    = onCanvasUp;
-  canvas.ontouchend   = onCanvasUp;
-  canvas.onmousemove  = onCanvasMove;
-  canvas.ontouchmove  = onCanvasMove;
+  canvas.onpointerdown = onCanvasDown;
+  canvas.onpointerup   = onCanvasUp;
+  canvas.onpointermove = onCanvasMove;
 
   canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); } );
 
