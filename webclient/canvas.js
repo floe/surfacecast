@@ -27,13 +27,13 @@ function onCanvasDown(evt) {
   x = evt.offsetX/scale;
   y = evt.offsetY/scale;
   mousedown = (evt.buttons == undefined) ? 1 : evt.buttons;
-  canvas.setPointerCapture(evt.pointerId);
+  try { canvas.setPointerCapture(evt.pointerId); } catch(e) {}
 }
 
 function onCanvasUp(evt) {
   onCanvasMove(evt);
   mousedown = 0;
-  canvas.releasePointerCapture(evt.pointerId);
+  try { canvas.releasePointerCapture(evt.pointerId); } catch(e) {}
 }
   
 function onCanvasMove(evt) {
