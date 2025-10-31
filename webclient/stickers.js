@@ -130,12 +130,19 @@ function do_move(evt) {
     if (pointerIndex !== -1) {
       sticker.activePointers[pointerIndex].clientX = evt.clientX;
       sticker.activePointers[pointerIndex].clientY = evt.clientY;
+    } else {
+      // Pointer not found - possibly a race condition, ignore this event
+      return;
     }
   }
 
   if (sticker.activePointers && sticker.activePointers.length >= 2) {
     // Multi-pointer gesture: scale and rotate
     var currentDistance = getDistanceBetweenPointers(sticker.activePointers);
+    
+    // Prevent division by zero if pointers start at the same position
+    if (sticker.startDistance === 0 || currentDistance === 0) return;
+    
     var newScale = currentDistance / sticker.startDistance;
     sticker.startDistance = currentDistance;
     setStickerScale(sticker, sticker.curScale * newScale);
