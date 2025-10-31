@@ -28,6 +28,7 @@ function imagePreviewFunc(that, previewerId) {
 }
 
 function getDistanceBetweenPointers(pointers) {
+  if (!pointers || pointers.length < 2) return 0;
   var pointer1 = pointers[0];
   var pointer2 = pointers[1];
   var dx = pointer1.clientX - pointer2.clientX;
@@ -36,6 +37,7 @@ function getDistanceBetweenPointers(pointers) {
 }
 
 function getAngleBetweenPointers(pointers) {
+  if (!pointers || pointers.length < 2) return 0;
   var pointer1 = pointers[0];
   var pointer2 = pointers[1];
   var dx = pointer1.clientX - pointer2.clientX;
