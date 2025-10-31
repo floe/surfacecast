@@ -146,13 +146,14 @@ function do_move(evt) {
     // Prevent division by zero if pointers start at the same position
     if (sticker.startDistance === 0) {
       // Initialize distance now that pointers have moved
-      sticker.startDistance = currentDistance;
+      if (currentDistance > 0) {
+        sticker.startDistance = currentDistance;
+      }
       return;
     }
     
     if (currentDistance === 0) {
-      // Pointers are overlapping - maintain state but skip scaling
-      sticker.startDistance = currentDistance;
+      // Pointers are overlapping - preserve previous startDistance and skip scaling
       return;
     }
     
