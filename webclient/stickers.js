@@ -124,24 +124,35 @@ function do_move(evt) {
   if (!sticker.isActive) return;
   evt.preventDefault();
 
+  // Ensure activePointers array exists
+  if (!sticker.activePointers) return;
+
   // Update the position of this pointer in the activePointers array
-  if (sticker.activePointers) {
-    var pointerIndex = sticker.activePointers.findIndex(p => p.pointerId === evt.pointerId);
-    if (pointerIndex !== -1) {
-      sticker.activePointers[pointerIndex].clientX = evt.clientX;
-      sticker.activePointers[pointerIndex].clientY = evt.clientY;
-    } else {
-      // Pointer not found - possibly a race condition, ignore this event
-      return;
-    }
+  var pointerIndex = sticker.activePointers.findIndex(p => p.pointerId === evt.pointerId);
+  if (pointerIndex !== -1) {
+    sticker.activePointers[pointerIndex].clientX = evt.clientX;
+    sticker.activePointers[pointerIndex].clientY = evt.clientY;
+  } else {
+    // Pointer not found - possibly a race condition, ignore this event
+    return;
   }
 
-  if (sticker.activePointers && sticker.activePointers.length >= 2) {
+  if (sticker.activePointers.length >= 2) {
     // Multi-pointer gesture: scale and rotate
     var currentDistance = getDistanceBetweenPointers(sticker.activePointers);
     
     // Prevent division by zero if pointers start at the same position
-    if (sticker.startDistance === 0 || currentDistance === 0) return;
+    if (sticker.startDistance === 0) {
+      // Initialize distance now that pointers have moved
+      sticker.startDistance = currentDistance;
+      return;
+    }
+    
+    if (currentDistance === 0) {
+      // Pointers are overlapping - maintain state but skip scaling
+      sticker.startDistance = currentDistance;
+      return;
+    }
     
     var newScale = currentDistance / sticker.startDistance;
     sticker.startDistance = currentDistance;
@@ -195,7 +206,7 @@ function add_sticker(elem) {
     for (const cl of elem.classList) sticker.classList.add(cl);
     fakecanvas.append(sticker);
 
-    // set intial scale for all stickers based on canvas width
+    // set initial scale for all stickers based on canvas width
     sticker.curScale = fakecanvas.offsetWidth / 1280.0;
     setStickerTransform(sticker);
 }
