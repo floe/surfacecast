@@ -326,6 +326,12 @@ class WebRTCDecoder(WebRTCPeer):
         if pad.direction != Gst.PadDirection.SRC or not res:
             return
 
+        # workaround: the ssrc property sometimes doesn't match the SDP
+        if str(ssrc) not in self.mapping:
+            blah = caps.to_string()
+            res = re.search(r"ssrc-(\d*)-cname",blah)
+            ssrc = res.groups()[0]
+
         name = self.mapping[str(ssrc)]
         logging.info("New incoming "+name+" stream, linking...")
         logging.trace("Stream caps: "+caps.to_string())
