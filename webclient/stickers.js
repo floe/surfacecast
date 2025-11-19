@@ -27,31 +27,25 @@ function imagePreviewFunc(that, previewerId) {
   }
 }
 
-function getDistanceBetweenTouches(touches) {
-  var touch1 = touches[0];
-  var touch2 = touches[1];
-  var dx = touch1.clientX - touch2.clientX;
-  var dy = touch1.clientY - touch2.clientY;
+function getDistanceBetweenPointers(pointers) {
+  if (!pointers || pointers.length < 2) return 0;
+  var pointer1 = pointers[0];
+  var pointer2 = pointers[1];
+  var dx = pointer1.clientX - pointer2.clientX;
+  var dy = pointer1.clientY - pointer2.clientY;
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-function getAngleBetweenTouches(touches) {
-  var touch1 = touches[0];
-  var touch2 = touches[1];
-  var dx = touch1.clientX - touch2.clientX;
-  var dy = touch1.clientY - touch2.clientY;
+function getAngleBetweenPointers(pointers) {
+  if (!pointers || pointers.length < 2) return 0;
+  var pointer1 = pointers[0];
+  var pointer2 = pointers[1];
+  var dx = pointer1.clientX - pointer2.clientX;
+  var dy = pointer1.clientY - pointer2.clientY;
   return -360*Math.atan2(dy,dx)/(2*Math.PI);
 }
 
-function touchify(evt) {
-  if (evt.touches === undefined) {
-    evt.touches = [ { clientX: evt.clientX, clientY: evt.clientY } ];
-  }
-  //console.log(evt);
-}
-
 function move_start(evt) {
-  touchify(evt);
   var sticker = evt.target;
   evt.preventDefault();
 
@@ -61,15 +55,33 @@ function move_start(evt) {
     return;
   }
 
-  sticker.isActive = true;
-  sticker.offset = [
-    sticker.offsetLeft - evt.touches[0].clientX,
-    sticker.offsetTop - evt.touches[0].clientY
-  ];
+  // Initialize pointers array if it doesn't exist
+  if (!sticker.activePointers) {
+    sticker.activePointers = [];
+  }
 
-  if (evt.touches.length >= 2) {
-    sticker.startDistance = getDistanceBetweenTouches(evt.touches);
-    sticker.startAngle = getAngleBetweenTouches(evt.touches);
+  // Add this pointer to the active pointers
+  sticker.activePointers.push({
+    pointerId: evt.pointerId,
+    clientX: evt.clientX,
+    clientY: evt.clientY
+  });
+
+  sticker.isActive = true;
+  
+  // Set pointer capture for better tracking
+  try { sticker.setPointerCapture(evt.pointerId); } catch(e) {}
+
+  if (sticker.activePointers.length === 1) {
+    // Single pointer - setup for dragging
+    sticker.offset = [
+      sticker.offsetLeft - evt.clientX,
+      sticker.offsetTop - evt.clientY
+    ];
+  } else if (sticker.activePointers.length >= 2) {
+    // Multiple pointers - setup for pinch/rotate
+    sticker.startDistance = getDistanceBetweenPointers(sticker.activePointers);
+    sticker.startAngle = getAngleBetweenPointers(sticker.activePointers);
   }
 
   // move sticker to the top
@@ -78,7 +90,27 @@ function move_start(evt) {
 
 function move_end(evt) {
   var sticker = evt.target;
-  sticker.isActive = false;
+  
+  // Release pointer capture
+  try { sticker.releasePointerCapture(evt.pointerId); } catch(e) {}
+
+  // Remove this pointer from active pointers
+  if (sticker.activePointers) {
+    sticker.activePointers = sticker.activePointers.filter(p => p.pointerId !== evt.pointerId);
+    
+    // If we still have 2 or more pointers, recalculate start values for remaining pointers
+    if (sticker.activePointers.length >= 2) {
+      sticker.startDistance = getDistanceBetweenPointers(sticker.activePointers);
+      sticker.startAngle = getAngleBetweenPointers(sticker.activePointers);
+    }
+    
+    // If no more pointers, deactivate
+    if (sticker.activePointers.length === 0) {
+      sticker.isActive = false;
+    }
+  } else {
+    sticker.isActive = false;
+  }
 }
 
 function wheel(evt) {
@@ -90,24 +122,53 @@ function wheel(evt) {
 }
 
 function do_move(evt) {
-  touchify(evt);
   var sticker = evt.target;
   if (!sticker.isActive) return;
   evt.preventDefault();
 
-  sticker.style.left = (evt.touches[0].clientX + sticker.offset[0]) + 'px';
-  sticker.style.top  = (evt.touches[0].clientY + sticker.offset[1]) + 'px';
+  // Ensure activePointers array exists
+  if (!sticker.activePointers) return;
 
-  if (evt.touches.length >= 2) {
-    var currentDistance = getDistanceBetweenTouches(evt.touches);
+  // Update the position of this pointer in the activePointers array
+  var pointerIndex = sticker.activePointers.findIndex(p => p.pointerId === evt.pointerId);
+  if (pointerIndex !== -1) {
+    sticker.activePointers[pointerIndex].clientX = evt.clientX;
+    sticker.activePointers[pointerIndex].clientY = evt.clientY;
+  } else {
+    // Pointer not found - possibly a race condition, ignore this event
+    return;
+  }
+
+  if (sticker.activePointers.length >= 2) {
+    // Multi-pointer gesture: scale and rotate
+    var currentDistance = getDistanceBetweenPointers(sticker.activePointers);
+    
+    // Prevent division by zero if pointers start at the same position
+    if (sticker.startDistance === 0) {
+      // Initialize distance now that pointers have moved
+      if (currentDistance > 0) {
+        sticker.startDistance = currentDistance;
+      }
+      return;
+    }
+    
+    if (currentDistance === 0) {
+      // Pointers are overlapping - preserve previous startDistance and skip scaling
+      return;
+    }
+    
     var newScale = currentDistance / sticker.startDistance;
     sticker.startDistance = currentDistance;
     setStickerScale(sticker, sticker.curScale * newScale);
 
-    var currentAngle = getAngleBetweenTouches(evt.touches);
+    var currentAngle = getAngleBetweenPointers(sticker.activePointers);
     var deltaAngle = sticker.startAngle - currentAngle;
     sticker.startAngle = currentAngle;
     setStickerRotation(sticker, sticker.curAngle + deltaAngle);
+  } else {
+    // Single pointer: drag
+    sticker.style.left = (evt.clientX + sticker.offset[0]) + 'px';
+    sticker.style.top  = (evt.clientY + sticker.offset[1]) + 'px';
   }
 }
 
@@ -138,19 +199,17 @@ function add_sticker(elem) {
     sticker.curAngle = 0;
     sticker.curScale = 1;
 
-    sticker.addEventListener("touchstart", move_start);  
-    sticker.addEventListener("mousedown",  move_start);  
-    sticker.addEventListener("touchend",   move_end);
-    sticker.addEventListener("mouseup",    move_end);
-    sticker.addEventListener("touchmove",  do_move);
-    sticker.addEventListener("mousemove",  do_move);
+    sticker.addEventListener("pointerdown", move_start);
+    sticker.addEventListener("pointerup",   move_end);
+    sticker.addEventListener("pointermove", do_move);
+    sticker.addEventListener("pointercancel", move_end); // Handle pointer cancel (e.g., when pointer is lost)
     sticker.addEventListener("wheel",      wheel);
 
     sticker.src = elem.src;
     for (const cl of elem.classList) sticker.classList.add(cl);
     fakecanvas.append(sticker);
 
-    // set intial scale for all stickers based on canvas width
+    // set initial scale for all stickers based on canvas width
     sticker.curScale = fakecanvas.offsetWidth / 1280.0;
     setStickerTransform(sticker);
 }
