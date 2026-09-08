@@ -1,3 +1,5 @@
+# Note: Repository has moved to Codeberg at https://codeberg.org/floe/surfacecast
+
 # SurfaceCast
 
 
